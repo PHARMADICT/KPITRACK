@@ -552,7 +552,7 @@ function updateKPIs(){
   const trn=n(SF.trn),foot=n(SF.footfall);
   const n7AED=n(SF.no7AED),tProd=n(SF.totalProducts),aura=n(SF.aura);
   const ipc=tProd!=null&&trn?(tProd/trn).toFixed(2):null;
-  const atv=tKD!=null&&trn?(tKD/trn).toFixed(2):null;
+  const atv=tAED!=null&&trn?(tAED/trn).toFixed(2):null;
   const conv=trn!=null&&foot?((trn/foot)*100).toFixed(1):null;
   const n7pct=n7AED!=null&&tAED?((n7AED/tAED)*100).toFixed(1):null;
   const auraPct=aura!=null&&trn?((aura/trn)*100).toFixed(1):null;
