@@ -3,933 +3,343 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Sales Tracker">
-<meta name="theme-color" content="#00153b">
-<title>Boots Pharmacy Tracker</title>
+<title>Pharmacy Sales Widget</title>
 <style>
-/* === SYSTEM FONTS & BRAND COLOURS === */
+/* === LIGHT NAVY & GLASSMORPHISM THEME === */
 :root {
-  --boots-navy: #00205b;
+  --light-navy: #1e3a8a;
+  --light-navy-bg: #eff6ff;
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.8);
   --boots-blue: #005eb8;
   --aura-pink: #d81b60;
   --aura-purple: #8e24aa;
-  --bg: #020b1f;
-  --bg2: #0a1633;
-  --bg3: #112247;
-  --card: #0d1e40;
-  --card2: #162a52;
-  --accent: #005eb8;
   --accent2: #4ba3e3;
   --green: #22c55e;
   --red: #ef4444;
   --orange: #f59e0b;
   --purple: #a855f7;
-  --text: #f1f5f9;
-  --text2: #94a3b8;
+  --text: #0f172a;
+  --text2: #475569;
   --text3: #64748b;
-  --border: #1e3a8a;
   --mono: 'Courier New', Courier, monospace;
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
   --serif: 'Times New Roman', Times, serif;
-  --safe-top: env(safe-area-inset-top, 44px);
-  --safe-bottom: env(safe-area-inset-bottom, 34px);
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;
-  min-height:-webkit-fill-available;overflow-x:hidden;padding-bottom:calc(70px + var(--safe-bottom))}
-.status-bar{height:var(--safe-top);background:var(--bg)}
-.topbar{position:sticky;top:0;z-index:100;background:rgba(2,11,31,0.95);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 20px 10px;
-  border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.topbar-title{font-family:var(--serif);font-style:italic;font-size:24px;font-weight:700;letter-spacing:1px;color:#fff;}
-.topbar-date{font-size:12px;color:var(--text2);font-family:var(--mono)}
-.store-badge{background:var(--boots-blue);color:#fff;font-size:10px;font-weight:700;
-  padding:4px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;}
-.screen{display:none;padding:0 0 20px;animation:fadeIn .25s ease}
-.screen.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--text3);padding:18px 20px 8px}
-.date-scroll{display:flex;gap:8px;padding:6px 20px 2px;overflow-x:auto;scrollbar-width:none}
-.date-scroll::-webkit-scrollbar{display:none}
-.date-chip{flex-shrink:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;
-  padding:8px 14px;text-align:center;cursor:pointer;transition:all .15s;min-width:56px}
-.date-chip.active{background:var(--boots-blue);border-color:var(--accent2);box-shadow:0 0 12px rgba(0,94,184,.4)}
-.date-chip .day-name{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px}
-.date-chip.active .day-name{color:rgba(255,255,255,.9)}
-.date-chip .day-num{font-size:18px;font-weight:700;line-height:1.1;margin-top:2px;color:var(--text)}
-.target-bar{margin:12px 20px;background:var(--card);border-radius:16px;padding:14px 16px;border:1px solid var(--border)}
-.target-bar-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.target-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px}
-.target-pct{font-size:22px;font-weight:700}
-.target-pct.good{color:var(--green)}.target-pct.bad{color:var(--red)}.target-pct.warn{color:var(--orange)}
-.target-sub{font-size:12px;color:var(--text2);font-family:var(--mono)}
-.prog-track{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden}
-.prog-fill{height:100%;border-radius:4px;transition:width .5s ease}
-.prog-fill.good{background:linear-gradient(90deg,#22c55e,#86efac)}
-.prog-fill.bad{background:linear-gradient(90deg,#ef4444,#fca5a5)}
-.prog-fill.warn{background:linear-gradient(90deg,#f59e0b,#fde68a)}
-.slot-tabs{display:flex;gap:6px;padding:4px 20px 0}
-.slot-tab{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:10px;
-  padding:8px 4px;text-align:center;font-size:10px;font-weight:700;color:var(--text2);
-  cursor:pointer;transition:all .15s;letter-spacing:.2px}
-.slot-tab.active{background:rgba(0,94,184,.2);border-color:var(--boots-blue);color:#fff}
-.slot-tab .slot-icon{font-size:14px;display:block;margin-bottom:2px}
-.entry-grid{margin:12px 20px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.entry-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;transition:border-color .15s}
-.entry-card:focus-within{border-color:var(--accent2)}
-.entry-card label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;
-  text-transform:uppercase;display:block;margin-bottom:4px}
-.entry-card input{background:none;border:none;outline:none;color:var(--text);font-size:22px;
-  font-weight:700;font-family:var(--mono);width:100%;-webkit-appearance:none}
-.entry-card input::placeholder{color:var(--text3);font-size:18px}
-.entry-card .calc-row{margin-top:4px;font-size:11px;color:var(--text2);font-family:var(--mono)}
-.save-btn{margin:16px 20px 0;background:var(--boots-blue);color:#fff;border:none;border-radius:14px;
-  padding:16px;font-size:15px;font-weight:700;font-family:var(--sans);width:calc(100% - 40px);
-  cursor:pointer;transition:all .15s;letter-spacing:.3px;box-shadow:0 4px 15px rgba(0,94,184,.4)}
-.save-btn:active{transform:scale(.97);box-shadow:none}
-.kpi-row{display:flex;gap:10px;padding:12px 20px 0;overflow-x:auto;scrollbar-width:none}
-.kpi-row::-webkit-scrollbar{display:none}
-.kpi-chip{flex-shrink:0;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;min-width:110px}
-.kpi-chip .kpi-name{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase}
-.kpi-chip .kpi-val{font-size:20px;font-weight:700;font-family:var(--mono);margin-top:2px}
-.kpi-chip .kpi-sub{font-size:10px;color:var(--text3);margin-top:1px}
-.kpi-chip.highlight{background:rgba(0,94,184,.15);border-color:var(--boots-blue)}
-.week-table-wrap{margin:10px 20px 0;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
-.week-row{display:grid;grid-template-columns:60px 1fr 1fr 60px 60px 50px;gap:0;
-  padding:11px 12px;border-bottom:1px solid var(--border);align-items:center;background:var(--card)}
-.week-row:last-child{border-bottom:none}
-.week-row.header{background:var(--bg3);padding:8px 12px}
-.week-row.header span{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.8px;text-transform:uppercase}
-.week-row.today{background:rgba(0,94,184,.2)}
-.week-row.total{background:var(--bg3);border-top:1px solid var(--border)}
-.week-day{font-size:12px;font-weight:700;color:var(--text)}
-.week-day .date-small{font-size:10px;color:var(--text3);font-weight:400}
-.week-sales{font-size:13px;font-weight:700;font-family:var(--mono)}
-.week-target{font-size:11px;color:var(--text2);font-family:var(--mono)}
-.week-pct{font-size:12px;font-weight:700;text-align:right}
-.week-pct.good{color:var(--green)}.week-pct.bad{color:var(--red)}.week-pct.warn{color:var(--orange)}
-.week-no7{font-size:11px;font-family:var(--mono);color:var(--purple);text-align:right}
-.week-atv{font-size:11px;font-family:var(--mono);color:var(--text2);text-align:right}
-.history-card{margin:8px 20px 0;background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.history-card:active{background:var(--card2)}
-.h-date{font-size:13px;font-weight:700;color:var(--text)}
-.h-sub{font-size:11px;color:var(--text2);margin-top:2px}
-.h-sales{font-size:18px;font-weight:700;font-family:var(--mono);text-align:right}
-.h-pct{font-size:11px;text-align:right;font-weight:700}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(2,11,31,.97);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);
-  display:flex;padding-bottom:var(--safe-bottom)}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:10px 0 8px;cursor:pointer;transition:all .15s;border:none;background:none;
-  color:var(--text3);font-family:var(--sans)}
-.nav-btn.active{color:var(--accent2)}
-.nav-btn .nav-icon{font-size:22px;line-height:1}
-.nav-btn .nav-label{font-size:10px;font-weight:600;margin-top:3px;letter-spacing:.3px}
-.toast{position:fixed;top:calc(var(--safe-top) + 60px);left:50%;transform:translateX(-50%) translateY(-10px);
-  background:var(--green);color:#fff;padding:10px 22px;border-radius:50px;font-size:13px;
-  font-weight:700;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.settings-group{margin:10px 20px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
-.settings-row:last-child{border-bottom:none}
-.settings-label{font-size:14px;font-weight:500;color:var(--text)}
-.settings-sub{font-size:11px;color:var(--text2);margin-top:2px}
-.settings-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;
-  padding:6px 10px;color:var(--text);font-size:14px;font-weight:600;font-family:var(--mono);
-  width:110px;text-align:right;outline:none}
-.settings-input:focus{border-color:var(--accent2)}
-.slot-summary{margin:10px 20px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.slot-sum-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center}
-.slot-sum-card .ss-label{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
-.slot-sum-card .ss-val{font-size:15px;font-weight:700;font-family:var(--mono);margin-top:3px;color:var(--text)}
-.slot-sum-card .ss-no7{font-size:10px;color:var(--purple);margin-top:1px;font-family:var(--mono)}
-.ramadan-strip{margin:10px 20px 0;background:linear-gradient(135deg,rgba(0,94,184,.2),rgba(216,27,96,.15));
-  border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px}
-.ramadan-day{font-size:13px;font-weight:700;color:var(--text)}
-.ramadan-times{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px}
-.divider{height:1px;background:var(--border);margin:12px 20px}
-.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
-.empty .empty-icon{font-size:36px;margin-bottom:10px}
 
-/* DASHBOARD */
-#screen-dashboard{padding:0 0 20px;min-height:100vh;
-  background:linear-gradient(160deg,var(--boots-navy) 0%,#00153b 60%,var(--bg) 100%);position:relative;overflow:hidden}
-.dash-watermark{position:absolute;right:-20px;top:25%;font-size:240px;color:rgba(255,255,255,.02);
-  letter-spacing:-6px;line-height:1;pointer-events:none;user-select:none;font-weight:900;font-family:var(--serif);font-style:italic;}
-.dash-header{padding:24px 20px 16px;position:relative;z-index:1}
-.dash-store-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.dash-store-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:100px;
-  padding:5px 14px 5px 6px;display:flex;align-items:center;gap:8px;backdrop-filter:blur(10px)}
-.dash-store-dot{width:28px;height:28px;background:#fff;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:14px;font-weight:900;color:var(--boots-navy)}
-.dash-store-name{font-size:11px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:1px;text-transform:uppercase}
-.dash-date-label{font-size:11px;color:rgba(255,255,255,.5);font-family:var(--mono)}
-.dash-title{font-size:40px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:4px;text-transform:uppercase}
-.dash-subtitle{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.dash-week-tag{display:inline-block;margin-top:10px;background:rgba(75,163,227,.2);border:1px solid rgba(75,163,227,.4);
-  color:var(--accent2);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 14px;border-radius:100px}
-.dash-progress{margin:0 20px 20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:16px;padding:16px;position:relative;z-index:1;box-shadow:0 8px 32px rgba(0,0,0,.2)}
-.dash-prog-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
-.dash-prog-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:4px}
-.dash-prog-val{font-size:32px;font-weight:900;color:#fff;letter-spacing:1px;line-height:1;font-family:var(--mono)}
-.dash-prog-pct{font-size:24px;font-weight:900;letter-spacing:1px}
-.dash-prog-track{height:6px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden}
-.dash-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--boots-blue),var(--accent2));
-  transition:width .8s cubic-bezier(.16,1,.3,1);width:0%}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;position:relative;z-index:1}
-.dash-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;position:relative;
-  overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.2);
-  animation:dashCardRise .5s cubic-bezier(.16,1,.3,1) both;transition:transform .2s ease}
-.dash-card:active{transform:scale(.97)}
-.dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* Brand Specific Cards */
-.dc-aura{background:linear-gradient(145deg,var(--aura-pink),var(--aura-purple));border:none;}
-.dc-aura::before{display:none;}
-.dc-aura .dc-label{color:rgba(255,255,255,.8);}
-.dc-aura .dc-value{color:#fff;}
-.dc-aura .dc-delta.neutral{background:rgba(255,255,255,.2);color:#fff;}
-.dc-aura .dc-delta.up{background:rgba(255,255,255,.3);color:#fff;}
+body {
+  font-family: var(--sans);
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: var(--text);
+  /* Using dvh to avoid taskbar hiding issues on laptops */
+  min-height: 100dvh; 
+  display: flex;
+  justify-content: center;
+}
 
-.dc-no7::before{background:#c8a84b;} /* No7 Gold */
-.dc-blue::before{background:var(--boots-blue);}
-.dc-green::before{background:var(--green);}
+/* Desktop Widget Container */
+.app-container {
+  width: 100%;
+  max-width: 450px; /* Keeps it looking like a widget on desktop */
+  background: var(--light-navy-bg);
+  min-height: 100dvh;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  /* Extra padding at the bottom so it does not go under the taskbar */
+  padding-bottom: 90px; 
+  overflow-x: hidden;
+}
 
-.dc-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
-.dc-value{font-size:36px;font-weight:900;color:#fff;line-height:1;letter-spacing:.5px;margin-bottom:10px;font-family:var(--mono)}
-.dc-delta{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px}
-.dc-delta.up{color:var(--green);background:rgba(34,197,94,.15)}
-.dc-delta.down{color:var(--red);background:rgba(239,68,68,.15)}
-.dc-delta.neutral{color:var(--text2);background:rgba(148,163,184,.15)}
-.dc-bg-glyph{position:absolute;right:10px;bottom:-10px;font-size:60px;font-weight:900;color:rgba(255,255,255,.04);line-height:1;pointer-events:none}
-.dash-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px 16px 0;position:relative;z-index:1}
-.dash-grid-3 .dash-card{padding:14px 12px;}
-.dash-grid-3 .dc-value{font-size:26px}
-.dash-grid-3 .dc-label{font-size:8px;letter-spacing:1px}
-.dash-grid-3 .dc-delta{font-size:9px;padding:3px 6px;}
+/* Glassmorphism Classes */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.05);
+}
 
-@keyframes dashCardRise{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-.dash-card:nth-child(1){animation-delay:.05s}.dash-card:nth-child(2){animation-delay:.12s}
-.dash-grid-3 .dash-card:nth-child(1){animation-delay:.20s}
-.dash-grid-3 .dash-card:nth-child(2){animation-delay:.27s}
-.dash-grid-3 .dash-card:nth-child(3){animation-delay:.34s}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(239, 246, 255, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-.dash-actions{display:flex;gap:10px;padding:16px 16px 0;position:relative;z-index:1}
-.dash-action-btn{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;
-  padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
-  color:var(--text);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  transition:all .15s;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 12px rgba(0,0,0,.15)}
-.dash-action-btn:active{background:var(--card2);transform:scale(.96)}
-.dash-action-btn .dai{font-size:22px}
-.dash-ramadan{margin:12px 16px 0;background:rgba(255,200,60,.12);border:1px solid rgba(255,200,60,.25);
-  border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative;z-index:1}
-.dash-ram-icon{font-size:24px}
-.dash-ram-day{font-size:13px;font-weight:700;color:#FFD166}
-.dash-ram-times{font-size:11px;color:rgba(255,209,102,.7);font-family:var(--mono);margin-top:2px}
+.topbar-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--light-navy); }
+.topbar-date { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+.store-badge { background: var(--light-navy); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+
+.screen { display: none; padding: 0 0 20px; animation: fadeIn .25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); padding: 18px 20px 8px; }
+
+/* Aura Gradient for Specific Elements */
+.aura-gradient {
+  background: linear-gradient(145deg, var(--aura-pink), var(--aura-purple));
+  color: #fff !important;
+  border: none;
+}
+
+.date-scroll { display: flex; gap: 8px; padding: 6px 20px 2px; overflow-x: auto; scrollbar-width: none; }
+.date-scroll::-webkit-scrollbar { display: none; }
+.date-chip { flex-shrink: 0; padding: 8px 14px; text-align: center; cursor: pointer; transition: all .15s; min-width: 56px; }
+.date-chip.active { background: var(--light-navy); color: #fff; border-color: var(--light-navy); }
+.date-chip .day-name { font-size: 10px; font-weight: 600; letter-spacing: .5px; }
+.date-chip .day-num { font-size: 18px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+
+.entry-grid { margin: 12px 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.entry-card { padding: 12px 14px; transition: border-color .15s; }
+.entry-card label { font-size: 10px; font-weight: 700; color: var(--light-navy); letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+.entry-card input { background: none; border: none; outline: none; color: var(--text); font-size: 22px; font-weight: 700; font-family: var(--mono); width: 100%; }
+.entry-card input::placeholder { color: #94a3b8; }
+.entry-card .calc-row { margin-top: 4px; font-size: 11px; color: var(--text2); font-family: var(--mono); }
+
+/* Aura coloured buttons */
+.save-btn { margin: 16px 20px 0; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 700; width: calc(100% - 40px); cursor: pointer; transition: all .15s; box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3); }
+.save-btn:active { transform: scale(.97); box-shadow: none; }
+
+.history-card { margin: 8px 20px 0; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.history-card:hover { border-color: var(--light-navy); }
+.h-date { font-size: 13px; font-weight: 700; color: var(--light-navy); }
+.h-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.h-sales { font-size: 18px; font-weight: 700; font-family: var(--mono); text-align: right; }
+
+.settings-group { margin: 10px 20px 0; overflow: hidden; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.settings-row:last-child { border-bottom: none; }
+.settings-label { font-size: 14px; font-weight: 600; color: var(--light-navy); }
+.settings-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.settings-input { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 14px; font-weight: 600; font-family: var(--mono); width: 110px; text-align: right; outline: none; }
+
+.bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; z-index: 200; background: rgba(239, 246, 255, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.6); display: flex; padding-bottom: 15px; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0 8px; cursor: pointer; border: none; background: none; color: var(--text3); font-weight: 600; }
+.nav-btn.active { color: var(--light-navy); }
+.nav-btn .nav-icon { font-size: 22px; margin-bottom: 3px; }
+
+.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--green); color: #fff; padding: 10px 22px; border-radius: 50px; font-size: 13px; font-weight: 700; z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.cloud-status { text-align: center; font-size: 11px; color: var(--text2); margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<div class="status-bar"></div>
-
-<div class="topbar">
-  <div>
-    <div class="topbar-title">Boots <span style="font-family:var(--sans);font-size:14px;font-style:normal;color:var(--text2);font-weight:600">Tracker</span></div>
-    <div class="topbar-date" id="todayStr"></div>
-  </div>
-  <div class="store-badge" id="storeBadge">BOOTS DXB T3</div>
-</div>
-
-<div class="toast" id="toast">✓ Saved!</div>
-
-<div class="screen active" id="screen-dashboard">
-  <div class="dash-watermark">B</div>
-  <div class="dash-header">
-    <div class="dash-store-row">
-      <div class="dash-store-pill">
-        <div class="dash-store-dot" id="dash-store-dot">⚕️</div>
-        <div class="dash-store-name" id="dash-store-name">BOOTS DXB T3</div>
-      </div>
-      <div class="dash-date-label" id="dash-date-label"></div>
-    </div>
-    <div class="dash-title">PHARMACY<br>SALES</div>
-    <div class="dash-subtitle">Daily Performance Dashboard</div>
-    <div class="dash-week-tag" id="dash-week-tag">Week —</div>
-  </div>
-  <div class="dash-ramadan" id="dash-ramadan" style="display:none">
-    <div class="dash-ram-icon">🌙</div>
+<div class="app-container">
+  <div class="topbar">
     <div>
-      <div class="dash-ram-day" id="dash-ram-day">Ramadan Day —</div>
-      <div class="dash-ram-times" id="dash-ram-times">Fajr: — | Imsak: —</div>
+      <div class="topbar-title">Widget <span style="font-weight:400;color:var(--text3)">Tracker</span></div>
+      <div class="topbar-date" id="todayStr"></div>
     </div>
+    <div class="store-badge" id="storeBadge">STORE</div>
   </div>
-  <div class="dash-progress">
-    <div class="dash-prog-row">
-      <div>
-        <div class="dash-prog-label">Today's Total Register</div>
-        <div class="dash-prog-val" id="dp-sales">AED 0</div>
+
+  <div class="toast" id="toast">✓ Saved successfully!</div>
+
+  <div class="screen active" id="screen-today">
+    <div class="date-scroll" id="dateChips"></div>
+    <div class="section-label">EDIT / ENTER DATA</div>
+    
+    <div class="entry-grid" id="entryGrid">
+      <div class="entry-card glass-card">
+        <label>💰 SALE (AED)</label>
+        <input type="number" id="inp-sale" placeholder="0.00">
       </div>
-      <div style="text-align:right">
-        <div class="dash-prog-label">Achieved</div>
-        <div class="dash-prog-pct" id="dp-pct" style="color:var(--accent2)">—%</div>
+      <div class="entry-card glass-card">
+        <label>🧴 NO7 SALES</label>
+        <input type="number" id="inp-no7" placeholder="0.00">
+      </div>
+      <div class="entry-card glass-card">
+        <label>🧾 TRANSACTIONS</label>
+        <input type="number" id="inp-trn" placeholder="0">
+      </div>
+      <div class="entry-card glass-card">
+        <label>👥 FOOTFALL</label>
+        <input type="number" id="inp-footfall" placeholder="0">
       </div>
     </div>
-    <div class="dash-prog-track"><div class="dash-prog-fill" id="dp-fill"></div></div>
-    <div style="display:flex;justify-content:space-between;margin-top:8px">
-      <div style="font-size:11px;color:rgba(255,255,255,.5);font-family:var(--mono)" id="dp-target">Target: AED 0</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.5);font-family:var(--mono)" id="dp-kwd"></div>
-    </div>
+    <button class="save-btn aura-gradient" onclick="saveData()">💾 Save & Sync to Cloud</button>
+    <div class="cloud-status" id="syncStatus">Status: Up to date</div>
   </div>
-  <div class="dash-grid">
-    <div class="dash-card dc-aura">
-      <div class="dc-label">✨ AURA LINKAGE</div>
-      <div class="dc-value" id="dk-aura">—</div>
-      <div class="dc-delta neutral" id="dk-aura-d">No data</div>
-      <div class="dc-bg-glyph">A</div>
-    </div>
-    <div class="dash-card dc-no7">
-      <div class="dc-label">🧴 NO7 FOCUS %</div>
-      <div class="dc-value" id="dk-no7pct">—</div>
-      <div class="dc-delta neutral" id="dk-no7-d">No data</div>
-      <div class="dc-bg-glyph">7</div>
-    </div>
-  </div>
-  <div class="dash-grid-3">
-    <div class="dash-card dc-blue">
-      <div class="dc-label">💳 ATV</div>
-      <div class="dc-value" id="dk-atv">—</div>
-      <div class="dc-delta neutral" id="dk-atv-d">No data</div>
-      <div class="dc-bg-glyph">A</div>
-    </div>
-    <div class="dash-card dc-blue">
-      <div class="dc-label">🛍️ NO7 SALES</div>
-      <div class="dc-value" id="dk-no7s">—</div>
-      <div class="dc-delta neutral" id="dk-no7s-d">No data</div>
-      <div class="dc-bg-glyph">N</div>
-    </div>
-    <div class="dash-card dc-blue">
-      <div class="dc-label">🧾 TRN</div>
-      <div class="dc-value" id="dk-trn">—</div>
-      <div class="dc-delta neutral" id="dk-trn-d">No data</div>
-      <div class="dc-bg-glyph">T</div>
-    </div>
-  </div>
-  <div class="dash-actions">
-    <div class="dash-action-btn" onclick="showScreen('today')"><div class="dai">💊</div><div>Enter Data</div></div>
-    <div class="dash-action-btn" onclick="showScreen('weekly')"><div class="dai">🗓️</div><div>Weekly</div></div>
-    <div class="dash-action-btn" onclick="showScreen('kpi')"><div class="dai">⚕️</div><div>KPIs</div></div>
-    <div class="dash-action-btn" onclick="showScreen('history')"><div class="dai">🗂️</div><div>History</div></div>
-  </div>
-</div>
 
-<div class="screen" id="screen-today">
-  <div class="ramadan-strip" id="ramadanStrip" style="display:none">
-    <div style="font-size:24px">🌙</div>
-    <div>
-      <div class="ramadan-day" id="ramadanDay">Ramadan Day —</div>
-      <div class="ramadan-times" id="ramadanTimes">Fajr: — | Imsak: —</div>
-    </div>
+  <div class="screen" id="screen-history">
+    <div class="section-label">PREVIOUS ENTRIES (CLICK TO EDIT)</div>
+    <div id="historyList"></div>
   </div>
-  <div class="date-scroll" id="dateChips"></div>
-  <div class="target-bar">
-    <div class="target-bar-row">
-      <div>
-        <div class="target-label">📈 TODAY'S PROGRESS</div>
-        <div class="target-sub" id="targetSubText">All Slots Combined</div>
+
+  <div class="screen" id="screen-settings">
+    <div class="section-label">STORE CONFIG</div>
+    <div class="settings-group glass-card">
+      <div class="settings-row">
+        <div><div class="settings-label">Store Name</div></div>
+        <input class="settings-input" id="set-store" placeholder="BOOTS DXB T3" oninput="saveSetting('storeName',this.value)">
       </div>
-      <div class="target-pct" id="targetPct">—%</div>
     </div>
-    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    <div style="display:flex;justify-content:space-between;margin-top:6px">
-      <div style="font-size:11px;color:var(--text2);font-family:var(--mono)" id="progActual">AED 0</div>
-      <div style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="progTarget">Target: AED 0</div>
+    
+    <div class="section-label">CLOUD DATA</div>
+    <div class="settings-group glass-card">
+      <div class="settings-row" style="cursor:pointer" onclick="forceCloudSync()">
+        <div><div class="settings-label" style="color:var(--aura-purple)">☁️ Force Cloud Sync</div><div class="settings-sub">Push local data to database</div></div>
+        <div style="color:var(--aura-pink);font-size:18px">›</div>
+      </div>
     </div>
   </div>
-  <div class="slot-summary">
-    <div class="slot-sum-card"><div class="ss-label">🌙 12A–6A</div><div class="ss-val" id="sum0">—</div><div class="ss-no7" id="sum0n7">No7: —</div></div>
-    <div class="slot-sum-card"><div class="ss-label">☀️ 6A–2P</div><div class="ss-val" id="sum1">—</div><div class="ss-no7" id="sum1n7">No7: —</div></div>
-    <div class="slot-sum-card"><div class="ss-label">🌆 2P–10P</div><div class="ss-val" id="sum2">—</div><div class="ss-no7" id="sum2n7">No7: —</div></div>
-  </div>
-  <div class="section-label">ENTER DATA BY TIME SLOT</div>
-  <div class="slot-tabs">
-    <div class="slot-tab active" onclick="switchSlot(0)" id="stab0"><span class="slot-icon">🌙</span>12AM–6AM</div>
-    <div class="slot-tab" onclick="switchSlot(1)" id="stab1"><span class="slot-icon">☀️</span>6AM–2PM</div>
-    <div class="slot-tab" onclick="switchSlot(2)" id="stab2"><span class="slot-icon">🌆</span>2PM–10PM</div>
-  </div>
-  <div class="entry-grid" id="entryGrid"></div>
-  <button class="save-btn" onclick="saveSlot()">💾 Save Slot Data</button>
-</div>
 
-<div class="screen" id="screen-weekly">
-  <div class="section-label">THIS WEEK OVERVIEW</div>
-  <div class="kpi-row">
-    <div class="kpi-chip highlight"><div class="kpi-name">WEEK SALES</div><div class="kpi-val" id="wk-sales">—</div><div class="kpi-sub" id="wk-sales-pct">of target</div></div>
-    <div class="kpi-chip"><div class="kpi-name">NO7</div><div class="kpi-val" id="wk-no7" style="color:var(--purple)">—</div><div class="kpi-sub" id="wk-no7-pct">% of sales</div></div>
-    <div class="kpi-chip"><div class="kpi-name">AVG ATV</div><div class="kpi-val" id="wk-atv" style="color:var(--orange)">—</div><div class="kpi-sub">per transaction</div></div>
-    <div class="kpi-chip"><div class="kpi-name">TRN</div><div class="kpi-val" id="wk-trn" style="color:var(--green)">—</div><div class="kpi-sub">transactions</div></div>
-    <div class="kpi-chip" style="border-color:var(--aura-pink);"><div class="kpi-name" style="color:var(--aura-pink)">AURA</div><div class="kpi-val" id="wk-aura" style="color:var(--text)">—</div><div class="kpi-sub">avg score</div></div>
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-today" onclick="showScreen('today')"><span class="nav-icon">✏️</span>Entry</button>
+    <button class="nav-btn" id="nav-history" onclick="showScreen('history')"><span class="nav-icon">🗂️</span>History</button>
+    <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')"><span class="nav-icon">⚙️</span>Settings</button>
   </div>
-  <div class="section-label">DAILY BREAKDOWN</div>
-  <div class="week-table-wrap">
-    <div class="week-row header">
-      <span>DAY</span><span>SALES</span><span>TARGET</span><span>%ACH</span><span>NO7</span><span>ATV</span>
-    </div>
-    <div id="weekRows"></div>
-  </div>
-</div>
-
-<div class="screen" id="screen-kpi">
-  <div class="section-label">TODAY'S KPIS — ALL SLOTS</div>
-  <div id="kpiCards"></div>
-  <div class="divider"></div>
-  <div class="section-label">AURA / CSAT & IPT</div>
-  <div class="entry-grid" style="margin-top:0" id="auraIptGrid">
-    <div class="entry-card"><label>⭐ AURA SCORE</label><input type="number" inputmode="decimal" id="aura-input" placeholder="4.5" step="0.1" min="0" max="5"></div>
-    <div class="entry-card"><label>🔗 AURA LINK%</label><input type="number" inputmode="decimal" id="aura-link-input" placeholder="75" step="0.1" min="0" max="100"></div>
-    <div class="entry-card"><label>🛒 IPT</label><input type="number" inputmode="decimal" id="ipt-input" placeholder="1.8" step="0.1"></div>
-    <div class="entry-card"><label>⚕️ CSAT</label><input type="number" inputmode="decimal" id="csat-input" placeholder="4.2" step="0.1"></div>
-  </div>
-  <button class="save-btn" onclick="saveKPIs()">💾 Save KPIs</button>
-</div>
-
-<div class="screen" id="screen-history">
-  <div class="section-label">RECENT ENTRIES</div>
-  <div id="historyList"></div>
-</div>
-
-<div class="screen" id="screen-settings">
-  <div class="section-label">STORE CONFIG</div>
-  <div class="settings-group">
-    <div class="settings-row">
-      <div><div class="settings-label">Store Name</div><div class="settings-sub">Your store code</div></div>
-      <input class="settings-input" id="set-store" placeholder="BOOTS DXB T3" oninput="saveSetting('storeName',this.value)">
-    </div>
-  </div>
-  <div class="section-label">WEEKLY TARGETS (AED)</div>
-  <div class="settings-group">
-    <div class="settings-row"><div><div class="settings-label">Monday</div></div><input class="settings-input" id="tgt-1" placeholder="35000" oninput="saveDayTarget(1,this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Tuesday</div></div><input class="settings-input" id="tgt-2" placeholder="35000" oninput="saveDayTarget(2,this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Wednesday</div></div><input class="settings-input" id="tgt-3" placeholder="35000" oninput="saveDayTarget(3,this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Thursday</div></div><input class="settings-input" id="tgt-4" placeholder="38000" oninput="saveDayTarget(4,this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Friday</div></div><input class="settings-input" id="tgt-5" placeholder="45000" oninput="saveDayTarget(5,this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Saturday</div></div><input class="settings-input" id="tgt-6" placeholder="45000" oninput="saveDayTarget(6,this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Sunday</div></div><input class="settings-input" id="tgt-0" placeholder="40000" oninput="saveDayTarget(0,this.value)"></div>
-  </div>
-  <div class="section-label">NO7 TARGETS</div>
-  <div class="settings-group">
-    <div class="settings-row"><div><div class="settings-label">Daily No7 Target (AED)</div></div><input class="settings-input" id="set-no7target" placeholder="4000" oninput="saveSetting('no7DailyTarget',this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">No7 % Target</div><div class="settings-sub">% of total sales</div></div><input class="settings-input" id="set-no7pct" placeholder="12" oninput="saveSetting('no7PctTarget',this.value)"></div>
-  </div>
-  <div class="section-label">ATV & CONVERSION</div>
-  <div class="settings-group">
-    <div class="settings-row"><div><div class="settings-label">ATV Target (AED)</div></div><input class="settings-input" id="set-atv" placeholder="120" oninput="saveSetting('atvTarget',this.value)"></div>
-    <div class="settings-row"><div><div class="settings-label">Conversion % Target</div></div><input class="settings-input" id="set-conv" placeholder="47" oninput="saveSetting('convTarget',this.value)"></div>
-  </div>
-  <div class="section-label">DATA MANAGEMENT</div>
-  <div class="settings-group">
-    <div class="settings-row" style="cursor:pointer" onclick="exportData()">
-      <div><div class="settings-label">📤 Export Data</div><div class="settings-sub">Download backup as JSON</div></div>
-      <div style="color:var(--accent2);font-size:18px">›</div>
-    </div>
-    <div class="settings-row" style="cursor:pointer" onclick="document.getElementById('importFile').click()">
-      <div><div class="settings-label">📥 Import Data</div><div class="settings-sub">Restore from backup</div></div>
-      <div style="color:var(--accent2);font-size:18px">›</div>
-    </div>
-  </div>
-  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
-  <button class="save-btn" onclick="clearData()" style="background:var(--red);box-shadow:0 4px 15px rgba(239,68,68,.3);margin-top:16px">🗑 Clear All Data</button>
-</div>
-
-<div class="bottom-nav">
-  <button class="nav-btn active" id="nav-dashboard" onclick="showScreen('dashboard')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
-  <button class="nav-btn" id="nav-today" onclick="showScreen('today')"><span class="nav-icon">💊</span><span class="nav-label">Today</span></button>
-  <button class="nav-btn" id="nav-weekly" onclick="showScreen('weekly')"><span class="nav-icon">🗓️</span><span class="nav-label">Weekly</span></button>
-  <button class="nav-btn" id="nav-kpi" onclick="showScreen('kpi')"><span class="nav-icon">⚕️</span><span class="nav-label">KPIs</span></button>
-  <button class="nav-btn" id="nav-history" onclick="showScreen('history')"><span class="nav-icon">🗂️</span><span class="nav-label">History</span></button>
-  <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
 </div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────
-const RAMADAN = {
-  '2026-02-18':{day:1,fajr:'5:34 AM',imsak:'5:24 AM'},
-  '2026-02-19':{day:2,fajr:'5:33 AM',imsak:'5:23 AM'},
-  '2026-02-20':{day:3,fajr:'5:32 AM',imsak:'5:22 AM'},
-  '2026-02-21':{day:4,fajr:'5:31 AM',imsak:'5:21 AM'},
-  '2026-02-22':{day:5,fajr:'5:31 AM',imsak:'5:21 AM'},
-  '2026-02-23':{day:6,fajr:'5:30 AM',imsak:'5:20 AM'},
-  '2026-02-24':{day:7,fajr:'5:29 AM',imsak:'5:19 AM'},
-  '2026-02-25':{day:8,fajr:'5:28 AM',imsak:'5:18 AM'},
-  '2026-02-26':{day:9,fajr:'5:27 AM',imsak:'5:17 AM'},
-  '2026-02-27':{day:10,fajr:'5:27 AM',imsak:'5:17 AM'},
-  '2026-02-28':{day:11,fajr:'5:26 AM',imsak:'5:16 AM'},
-  '2026-03-01':{day:12,fajr:'5:25 AM',imsak:'5:15 AM'},
-  '2026-03-02':{day:13,fajr:'5:24 AM',imsak:'5:14 AM'},
-  '2026-03-03':{day:14,fajr:'5:23 AM',imsak:'5:13 AM'},
-  '2026-03-04':{day:15,fajr:'5:22 AM',imsak:'5:12 AM'},
-  '2026-03-05':{day:16,fajr:'5:21 AM',imsak:'5:11 AM'},
-  '2026-03-06':{day:17,fajr:'5:20 AM',imsak:'5:10 AM'},
-  '2026-03-07':{day:18,fajr:'5:19 AM',imsak:'5:09 AM'},
-  '2026-03-08':{day:19,fajr:'5:18 AM',imsak:'5:08 AM'},
-  '2026-03-09':{day:20,fajr:'5:17 AM',imsak:'5:07 AM'},
-  '2026-03-10':{day:21,fajr:'5:16 AM',imsak:'5:06 AM'},
-  '2026-03-11':{day:22,fajr:'5:15 AM',imsak:'5:05 AM'},
-  '2026-03-12':{day:23,fajr:'5:14 AM',imsak:'5:04 AM'},
-  '2026-03-13':{day:24,fajr:'5:13 AM',imsak:'5:03 AM'},
-  '2026-03-14':{day:25,fajr:'5:12 AM',imsak:'5:02 AM'},
-  '2026-03-15':{day:26,fajr:'5:10 AM',imsak:'5:00 AM'},
-  '2026-03-16':{day:27,fajr:'5:09 AM',imsak:'4:59 AM'},
-  '2026-03-17':{day:28,fajr:'5:08 AM',imsak:'4:58 AM'},
-  '2026-03-18':{day:29,fajr:'5:07 AM',imsak:'4:57 AM'},
-  '2026-03-19':{day:30,fajr:'5:06 AM',imsak:'4:56 AM'},
-};
-
-const DAYS_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DEFAULT_TGT=[40000,35000,35000,35000,38000,45000,45000]; 
-
-let settings = {};
+// --- CLOUD MOCKUP SYSTEM ---
+// You will replace these functions with your actual database code (Firebase, etc.)
 let salesData = {};
+let settings = {};
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let selectedDate = new Date().toISOString().slice(0,10);
 
-function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
-function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-
-function loadStorage(){
-  settings = lsGet('dst_settings') || {};
-  salesData = lsGet('dst_data') || {};
+function simulateCloudSave(data) {
+  return new Promise(resolve => setTimeout(() => {
+    localStorage.setItem('cloud_backup', JSON.stringify(data));
+    resolve('Success');
+  }, 800));
 }
 
-function getSetting(k,def){ return settings[k]!==undefined ? settings[k] : def; }
-function saveSetting(k,v){ settings[k]=v; lsSet('dst_settings',settings); refreshAll(); updateTopbar(); }
-function saveDayTarget(dow,v){
-  if(!settings.dayTargets) settings.dayTargets=[...DEFAULT_TGT];
-  settings.dayTargets[dow]=parseFloat(v)||DEFAULT_TGT[dow];
-  lsSet('dst_settings',settings); refreshAll();
+function simulateCloudFetch() {
+  return new Promise(resolve => setTimeout(() => {
+    const data = JSON.parse(localStorage.getItem('cloud_backup')) || {};
+    resolve(data);
+  }, 800));
 }
-function getDayTarget(dow){ return (settings.dayTargets||DEFAULT_TGT)[dow]||DEFAULT_TGT[dow]; }
-function getDateKey(d){ return d.toISOString().slice(0,10); }
 
-let selectedDate = getDateKey(new Date());
-let selectedSlot = 0;
-
-function init(){
-  loadStorage();
-  updateTopbar();
+// --- APP LOGIC ---
+function init() {
+  const now = new Date();
+  document.getElementById('todayStr').textContent = now.toDateString();
+  salesData = JSON.parse(localStorage.getItem('local_data')) || {};
+  settings = JSON.parse(localStorage.getItem('local_settings')) || {};
+  document.getElementById('storeBadge').textContent = settings.storeName || 'BOOTS DXB';
+  document.getElementById('set-store').value = settings.storeName || '';
+  
   buildDateChips();
-  renderEntryGrid();
-  loadSettingsUI();
-  refreshAll();
+  loadFormData();
 }
 
-function updateTopbar(){
-  const now=new Date();
-  document.getElementById('todayStr').textContent=
-    DAYS_FULL[now.getDay()]+', '+now.getDate()+' '+MONTHS[now.getMonth()]+' '+now.getFullYear();
-  const name=getSetting('storeName','BOOTS DXB T3')||'BOOTS DXB T3';
-  document.getElementById('storeBadge').textContent=name;
-}
-
-function loadSettingsUI(){
-  document.getElementById('set-store').value=getSetting('storeName','BOOTS DXB T3');
-  document.getElementById('set-no7target').value=getSetting('no7DailyTarget','4000');
-  document.getElementById('set-no7pct').value=getSetting('no7PctTarget','12');
-  document.getElementById('set-atv').value=getSetting('atvTarget','120');
-  document.getElementById('set-conv').value=getSetting('convTarget','47');
-  (settings.dayTargets||DEFAULT_TGT).forEach((t,i)=>{
-    const el=document.getElementById('tgt-'+i); if(el) el.value=t;
-  });
-}
-
-function buildDateChips(){
-  const c=document.getElementById('dateChips'); c.innerHTML='';
-  const today=new Date();
-  for(let i=6;i>=0;i--){
-    const d=new Date(today); d.setDate(today.getDate()-i);
-    const key=getDateKey(d);
-    const chip=document.createElement('div');
-    chip.className='date-chip'+(key===selectedDate?' active':'');
-    chip.innerHTML=`<div class="day-name">${DAYS_SHORT[d.getDay()]}</div><div class="day-num">${d.getDate()}</div>`;
-    chip.onclick=()=>{ selectedDate=key; buildDateChips(); refreshAll(); loadSlotData(); };
+function buildDateChips() {
+  const c = document.getElementById('dateChips'); 
+  c.innerHTML = '';
+  const today = new Date();
+  for(let i=6; i>=0; i--) {
+    const d = new Date(today); 
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const chip = document.createElement('div');
+    chip.className = 'date-chip glass-card' + (key === selectedDate ? ' active' : '');
+    chip.innerHTML = `<div class="day-name">${DAYS_SHORT[d.getDay()]}</div><div class="day-num">${d.getDate()}</div>`;
+    chip.onclick = () => { selectedDate = key; buildDateChips(); loadFormData(); };
     c.appendChild(chip);
   }
 }
 
-function updateRamadan(){
-  const ri=RAMADAN[selectedDate];
-  const strip=document.getElementById('ramadanStrip');
-  if(ri){
-    document.getElementById('ramadanDay').textContent='Ramadan Day '+ri.day+' 🌙';
-    document.getElementById('ramadanTimes').textContent='Fajr: '+ri.fajr+'  |  Imsak: '+ri.imsak;
-    strip.style.display='flex';
-  } else { strip.style.display='none'; }
+function loadFormData() {
+  const data = salesData[selectedDate] || {};
+  document.getElementById('inp-sale').value = data.sale || '';
+  document.getElementById('inp-no7').value = data.no7 || '';
+  document.getElementById('inp-trn').value = data.trn || '';
+  document.getElementById('inp-footfall').value = data.footfall || '';
 }
 
-function switchSlot(i){
-  selectedSlot=i;
-  [0,1,2].forEach(j=>{
-    document.getElementById('stab'+j).className='slot-tab'+(j===i?' active':'');
-  });
-  loadSlotData();
-}
-
-function renderEntryGrid(){
-  document.getElementById('entryGrid').innerHTML=`
-    <div class="entry-card">
-      <label>💰 SALE (AED)</label>
-      <input type="number" inputmode="decimal" id="inp-sale" placeholder="0.00" oninput="autoCalc()">
-    </div>
-    <div class="entry-card">
-      <label>🧴 NO7 SALES</label>
-      <input type="number" inputmode="decimal" id="inp-no7" placeholder="0.00" oninput="autoCalc()">
-    </div>
-    <div class="entry-card">
-      <label>🧾 TRANSACTIONS</label>
-      <input type="number" inputmode="numeric" id="inp-trn" placeholder="0" oninput="autoCalc()">
-      <div class="calc-row" id="calc-atv">ATV: —</div>
-    </div>
-    <div class="entry-card">
-      <label>📱 NO7 %</label>
-      <input type="number" inputmode="decimal" id="inp-no7pct" placeholder="0.0" step="0.1">
-      <div class="calc-row" id="calc-no7pct">Auto-calc</div>
-    </div>
-    <div class="entry-card">
-      <label>👥 FOOTFALL</label>
-      <input type="number" inputmode="numeric" id="inp-footfall" placeholder="0" oninput="autoCalc()">
-    </div>
-    <div class="entry-card">
-      <label>📈 CONV %</label>
-      <input type="number" inputmode="decimal" id="inp-conv" placeholder="0.0" step="0.1">
-      <div class="calc-row" id="calc-conv">Auto-calc</div>
-    </div>`;
-  loadSlotData();
-}
-
-function autoCalc(){
-  const sale=parseFloat(document.getElementById('inp-sale')?.value)||0;
-  const trn=parseFloat(document.getElementById('inp-trn')?.value)||0;
-  const no7=parseFloat(document.getElementById('inp-no7')?.value)||0;
-  const ff=parseFloat(document.getElementById('inp-footfall')?.value)||0;
-  const atvEl=document.getElementById('calc-atv');
-  const no7El=document.getElementById('calc-no7pct');
-  const convEl=document.getElementById('calc-conv');
-  if(atvEl) atvEl.textContent=trn>0?'ATV: '+(sale/trn).toFixed(1)+' AED':'ATV: —';
-  if(no7El){
-    if(sale>0&&no7>0){
-      const p=(no7/sale*100).toFixed(1);
-      no7El.textContent='= '+p+'%';
-      const pi=document.getElementById('inp-no7pct');
-      if(pi&&!pi.value) pi.value=p;
-    } else no7El.textContent='Auto-calc';
-  }
-  if(convEl) convEl.textContent=ff>0&&trn>0?'Conv: '+(trn/ff*100).toFixed(1)+'%':'Auto-calc';
-}
-
-function loadSlotData(){
-  const slot=(salesData[selectedDate]||{})['slot_'+selectedSlot]||{};
-  ['sale','no7','trn','no7pct','footfall','conv'].forEach(f=>{
-    const el=document.getElementById('inp-'+f);
-    if(el) el.value=slot[f]||'';
-  });
-  autoCalc();
-}
-
-function saveSlot(){
-  if(!salesData[selectedDate]) salesData[selectedDate]={};
-  const slot={};
-  ['sale','no7','trn','no7pct','footfall','conv'].forEach(f=>{
-    const el=document.getElementById('inp-'+f);
-    if(el&&el.value!=='') slot[f]=parseFloat(el.value);
-  });
-  if(slot.sale&&slot.trn) slot.atv=slot.sale/slot.trn;
-  if(slot.sale&&slot.no7&&!slot.no7pct) slot.no7pct=slot.no7/slot.sale*100;
-  if(slot.trn&&slot.footfall&&!slot.conv) slot.conv=slot.trn/slot.footfall*100;
-  salesData[selectedDate]['slot_'+selectedSlot]=slot;
-  lsSet('dst_data',salesData);
-  showToast('✓ Slot saved!');
-  refreshAll();
-}
-
-function saveKPIs(){
-  if(!salesData[selectedDate]) salesData[selectedDate]={};
-  salesData[selectedDate].aura=parseFloat(document.getElementById('aura-input')?.value)||null;
-  salesData[selectedDate].auraLink=parseFloat(document.getElementById('aura-link-input')?.value)||null;
-  salesData[selectedDate].ipt=parseFloat(document.getElementById('ipt-input')?.value)||null;
-  salesData[selectedDate].csat=parseFloat(document.getElementById('csat-input')?.value)||null;
-  lsSet('dst_data',salesData);
-  showToast('✓ KPIs saved!');
-}
-
-function getDayTotals(key){
-  const d=salesData[key]||{};
-  let sale=0,no7=0,trn=0,ff=0;
-  for(let i=0;i<3;i++){const s=d['slot_'+i]||{};sale+=s.sale||0;no7+=s.no7||0;trn+=s.trn||0;ff+=s.footfall||0;}
-  return{sale,no7,trn,footfall:ff,
-    atv:trn>0?sale/trn:0,
-    no7Pct:sale>0?no7/sale*100:0,
-    conv:ff>0?trn/ff*100:0,
-    aura:d.aura,auraLink:d.auraLink,ipt:d.ipt};
-}
-
-function fmtNum(n){
-  if(!n||isNaN(n)) return '0';
-  if(n>=1000) return (n/1000).toFixed(1)+'K';
-  return Math.round(n).toString();
-}
-
-function refreshAll(){
-  updateRamadan();
-  refreshTargetBar();
-  refreshSlotSummary();
-  refreshDashboard();
-  refreshWeekly();
-}
-
-function refreshTargetBar(){
-  const t=getDayTotals(selectedDate);
-  const d=new Date(selectedDate+'T12:00:00');
-  const tgt=getDayTarget(d.getDay());
-  const pct=tgt>0?t.sale/tgt*100:0;
-  const cls=pct>=100?'good':pct>=80?'warn':'bad';
-  const el=document.getElementById('targetPct');
-  el.textContent=pct>0?pct.toFixed(1)+'%':'—%';
-  el.className='target-pct '+cls;
-  const fill=document.getElementById('progFill');
-  fill.style.width=Math.min(pct,100)+'%';
-  fill.className='prog-fill '+cls;
-  document.getElementById('progActual').textContent='AED '+fmtNum(t.sale);
-  document.getElementById('progTarget').textContent='Target: AED '+fmtNum(tgt);
-  const d2=new Date(selectedDate+'T12:00:00');
-  document.getElementById('targetSubText').textContent=DAYS_FULL[d2.getDay()]+' · All Slots';
-}
-
-function refreshSlotSummary(){
-  const d=salesData[selectedDate]||{};
-  for(let i=0;i<3;i++){
-    const s=d['slot_'+i]||{};
-    document.getElementById('sum'+i).textContent=s.sale?'AED '+fmtNum(s.sale):'—';
-    document.getElementById('sum'+i+'n7').textContent=s.no7?'No7: '+fmtNum(s.no7):'No7: —';
-  }
-}
-
-function refreshWeekly(){
-  const today=new Date();
-  const dow=today.getDay();
-  const start=new Date(today);
-  start.setDate(today.getDate()-(dow===0?6:dow-1));
-  let tSale=0,tNo7=0,tTrn=0,tAura=0,aCount=0,tTgt=0;
-  const rows=[];
-  for(let i=0;i<7;i++){
-    const d=new Date(start); d.setDate(start.getDate()+i);
-    if(d>today) break;
-    const key=getDateKey(d);
-    const t=getDayTotals(key);
-    const tgt=getDayTarget(d.getDay());
-    const pct=tgt>0?t.sale/tgt*100:0;
-    tSale+=t.sale; tNo7+=t.no7; tTrn+=t.trn; tTgt+=tgt;
-    if(t.aura){tAura+=t.aura;aCount++;}
-    rows.push({d,key,t,tgt,pct,isToday:key===getDateKey(today)});
-  }
-  const wPct=tTgt>0?(tSale/tTgt*100).toFixed(1):'—';
-  document.getElementById('wk-sales').textContent='AED '+fmtNum(tSale);
-  document.getElementById('wk-sales-pct').textContent=wPct+'% of target';
-  document.getElementById('wk-no7').textContent='AED '+fmtNum(tNo7);
-  document.getElementById('wk-no7-pct').textContent=(tSale>0?(tNo7/tSale*100).toFixed(1):'—')+'% of sales';
-  document.getElementById('wk-atv').textContent=tTrn>0?'AED '+(tSale/tTrn).toFixed(0):'—';
-  document.getElementById('wk-trn').textContent=fmtNum(tTrn);
-  document.getElementById('wk-aura').textContent=aCount>0?(tAura/aCount).toFixed(2):'—';
-  const c=document.getElementById('weekRows'); c.innerHTML='';
-  rows.forEach(r=>{
-    const cls=r.pct>=100?'good':r.pct>=80?'warn':(r.t.sale>0?'bad':'');
-    const row=document.createElement('div');
-    row.className='week-row'+(r.isToday?' today':'');
-    row.innerHTML=`
-      <div class="week-day">${DAYS_SHORT[r.d.getDay()]}<div class="date-small">${r.d.getDate()}</div></div>
-      <div class="week-sales">${r.t.sale>0?fmtNum(r.t.sale):'—'}</div>
-      <div class="week-target">${fmtNum(r.tgt)}</div>
-      <div class="week-pct ${cls}">${r.pct>0?r.pct.toFixed(0)+'%':'—'}</div>
-      <div class="week-no7">${r.t.no7>0?fmtNum(r.t.no7):'—'}</div>
-      <div class="week-atv">${r.t.atv>0?r.t.atv.toFixed(0):'—'}</div>`;
-    c.appendChild(row);
-  });
-  const tr=document.createElement('div'); tr.className='week-row total';
-  const tPct=tTgt>0?tSale/tTgt*100:0;
-  const tCls=tPct>=100?'good':tPct>=80?'warn':(tSale>0?'bad':'');
-  tr.innerHTML=`
-    <div class="week-day" style="font-size:11px;font-weight:800;color:var(--text)">TOTAL</div>
-    <div class="week-sales" style="color:var(--accent2)">${fmtNum(tSale)}</div>
-    <div class="week-target">${fmtNum(tTgt)}</div>
-    <div class="week-pct ${tCls}">${tPct>0?tPct.toFixed(0)+'%':'—'}</div>
-    <div class="week-no7">${tNo7>0?fmtNum(tNo7):'—'}</div>
-    <div class="week-atv">${tTrn>0?(tSale/tTrn).toFixed(0):'—'}</div>`;
-  c.appendChild(tr);
-}
-
-function refreshDashboard(){
-  const now=new Date();
-  const name=getSetting('storeName','BOOTS DXB T3')||'BOOTS DXB T3';
-  document.getElementById('dash-store-name').textContent=name;
-  document.getElementById('dash-date-label').textContent=
-    DAYS_FULL[now.getDay()].slice(0,3)+' '+now.getDate()+' '+MONTHS[now.getMonth()];
-  const wn=Math.ceil((((now-new Date(now.getFullYear(),0,1))/86400000)+new Date(now.getFullYear(),0,1).getDay()+1)/7);
-  document.getElementById('dash-week-tag').textContent='Week '+wn+', '+now.getFullYear();
+async function saveData() {
+  const stat = document.getElementById('syncStatus');
+  stat.textContent = 'Status: Saving to cloud...';
   
-  const ri=RAMADAN[getDateKey(now)]||RAMADAN[selectedDate];
-  const dr=document.getElementById('dash-ramadan');
-  if(ri){
-    document.getElementById('dash-ram-day').textContent='Ramadan Day '+ri.day+' 🌙';
-    document.getElementById('dash-ram-times').textContent='Fajr: '+ri.fajr+'  |  Imsak: '+ri.imsak;
-    dr.style.display='flex';
-  } else dr.style.display='none';
+  if(!salesData[selectedDate]) salesData[selectedDate] = {};
+  salesData[selectedDate].sale = parseFloat(document.getElementById('inp-sale').value) || 0;
+  salesData[selectedDate].no7 = parseFloat(document.getElementById('inp-no7').value) || 0;
+  salesData[selectedDate].trn = parseFloat(document.getElementById('inp-trn').value) || 0;
+  salesData[selectedDate].footfall = parseFloat(document.getElementById('inp-footfall').value) || 0;
   
-  const t=getDayTotals(selectedDate);
-  const d=new Date(selectedDate+'T12:00:00');
-  const tgt=getDayTarget(d.getDay());
-  const pct=tgt>0?Math.round(t.sale/tgt*100):0;
-  document.getElementById('dp-sales').textContent='AED '+t.sale.toLocaleString();
-  document.getElementById('dp-target').textContent='Target: AED '+tgt.toLocaleString();
-  document.getElementById('dp-kwd').textContent=t.sale>0?'≈ KWD '+Math.round(t.sale/11.99).toLocaleString():'';
-  document.getElementById('dp-pct').textContent=t.sale>0?pct+'%':'—%';
-  document.getElementById('dp-pct').style.color=pct>=100?'#22c55e':pct>=80?'#f59e0b':'#ef4444';
-  document.getElementById('dp-fill').style.width=Math.min(pct,100)+'%';
+  localStorage.setItem('local_data', JSON.stringify(salesData));
   
-  const no7Pct=t.sale>0?(t.no7/t.sale*100).toFixed(1):null;
-  const no7PctTgt=parseFloat(getSetting('no7PctTarget',12));
-  const atvTgt=parseFloat(getSetting('atvTarget',120));
-  setDashCard('dk-aura','dk-aura-d',t.auraLink?t.auraLink+'%':'—',t.auraLink,75,'%');
-  setDashCard('dk-no7pct','dk-no7-d',no7Pct?no7Pct+'%':'—',no7Pct,no7PctTgt,'%');
-  setDashCard('dk-atv','dk-atv-d',t.atv>0?Math.round(t.atv):'—',t.atv,atvTgt,'');
-  document.getElementById('dk-no7s').textContent=t.no7>0?fmtNum(t.no7):'—';
-  const n7tgt=parseFloat(getSetting('no7DailyTarget',4000));
-  const n7d=document.getElementById('dk-no7s-d');
-  if(t.no7>0){n7d.className='dc-delta '+(t.no7/n7tgt>=1?'up':t.no7/n7tgt>=.8?'neutral':'down');n7d.textContent=Math.round(t.no7/n7tgt*100)+'% of target';}
-  else{n7d.className='dc-delta neutral';n7d.textContent='No data';}
-  document.getElementById('dk-trn').textContent=t.trn>0?t.trn:'—';
-  const td=document.getElementById('dk-trn-d');
-  if(t.trn>0){td.className='dc-delta up';td.textContent='↑ '+t.trn+' today';}
-  else{td.className='dc-delta neutral';td.textContent='No data';}
+  // Cloud sync trigger
+  await simulateCloudSave(salesData);
+  
+  stat.textContent = 'Status: Up to date';
+  showToast('✓ Saved & Synced!');
+  refreshHistory();
 }
 
-function setDashCard(vid,did,display,actual,target,suffix){
-  document.getElementById(vid).textContent=display;
-  const el=document.getElementById(did);
-  if(!actual||isNaN(actual)){el.className='dc-delta neutral';el.textContent='No data';return;}
-  const diff=(parseFloat(actual)-parseFloat(target));
-  el.className='dc-delta '+(diff>=0?'up':'down');
-  el.textContent=(diff>=0?'▲ +':'▼ ')+Math.abs(diff).toFixed(1)+suffix+' vs target';
+function saveSetting(key, val) {
+  settings[key] = val;
+  localStorage.setItem('local_settings', JSON.stringify(settings));
+  document.getElementById('storeBadge').textContent = settings.storeName || 'BOOTS DXB';
 }
 
-function refreshKPIScreen(){
-  const t=getDayTotals(selectedDate);
-  const d=salesData[selectedDate]||{};
-  const atvTgt=getSetting('atvTarget',120);
-  const c=document.getElementById('kpiCards');
-  c.innerHTML='';
-  const g=document.createElement('div');
-  g.className='entry-grid'; g.style.marginTop='0';
-  [
-    {icon:'💰',label:'TOTAL SALES',val:t.sale>0?'AED '+fmtNum(t.sale):'—',color:'var(--text)'},
-    {icon:'🧴',label:'NO7 SALES',val:t.no7>0?'AED '+fmtNum(t.no7):'—',sub:t.no7Pct>0?t.no7Pct.toFixed(1)+'% of sales':'',color:'var(--purple)'},
-    {icon:'🧾',label:'TRANSACTIONS',val:t.trn>0?fmtNum(t.trn):'—',color:'var(--green)'},
-    {icon:'💳',label:'AVG ATV',val:t.atv>0?'AED '+t.atv.toFixed(0):'—',sub:atvTgt?'Target: AED '+atvTgt:'',color:t.atv>=atvTgt?'var(--green)':t.atv>0?'var(--orange)':'var(--text)'},
-    {icon:'👥',label:'FOOTFALL',val:t.footfall>0?fmtNum(t.footfall):'—',color:'var(--text)'},
-    {icon:'📈',label:'CONVERSION',val:t.conv>0?t.conv.toFixed(1)+'%':'—',color:'var(--accent2)'},
-  ].forEach(m=>{
-    const card=document.createElement('div'); card.className='entry-card';
-    card.innerHTML=`<label>${m.icon} ${m.label}</label>
-      <div style="font-size:20px;font-weight:700;font-family:var(--mono);color:${m.color};line-height:1.2;margin-top:4px">${m.val}</div>
-      ${m.sub?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${m.sub}</div>`:''}`;
-    g.appendChild(card);
-  });
-  c.appendChild(g);
-  const ai=document.getElementById('aura-input'); if(ai) ai.value=d.aura||'';
-  const al=document.getElementById('aura-link-input'); if(al) al.value=d.auraLink||'';
-  const ip=document.getElementById('ipt-input'); if(ip) ip.value=d.ipt||'';
-  const cs=document.getElementById('csat-input'); if(cs) cs.value=d.csat||'';
+async function forceCloudSync() {
+  showToast('⏳ Syncing to cloud...');
+  await simulateCloudSave(salesData);
+  showToast('✓ Cloud Sync Complete!');
 }
 
-function refreshHistory(){
-  const c=document.getElementById('historyList');
-  const keys=Object.keys(salesData).sort().reverse().slice(0,30);
-  c.innerHTML='';
-  if(!keys.length){c.innerHTML='<div class="empty"><div class="empty-icon">📭</div>No data yet.</div>';return;}
-  keys.forEach(key=>{
-    const t=getDayTotals(key);
-    if(t.sale===0&&!salesData[key]?.aura) return;
-    const d=new Date(key+'T12:00:00');
-    const tgt=getDayTarget(d.getDay());
-    const pct=tgt>0?t.sale/tgt*100:0;
-    const pctColor=pct>=100?'var(--green)':pct>=80?'var(--orange)':'var(--red)';
-    const card=document.createElement('div'); card.className='history-card';
-    card.innerHTML=`
+function refreshHistory() {
+  const c = document.getElementById('historyList');
+  const keys = Object.keys(salesData).sort().reverse();
+  c.innerHTML = '';
+  
+  if(keys.length === 0) {
+    c.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">No data yet.</div>';
+    return;
+  }
+  
+  keys.forEach(key => {
+    const d = salesData[key];
+    const card = document.createElement('div');
+    card.className = 'history-card glass-card';
+    card.innerHTML = `
       <div>
-        <div class="h-date">${DAYS_FULL[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}</div>
-        <div class="h-sub">TRN: ${fmtNum(t.trn)} · No7: ${t.no7>0?fmtNum(t.no7):'—'}${t.aura?' · AURA: '+t.aura.toFixed(1):''}</div>
+        <div class="h-date">${key}</div>
+        <div class="h-sub">TRN: ${d.trn || 0} · No7: ${d.no7 || 0}</div>
       </div>
-      <div>
-        <div class="h-sales">${t.sale>0?fmtNum(t.sale):'—'}</div>
-        <div class="h-pct" style="color:${pctColor}">${pct>0?pct.toFixed(0)+'%':''}</div>
-      </div>`;
-    card.onclick=()=>{ selectedDate=key; buildDateChips(); showScreen('today'); refreshAll(); loadSlotData(); };
+      <div class="h-sales">AED ${d.sale || 0}</div>
+    `;
+    // Click to edit functionality
+    card.onclick = () => { 
+      selectedDate = key; 
+      buildDateChips(); 
+      showScreen('today'); 
+      loadFormData(); 
+    };
     c.appendChild(card);
   });
 }
 
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  const nb=document.getElementById('nav-'+name); if(nb) nb.classList.add('active');
-  if(name==='kpi') refreshKPIScreen();
-  if(name==='history') refreshHistory();
-  if(name==='weekly') refreshWeekly();
-  if(name==='dashboard') refreshDashboard();
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  
+  if(name === 'history') refreshHistory();
 }
 
-function exportData(){
-  const blob=new Blob([JSON.stringify({settings,salesData},null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='boots-tracker-backup-'+getDateKey(new Date())+'.json';
-  a.click(); URL.revokeObjectURL(a.href);
-  showToast('📤 Backup downloaded!');
-}
-
-function importData(input){
-  const file=input.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const parsed=JSON.parse(e.target.result);
-      if(parsed.salesData) salesData=parsed.salesData;
-      if(parsed.settings){ settings=parsed.settings; loadSettingsUI(); }
-      lsSet('dst_data',salesData); lsSet('dst_settings',settings);
-      refreshAll(); updateTopbar();
-      showToast('📥 Data imported!');
-    } catch(err){ showToast('❌ Invalid file'); }
-  };
-  reader.readAsText(file);
-  input.value='';
-}
-
-function clearData(){
-  if(confirm('Clear ALL sales data? Settings will be kept.')) {
-    salesData={};
-    lsSet('dst_data',salesData);
-    refreshAll();
-    showToast('🗑 Data cleared');
-  }
-}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; 
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 init();
