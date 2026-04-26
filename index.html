@@ -2,26 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#eff6ff">
 <title>Pharmacy Sales Widget</title>
 <style>
 /* === LIGHT NAVY & GLASSMORPHISM THEME === */
 :root {
-  --light-navy: #1e3a8a;
-  --light-navy-bg: #eff6ff;
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.8);
+  --boots-navy: #1e3a8a;
   --boots-blue: #005eb8;
   --aura-pink: #d81b60;
   --aura-purple: #8e24aa;
+  
+  /* Glass colors */
+  --bg: transparent; 
+  --card: rgba(255, 255, 255, 0.45);
+  --card2: rgba(255, 255, 255, 0.6);
+  --bg3: rgba(255, 255, 255, 0.3);
+  --border: rgba(255, 255, 255, 0.6);
+  
+  --accent: #005eb8;
   --accent2: #4ba3e3;
-  --green: #22c55e;
+  --green: #16a34a;
   --red: #ef4444;
-  --orange: #f59e0b;
-  --purple: #a855f7;
+  --orange: #d97706;
+  --purple: #9333ea;
+  
+  /* Dark text for light glass */
   --text: #0f172a;
-  --text2: #475569;
-  --text3: #64748b;
+  --text2: #334155;
+  --text3: #475569;
+  
   --mono: 'Courier New', Courier, monospace;
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
   --serif: 'Times New Roman', Times, serif;
@@ -31,146 +43,309 @@
 
 body {
   font-family: var(--sans);
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  /* Using your uploaded image as the background */
+  background: url('image_8e6294.jpg') center center / cover fixed no-repeat;
   color: var(--text);
-  /* Using dvh to avoid taskbar hiding issues on laptops */
-  min-height: 100dvh; 
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
-/* Desktop Widget Container */
-.app-container {
+/* DESKTOP WIDGET CONTAINER */
+.app-wrapper {
   width: 100%;
-  max-width: 450px; /* Keeps it looking like a widget on desktop */
-  background: var(--light-navy-bg);
+  max-width: 550px; /* Wider than mobile, acts like a desktop widget */
   min-height: 100dvh;
+  background: rgba(239, 246, 255, 0.2); /* Very light blue tint */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-left: 1px solid rgba(255,255,255,0.4);
+  border-right: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 0 30px rgba(0,0,0,0.1);
   position: relative;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  /* Extra padding at the bottom so it does not go under the taskbar */
-  padding-bottom: 90px; 
+  /* Extra padding to prevent taskbar hiding */
+  padding-bottom: 110px; 
   overflow-x: hidden;
 }
 
-/* Glassmorphism Classes */
-.glass-card {
-  background: var(--glass-bg);
+/* Glass properties applied to all cards */
+.glass-panel {
+  background: var(--card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.05);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
+
+.status-bar { height: env(safe-area-inset-top, 20px); }
 
 .topbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(239, 246, 255, 0.85);
-  backdrop-filter: blur(12px);
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 12px 20px 10px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-
-.topbar-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--light-navy); }
-.topbar-date { font-size: 12px; color: var(--text2); font-family: var(--mono); }
-.store-badge { background: var(--light-navy); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.topbar-title { font-family: var(--serif); font-style: italic; font-size: 24px; font-weight: 700; color: var(--boots-navy); }
+.topbar-date { font-size: 12px; color: var(--text2); font-family: var(--mono); font-weight: 600; }
+.store-badge { background: var(--boots-navy); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
 
 .screen { display: none; padding: 0 0 20px; animation: fadeIn .25s ease; }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-.section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); padding: 18px 20px 8px; }
-
-/* Aura Gradient for Specific Elements */
-.aura-gradient {
-  background: linear-gradient(145deg, var(--aura-pink), var(--aura-purple));
-  color: #fff !important;
-  border: none;
-}
+.section-label { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--boots-navy); padding: 18px 20px 8px; }
 
 .date-scroll { display: flex; gap: 8px; padding: 6px 20px 2px; overflow-x: auto; scrollbar-width: none; }
 .date-scroll::-webkit-scrollbar { display: none; }
-.date-chip { flex-shrink: 0; padding: 8px 14px; text-align: center; cursor: pointer; transition: all .15s; min-width: 56px; }
-.date-chip.active { background: var(--light-navy); color: #fff; border-color: var(--light-navy); }
-.date-chip .day-name { font-size: 10px; font-weight: 600; letter-spacing: .5px; }
-.date-chip .day-num { font-size: 18px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+.date-chip { flex-shrink: 0; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 14px; text-align: center; cursor: pointer; transition: all .15s; min-width: 56px; backdrop-filter: blur(10px); }
+.date-chip.active { background: var(--boots-navy); border-color: var(--boots-navy); box-shadow: 0 4px 12px rgba(30,58,138,0.3); }
+.date-chip .day-name { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: .5px; }
+.date-chip.active .day-name { color: rgba(255,255,255,0.9); }
+.date-chip .day-num { font-size: 18px; font-weight: 800; line-height: 1.1; margin-top: 2px; color: var(--text); }
+.date-chip.active .day-num { color: #fff; }
+
+.target-bar { margin: 12px 20px; border-radius: 16px; padding: 14px 16px; }
+.target-bar-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.target-label { font-size: 11px; font-weight: 800; color: var(--boots-navy); letter-spacing: .5px; }
+.target-pct { font-size: 22px; font-weight: 800; }
+.target-pct.good { color: var(--green); } .target-pct.bad { color: var(--red); } .target-pct.warn { color: var(--orange); }
+.target-sub { font-size: 12px; color: var(--text2); font-weight: 600; font-family: var(--mono); }
+.prog-track { background: rgba(0,0,0,0.1); border-radius: 4px; height: 6px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+.prog-fill.good { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.prog-fill.bad { background: linear-gradient(90deg, #ef4444, #f87171); }
+.prog-fill.warn { background: linear-gradient(90deg, #d97706, #fbbf24); }
+
+.slot-tabs { display: flex; gap: 6px; padding: 4px 20px 0; }
+.slot-tab { flex: 1; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 10px; font-weight: 800; color: var(--text2); cursor: pointer; transition: all .15s; backdrop-filter: blur(5px); }
+.slot-tab.active { background: var(--boots-blue); border-color: var(--boots-blue); color: #fff; }
 
 .entry-grid { margin: 12px 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.entry-card { padding: 12px 14px; transition: border-color .15s; }
-.entry-card label { font-size: 10px; font-weight: 700; color: var(--light-navy); letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px; }
-.entry-card input { background: none; border: none; outline: none; color: var(--text); font-size: 22px; font-weight: 700; font-family: var(--mono); width: 100%; }
-.entry-card input::placeholder { color: #94a3b8; }
-.entry-card .calc-row { margin-top: 4px; font-size: 11px; color: var(--text2); font-family: var(--mono); }
+.entry-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 14px; backdrop-filter: blur(10px); }
+.entry-card label { font-size: 10px; font-weight: 800; color: var(--boots-navy); letter-spacing: 1px; display: block; margin-bottom: 4px; }
+.entry-card input { background: transparent; border: none; outline: none; color: var(--text); font-size: 22px; font-weight: 800; font-family: var(--mono); width: 100%; }
+.entry-card input::placeholder { color: rgba(0,0,0,0.3); }
+.entry-card .calc-row { margin-top: 4px; font-size: 11px; font-weight: 600; color: var(--text2); font-family: var(--mono); }
 
-/* Aura coloured buttons */
-.save-btn { margin: 16px 20px 0; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 700; width: calc(100% - 40px); cursor: pointer; transition: all .15s; box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3); }
+/* Aura Gradient Button */
+.save-btn { margin: 16px 20px 0; background: linear-gradient(145deg, var(--aura-pink), var(--aura-purple)); color: #fff; border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 800; width: calc(100% - 40px); cursor: pointer; transition: all .15s; box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3); }
 .save-btn:active { transform: scale(.97); box-shadow: none; }
 
-.history-card { margin: 8px 20px 0; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-.history-card:hover { border-color: var(--light-navy); }
-.h-date { font-size: 13px; font-weight: 700; color: var(--light-navy); }
-.h-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.h-sales { font-size: 18px; font-weight: 700; font-family: var(--mono); text-align: right; }
+.kpi-row { display: flex; gap: 10px; padding: 12px 20px 0; overflow-x: auto; scrollbar-width: none; }
+.kpi-row::-webkit-scrollbar { display: none; }
+.kpi-chip { flex-shrink: 0; background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; min-width: 110px; backdrop-filter: blur(10px); }
+.kpi-chip .kpi-name { font-size: 10px; font-weight: 800; color: var(--boots-navy); letter-spacing: .8px; }
+.kpi-chip .kpi-val { font-size: 20px; font-weight: 800; font-family: var(--mono); margin-top: 2px; color: var(--text); }
+.kpi-chip .kpi-sub { font-size: 10px; font-weight: 600; color: var(--text2); margin-top: 1px; }
 
-.settings-group { margin: 10px 20px 0; overflow: hidden; }
-.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-.settings-row:last-child { border-bottom: none; }
-.settings-label { font-size: 14px; font-weight: 600; color: var(--light-navy); }
-.settings-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.settings-input { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 14px; font-weight: 600; font-family: var(--mono); width: 110px; text-align: right; outline: none; }
+.week-table-wrap { margin: 10px 20px 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--card); backdrop-filter: blur(10px); }
+.week-row { display: grid; grid-template-columns: 60px 1fr 1fr 60px 60px 50px; gap: 0; padding: 11px 12px; border-bottom: 1px solid var(--border); align-items: center; }
+.week-row.header { background: rgba(0,0,0,0.05); padding: 8px 12px; }
+.week-row.header span { font-size: 9px; font-weight: 800; color: var(--boots-navy); letter-spacing: .8px; }
+.week-day { font-size: 12px; font-weight: 800; color: var(--text); }
+.week-day .date-small { font-size: 10px; color: var(--text2); }
+.week-sales { font-size: 13px; font-weight: 800; font-family: var(--mono); color: var(--text); }
+.week-target { font-size: 11px; color: var(--text2); font-weight: 600; font-family: var(--mono); }
+.week-pct { font-size: 12px; font-weight: 800; text-align: right; }
+.week-pct.good { color: var(--green); } .week-pct.bad { color: var(--red); } .week-pct.warn { color: var(--orange); }
+.week-no7 { font-size: 11px; font-family: var(--mono); font-weight: 700; color: var(--purple); text-align: right; }
+.week-atv { font-size: 11px; font-family: var(--mono); font-weight: 700; color: var(--text2); text-align: right; }
 
-.bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; z-index: 200; background: rgba(239, 246, 255, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.6); display: flex; padding-bottom: 15px; }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0 8px; cursor: pointer; border: none; background: none; color: var(--text3); font-weight: 600; }
-.nav-btn.active { color: var(--light-navy); }
-.nav-btn .nav-icon { font-size: 22px; margin-bottom: 3px; }
+.history-card { margin: 8px 20px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; backdrop-filter: blur(10px); }
+.history-card:active { background: var(--card2); }
+.h-date { font-size: 13px; font-weight: 800; color: var(--boots-navy); }
+.h-sub { font-size: 11px; font-weight: 600; color: var(--text2); margin-top: 2px; }
+.h-sales { font-size: 18px; font-weight: 800; font-family: var(--mono); text-align: right; color: var(--text); }
 
-.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--green); color: #fff; padding: 10px 22px; border-radius: 50px; font-size: 13px; font-weight: 700; z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; }
+/* Taskbar fix: Bottom Nav restricted to container width */
+.bottom-nav { 
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  width: 100%; 
+  z-index: 200; 
+  background: rgba(255, 255, 255, 0.75); 
+  backdrop-filter: blur(20px); 
+  -webkit-backdrop-filter: blur(20px); 
+  border-top: 1px solid var(--border); 
+  display: flex; 
+  padding-bottom: env(safe-area-inset-bottom, 15px); 
+}
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0 8px; cursor: pointer; border: none; background: none; color: var(--text3); }
+.nav-btn.active { color: var(--boots-navy); }
+.nav-btn .nav-icon { font-size: 22px; line-height: 1; }
+.nav-btn .nav-label { font-size: 10px; font-weight: 800; margin-top: 3px; }
+
+.toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--green); color: #fff; padding: 10px 22px; border-radius: 50px; font-size: 13px; font-weight: 800; z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-.cloud-status { text-align: center; font-size: 11px; color: var(--text2); margin-top: 10px; }
+.settings-group { margin: 10px 20px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; backdrop-filter: blur(10px); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.settings-label { font-size: 14px; font-weight: 700; color: var(--boots-navy); }
+.settings-sub { font-size: 11px; font-weight: 600; color: var(--text2); margin-top: 2px; }
+.settings-input { background: rgba(255,255,255,0.5); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 14px; font-weight: 800; font-family: var(--mono); width: 110px; text-align: right; outline: none; }
+
+.slot-summary { margin: 10px 20px 0; display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.slot-sum-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; backdrop-filter: blur(10px); }
+.slot-sum-card .ss-label { font-size: 9px; font-weight: 800; color: var(--boots-navy); }
+.slot-sum-card .ss-val { font-size: 15px; font-weight: 800; font-family: var(--mono); margin-top: 3px; color: var(--text); }
+
+/* Dashboard Adjustments */
+.dash-header { padding: 24px 20px 16px; }
+.dash-title { font-size: 40px; font-weight: 900; color: var(--boots-navy); letter-spacing: 2px; line-height: 1.1; margin-bottom: 4px; }
+.dash-subtitle { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: var(--text2); text-transform: uppercase; }
+.dash-week-tag { background: rgba(75,163,227,.2); border: 1px solid var(--accent2); color: var(--boots-navy); font-size: 10px; font-weight: 800; padding: 4px 14px; border-radius: 100px; display: inline-block; margin-top: 10px; }
+
+.dash-progress { margin: 0 20px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; backdrop-filter: blur(15px); }
+.dash-prog-label { font-size: 9px; font-weight: 800; color: var(--boots-navy); margin-bottom: 4px; }
+.dash-prog-val { font-size: 32px; font-weight: 900; color: var(--text); font-family: var(--mono); }
+.dash-prog-pct { font-size: 24px; font-weight: 900; }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
+.dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; backdrop-filter: blur(15px); }
+.dc-aura { background: linear-gradient(145deg, rgba(216,27,96,0.8), rgba(142,36,170,0.8)); border: none; }
+.dc-aura .dc-label, .dc-aura .dc-value { color: #fff; }
+.dc-label { font-size: 9px; font-weight: 800; color: var(--boots-navy); margin-bottom: 8px; }
+.dc-value { font-size: 36px; font-weight: 900; color: var(--text); font-family: var(--mono); margin-bottom: 10px; }
+
+.dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 12px 16px 0; }
+.dash-grid-3 .dash-card { padding: 14px 12px; }
+.dash-grid-3 .dc-value { font-size: 26px; }
+
+.dash-actions { display: flex; gap: 10px; padding: 16px 16px 0; }
+.dash-action-btn { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; color: var(--boots-navy); backdrop-filter: blur(10px); cursor: pointer; }
+.cloud-status { text-align: center; font-size: 11px; font-weight: 600; color: var(--text2); margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-wrapper">
+  <div class="status-bar"></div>
+
   <div class="topbar">
     <div>
-      <div class="topbar-title">Widget <span style="font-weight:400;color:var(--text3)">Tracker</span></div>
+      <div class="topbar-title">Boots <span style="font-weight:600;color:var(--text2);font-size:16px;">Tracker</span></div>
       <div class="topbar-date" id="todayStr"></div>
     </div>
-    <div class="store-badge" id="storeBadge">STORE</div>
+    <div class="store-badge" id="storeBadge">BOOTS DXB T3</div>
   </div>
 
-  <div class="toast" id="toast">✓ Saved successfully!</div>
+  <div class="toast" id="toast">✓ Saved!</div>
 
-  <div class="screen active" id="screen-today">
-    <div class="date-scroll" id="dateChips"></div>
-    <div class="section-label">EDIT / ENTER DATA</div>
+  <div class="screen active" id="screen-dashboard">
+    <div class="dash-header">
+      <div class="dash-title">PHARMACY<br>SALES</div>
+      <div class="dash-subtitle">Daily Performance Dashboard</div>
+      <div class="dash-week-tag" id="dash-week-tag">Week —</div>
+    </div>
+    <div class="dash-progress glass-panel">
+      <div class="dash-prog-row">
+        <div>
+          <div class="dash-prog-label">TODAY'S TOTAL REGISTER</div>
+          <div class="dash-prog-val" id="dp-sales">AED 0</div>
+        </div>
+        <div style="text-align:right">
+          <div class="dash-prog-label">ACHIEVED</div>
+          <div class="dash-prog-pct" id="dp-pct" style="color:var(--accent2)">—%</div>
+        </div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="dp-fill"></div></div>
+    </div>
     
-    <div class="entry-grid" id="entryGrid">
-      <div class="entry-card glass-card">
-        <label>💰 SALE (AED)</label>
-        <input type="number" id="inp-sale" placeholder="0.00">
+    <div class="dash-grid">
+      <div class="dash-card dc-aura">
+        <div class="dc-label">✨ AURA LINKAGE</div>
+        <div class="dc-value" id="dk-aura">—</div>
       </div>
-      <div class="entry-card glass-card">
-        <label>🧴 NO7 SALES</label>
-        <input type="number" id="inp-no7" placeholder="0.00">
-      </div>
-      <div class="entry-card glass-card">
-        <label>🧾 TRANSACTIONS</label>
-        <input type="number" id="inp-trn" placeholder="0">
-      </div>
-      <div class="entry-card glass-card">
-        <label>👥 FOOTFALL</label>
-        <input type="number" id="inp-footfall" placeholder="0">
+      <div class="dash-card">
+        <div class="dc-label">🧴 NO7 FOCUS %</div>
+        <div class="dc-value" id="dk-no7pct">—</div>
       </div>
     </div>
-    <button class="save-btn aura-gradient" onclick="saveData()">💾 Save & Sync to Cloud</button>
+    <div class="dash-grid-3">
+      <div class="dash-card">
+        <div class="dc-label">💳 ATV</div>
+        <div class="dc-value" id="dk-atv">—</div>
+      </div>
+      <div class="dash-card">
+        <div class="dc-label">🛍️ NO7 SALES</div>
+        <div class="dc-value" id="dk-no7s">—</div>
+      </div>
+      <div class="dash-card">
+        <div class="dc-label">🧾 TRN</div>
+        <div class="dc-value" id="dk-trn">—</div>
+      </div>
+    </div>
+    <div class="dash-actions">
+      <div class="dash-action-btn" onclick="showScreen('today')"><div class="dai">💊</div><div>Enter Data</div></div>
+      <div class="dash-action-btn" onclick="showScreen('weekly')"><div class="dai">🗓️</div><div>Weekly</div></div>
+      <div class="dash-action-btn" onclick="showScreen('kpi')"><div class="dai">⚕️</div><div>KPIs</div></div>
+      <div class="dash-action-btn" onclick="showScreen('history')"><div class="dai">🗂️</div><div>History</div></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-today">
+    <div class="date-scroll" id="dateChips"></div>
+    <div class="target-bar glass-panel">
+      <div class="target-bar-row">
+        <div>
+          <div class="target-label">📈 TODAY'S PROGRESS</div>
+          <div class="target-sub" id="targetSubText">All Slots Combined</div>
+        </div>
+        <div class="target-pct" id="targetPct">—%</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+    <div class="slot-summary">
+      <div class="slot-sum-card"><div class="ss-label">🌙 12A–6A</div><div class="ss-val" id="sum0">—</div></div>
+      <div class="slot-sum-card"><div class="ss-label">☀️ 6A–2P</div><div class="ss-val" id="sum1">—</div></div>
+      <div class="slot-sum-card"><div class="ss-label">🌆 2P–10P</div><div class="ss-val" id="sum2">—</div></div>
+    </div>
+    
+    <div class="section-label">EDIT / ENTER DATA BY SLOT</div>
+    <div class="slot-tabs">
+      <div class="slot-tab active" onclick="switchSlot(0)" id="stab0">🌙 12AM–6AM</div>
+      <div class="slot-tab" onclick="switchSlot(1)" id="stab1">☀️ 6AM–2PM</div>
+      <div class="slot-tab" onclick="switchSlot(2)" id="stab2">🌆 2PM–10PM</div>
+    </div>
+    <div class="entry-grid" id="entryGrid"></div>
+    <button class="save-btn" onclick="saveSlot()">💾 Save & Sync Data</button>
     <div class="cloud-status" id="syncStatus">Status: Up to date</div>
+  </div>
+
+  <div class="screen" id="screen-weekly">
+    <div class="section-label">THIS WEEK OVERVIEW</div>
+    <div class="kpi-row">
+      <div class="kpi-chip"><div class="kpi-name">WEEK SALES</div><div class="kpi-val" id="wk-sales">—</div></div>
+      <div class="kpi-chip"><div class="kpi-name">NO7</div><div class="kpi-val" id="wk-no7" style="color:var(--purple)">—</div></div>
+      <div class="kpi-chip"><div class="kpi-name">AVG ATV</div><div class="kpi-val" id="wk-atv" style="color:var(--orange)">—</div></div>
+    </div>
+    <div class="section-label">DAILY BREAKDOWN</div>
+    <div class="week-table-wrap">
+      <div class="week-row header">
+        <span>DAY</span><span>SALES</span><span>TARGET</span><span>%ACH</span><span>NO7</span><span>ATV</span>
+      </div>
+      <div id="weekRows"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-kpi">
+    <div class="section-label">TODAY'S KPIS</div>
+    <div id="kpiCards"></div>
+    <div class="section-label">AURA / CSAT</div>
+    <div class="entry-grid" id="auraIptGrid">
+      <div class="entry-card"><label>⭐ AURA SCORE</label><input type="number" id="aura-input" placeholder="4.5"></div>
+      <div class="entry-card"><label>🔗 AURA LINK%</label><input type="number" id="aura-link-input" placeholder="75"></div>
+    </div>
+    <button class="save-btn" onclick="saveKPIs()">💾 Save KPIs</button>
   </div>
 
   <div class="screen" id="screen-history">
@@ -180,166 +355,268 @@ body {
 
   <div class="screen" id="screen-settings">
     <div class="section-label">STORE CONFIG</div>
-    <div class="settings-group glass-card">
+    <div class="settings-group">
       <div class="settings-row">
         <div><div class="settings-label">Store Name</div></div>
         <input class="settings-input" id="set-store" placeholder="BOOTS DXB T3" oninput="saveSetting('storeName',this.value)">
       </div>
     </div>
     
-    <div class="section-label">CLOUD DATA</div>
-    <div class="settings-group glass-card">
+    <div class="section-label">CLOUD SYNC</div>
+    <div class="settings-group">
       <div class="settings-row" style="cursor:pointer" onclick="forceCloudSync()">
-        <div><div class="settings-label" style="color:var(--aura-purple)">☁️ Force Cloud Sync</div><div class="settings-sub">Push local data to database</div></div>
+        <div><div class="settings-label" style="color:var(--aura-purple)">☁️ Push to Cloud</div><div class="settings-sub">Manually sync data to database</div></div>
         <div style="color:var(--aura-pink);font-size:18px">›</div>
       </div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-today" onclick="showScreen('today')"><span class="nav-icon">✏️</span>Entry</button>
-    <button class="nav-btn" id="nav-history" onclick="showScreen('history')"><span class="nav-icon">🗂️</span>History</button>
-    <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')"><span class="nav-icon">⚙️</span>Settings</button>
+    <button class="nav-btn active" id="nav-dashboard" onclick="showScreen('dashboard')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+    <button class="nav-btn" id="nav-today" onclick="showScreen('today')"><span class="nav-icon">✏️</span><span class="nav-label">Entry</span></button>
+    <button class="nav-btn" id="nav-weekly" onclick="showScreen('weekly')"><span class="nav-icon">🗓️</span><span class="nav-label">Weekly</span></button>
+    <button class="nav-btn" id="nav-history" onclick="showScreen('history')"><span class="nav-icon">🗂️</span><span class="nav-label">History</span></button>
+    <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
   </div>
 </div>
 
 <script>
-// --- CLOUD MOCKUP SYSTEM ---
-// You will replace these functions with your actual database code (Firebase, etc.)
-let salesData = {};
+const DAYS_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DEFAULT_TGT=[40000,35000,35000,35000,38000,45000,45000]; 
+
 let settings = {};
-const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let salesData = {};
 let selectedDate = new Date().toISOString().slice(0,10);
+let selectedSlot = 0;
 
-function simulateCloudSave(data) {
-  return new Promise(resolve => setTimeout(() => {
-    localStorage.setItem('cloud_backup', JSON.stringify(data));
-    resolve('Success');
-  }, 800));
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+// CLOUD MOCKUP
+function simulateCloudSave() {
+  return new Promise(resolve => setTimeout(() => resolve('Success'), 800));
 }
 
-function simulateCloudFetch() {
-  return new Promise(resolve => setTimeout(() => {
-    const data = JSON.parse(localStorage.getItem('cloud_backup')) || {};
-    resolve(data);
-  }, 800));
-}
-
-// --- APP LOGIC ---
-function init() {
-  const now = new Date();
-  document.getElementById('todayStr').textContent = now.toDateString();
-  salesData = JSON.parse(localStorage.getItem('local_data')) || {};
-  settings = JSON.parse(localStorage.getItem('local_settings')) || {};
-  document.getElementById('storeBadge').textContent = settings.storeName || 'BOOTS DXB';
-  document.getElementById('set-store').value = settings.storeName || '';
-  
+function init(){
+  settings = lsGet('dst_settings') || {};
+  salesData = lsGet('dst_data') || {};
+  updateTopbar();
   buildDateChips();
-  loadFormData();
+  renderEntryGrid();
+  document.getElementById('set-store').value=settings.storeName||'BOOTS DXB T3';
+  refreshAll();
 }
 
-function buildDateChips() {
-  const c = document.getElementById('dateChips'); 
-  c.innerHTML = '';
-  const today = new Date();
-  for(let i=6; i>=0; i--) {
-    const d = new Date(today); 
-    d.setDate(today.getDate() - i);
-    const key = d.toISOString().slice(0,10);
-    const chip = document.createElement('div');
-    chip.className = 'date-chip glass-card' + (key === selectedDate ? ' active' : '');
-    chip.innerHTML = `<div class="day-name">${DAYS_SHORT[d.getDay()]}</div><div class="day-num">${d.getDate()}</div>`;
-    chip.onclick = () => { selectedDate = key; buildDateChips(); loadFormData(); };
+function updateTopbar(){
+  const now=new Date();
+  document.getElementById('todayStr').textContent=
+    DAYS_FULL[now.getDay()]+', '+now.getDate()+' '+MONTHS[now.getMonth()];
+  document.getElementById('storeBadge').textContent=settings.storeName||'BOOTS DXB T3';
+}
+
+function buildDateChips(){
+  const c=document.getElementById('dateChips'); c.innerHTML='';
+  const today=new Date();
+  for(let i=6;i>=0;i--){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    const chip=document.createElement('div');
+    chip.className='date-chip'+(key===selectedDate?' active':'');
+    chip.innerHTML=`<div class="day-name">${DAYS_SHORT[d.getDay()]}</div><div class="day-num">${d.getDate()}</div>`;
+    chip.onclick=()=>{ selectedDate=key; buildDateChips(); refreshAll(); loadSlotData(); };
     c.appendChild(chip);
   }
 }
 
-function loadFormData() {
-  const data = salesData[selectedDate] || {};
-  document.getElementById('inp-sale').value = data.sale || '';
-  document.getElementById('inp-no7').value = data.no7 || '';
-  document.getElementById('inp-trn').value = data.trn || '';
-  document.getElementById('inp-footfall').value = data.footfall || '';
+function switchSlot(i){
+  selectedSlot=i;
+  [0,1,2].forEach(j=>{
+    document.getElementById('stab'+j).className='slot-tab'+(j===i?' active':'');
+  });
+  loadSlotData();
 }
 
-async function saveData() {
+function renderEntryGrid(){
+  document.getElementById('entryGrid').innerHTML=`
+    <div class="entry-card">
+      <label>💰 SALE (AED)</label>
+      <input type="number" inputmode="decimal" id="inp-sale" placeholder="0.00" oninput="autoCalc()">
+    </div>
+    <div class="entry-card">
+      <label>🧴 NO7 SALES</label>
+      <input type="number" inputmode="decimal" id="inp-no7" placeholder="0.00" oninput="autoCalc()">
+    </div>
+    <div class="entry-card">
+      <label>🧾 TRANSACTIONS</label>
+      <input type="number" inputmode="numeric" id="inp-trn" placeholder="0" oninput="autoCalc()">
+      <div class="calc-row" id="calc-atv">ATV: —</div>
+    </div>
+    <div class="entry-card">
+      <label>👥 FOOTFALL</label>
+      <input type="number" inputmode="numeric" id="inp-footfall" placeholder="0" oninput="autoCalc()">
+    </div>`;
+  loadSlotData();
+}
+
+function autoCalc(){
+  const sale=parseFloat(document.getElementById('inp-sale')?.value)||0;
+  const trn=parseFloat(document.getElementById('inp-trn')?.value)||0;
+  const atvEl=document.getElementById('calc-atv');
+  if(atvEl) atvEl.textContent=trn>0?'ATV: '+(sale/trn).toFixed(1)+' AED':'ATV: —';
+}
+
+function loadSlotData(){
+  const slot=(salesData[selectedDate]||{})['slot_'+selectedSlot]||{};
+  ['sale','no7','trn','footfall'].forEach(f=>{
+    const el=document.getElementById('inp-'+f);
+    if(el) el.value=slot[f]||'';
+  });
+  autoCalc();
+}
+
+async function saveSlot(){
   const stat = document.getElementById('syncStatus');
   stat.textContent = 'Status: Saving to cloud...';
   
-  if(!salesData[selectedDate]) salesData[selectedDate] = {};
-  salesData[selectedDate].sale = parseFloat(document.getElementById('inp-sale').value) || 0;
-  salesData[selectedDate].no7 = parseFloat(document.getElementById('inp-no7').value) || 0;
-  salesData[selectedDate].trn = parseFloat(document.getElementById('inp-trn').value) || 0;
-  salesData[selectedDate].footfall = parseFloat(document.getElementById('inp-footfall').value) || 0;
+  if(!salesData[selectedDate]) salesData[selectedDate]={};
+  const slot={};
+  ['sale','no7','trn','footfall'].forEach(f=>{
+    const el=document.getElementById('inp-'+f);
+    if(el&&el.value!=='') slot[f]=parseFloat(el.value);
+  });
+  if(slot.sale&&slot.trn) slot.atv=slot.sale/slot.trn;
+  salesData[selectedDate]['slot_'+selectedSlot]=slot;
+  lsSet('dst_data',salesData);
   
-  localStorage.setItem('local_data', JSON.stringify(salesData));
-  
-  // Cloud sync trigger
-  await simulateCloudSave(salesData);
-  
+  await simulateCloudSave();
   stat.textContent = 'Status: Up to date';
-  showToast('✓ Saved & Synced!');
-  refreshHistory();
+  showToast('✓ Saved to Cloud!');
+  refreshAll();
 }
 
-function saveSetting(key, val) {
-  settings[key] = val;
-  localStorage.setItem('local_settings', JSON.stringify(settings));
-  document.getElementById('storeBadge').textContent = settings.storeName || 'BOOTS DXB';
+function saveKPIs(){
+  if(!salesData[selectedDate]) salesData[selectedDate]={};
+  salesData[selectedDate].aura=parseFloat(document.getElementById('aura-input')?.value)||null;
+  salesData[selectedDate].auraLink=parseFloat(document.getElementById('aura-link-input')?.value)||null;
+  lsSet('dst_data',salesData);
+  showToast('✓ KPIs saved!');
 }
+
+function saveSetting(k,v){ settings[k]=v; lsSet('dst_settings',settings); updateTopbar(); }
 
 async function forceCloudSync() {
   showToast('⏳ Syncing to cloud...');
-  await simulateCloudSave(salesData);
+  await simulateCloudSave();
   showToast('✓ Cloud Sync Complete!');
 }
 
-function refreshHistory() {
-  const c = document.getElementById('historyList');
-  const keys = Object.keys(salesData).sort().reverse();
-  c.innerHTML = '';
+function getDayTotals(key){
+  const d=salesData[key]||{};
+  let sale=0,no7=0,trn=0,ff=0;
+  for(let i=0;i<3;i++){const s=d['slot_'+i]||{};sale+=s.sale||0;no7+=s.no7||0;trn+=s.trn||0;ff+=s.footfall||0;}
+  return{sale,no7,trn,footfall:ff, atv:trn>0?sale/trn:0, no7Pct:sale>0?no7/sale*100:0, aura:d.aura, auraLink:d.auraLink};
+}
+
+function refreshAll(){
+  refreshTargetBar();
+  refreshDashboard();
+  if(document.getElementById('screen-weekly').classList.contains('active')) refreshWeekly();
+  if(document.getElementById('screen-history').classList.contains('active')) refreshHistory();
+}
+
+function refreshTargetBar(){
+  const t=getDayTotals(selectedDate);
+  const tgt=DEFAULT_TGT[new Date(selectedDate+'T12:00:00').getDay()];
+  const pct=tgt>0?t.sale/tgt*100:0;
+  document.getElementById('targetPct').textContent=pct>0?pct.toFixed(0)+'%':'—%';
+  document.getElementById('progFill').style.width=Math.min(pct,100)+'%';
   
-  if(keys.length === 0) {
-    c.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">No data yet.</div>';
-    return;
+  const d=salesData[selectedDate]||{};
+  for(let i=0;i<3;i++){
+    const s=d['slot_'+i]||{};
+    document.getElementById('sum'+i).textContent=s.sale?'AED '+Math.round(s.sale):'—';
   }
+}
+
+function refreshDashboard(){
+  const t=getDayTotals(selectedDate);
+  const tgt=DEFAULT_TGT[new Date(selectedDate+'T12:00:00').getDay()];
+  const pct=tgt>0?Math.round(t.sale/tgt*100):0;
   
-  keys.forEach(key => {
-    const d = salesData[key];
-    const card = document.createElement('div');
-    card.className = 'history-card glass-card';
-    card.innerHTML = `
+  document.getElementById('dp-sales').textContent='AED '+t.sale.toLocaleString();
+  document.getElementById('dp-pct').textContent=t.sale>0?pct+'%':'—%';
+  document.getElementById('dp-fill').style.width=Math.min(pct,100)+'%';
+  document.getElementById('dk-aura').textContent=t.auraLink?t.auraLink+'%':'—';
+  document.getElementById('dk-no7pct').textContent=t.no7Pct>0?t.no7Pct.toFixed(1)+'%':'—';
+  document.getElementById('dk-atv').textContent=t.atv>0?Math.round(t.atv):'—';
+  document.getElementById('dk-no7s').textContent=t.no7>0?Math.round(t.no7):'—';
+  document.getElementById('dk-trn').textContent=t.trn>0?t.trn:'—';
+}
+
+function refreshWeekly(){
+  const c=document.getElementById('weekRows'); c.innerHTML='';
+  const today=new Date();
+  const start=new Date(today); start.setDate(today.getDate()-today.getDay()+1); // Start Monday
+  for(let i=0;i<7;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const key=d.toISOString().slice(0,10);
+    const t=getDayTotals(key);
+    const tgt=DEFAULT_TGT[d.getDay()];
+    const pct=tgt>0?t.sale/tgt*100:0;
+    const row=document.createElement('div');
+    row.className='week-row';
+    row.innerHTML=`
+      <div class="week-day">${DAYS_SHORT[d.getDay()]}<div class="date-small">${d.getDate()}</div></div>
+      <div class="week-sales">${t.sale>0?Math.round(t.sale):'—'}</div>
+      <div class="week-target">${tgt}</div>
+      <div class="week-pct ${pct>=100?'good':pct>=80?'warn':'bad'}">${pct>0?pct.toFixed(0)+'%':'—'}</div>
+      <div class="week-no7">${t.no7>0?Math.round(t.no7):'—'}</div>
+      <div class="week-atv">${t.atv>0?Math.round(t.atv):'—'}</div>`;
+    c.appendChild(row);
+  }
+}
+
+function refreshHistory(){
+  const c=document.getElementById('historyList');
+  const keys=Object.keys(salesData).sort().reverse();
+  c.innerHTML='';
+  keys.forEach(key=>{
+    const t=getDayTotals(key);
+    if(t.sale===0) return;
+    const d=new Date(key+'T12:00:00');
+    const card=document.createElement('div');
+    card.className='history-card';
+    card.innerHTML=`
       <div>
-        <div class="h-date">${key}</div>
-        <div class="h-sub">TRN: ${d.trn || 0} · No7: ${d.no7 || 0}</div>
+        <div class="h-date">${DAYS_FULL[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}</div>
+        <div class="h-sub">TRN: ${t.trn} · No7: ${t.no7>0?Math.round(t.no7):'—'}</div>
       </div>
-      <div class="h-sales">AED ${d.sale || 0}</div>
-    `;
-    // Click to edit functionality
-    card.onclick = () => { 
-      selectedDate = key; 
-      buildDateChips(); 
-      showScreen('today'); 
-      loadFormData(); 
-    };
+      <div class="h-sales">AED ${Math.round(t.sale)}</div>`;
+    card.onclick=()=>{ selectedDate=key; buildDateChips(); showScreen('today'); loadSlotData(); refreshAll(); };
     c.appendChild(card);
   });
 }
 
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
-  
-  if(name === 'history') refreshHistory();
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='history') refreshHistory();
+  if(name==='weekly') refreshWeekly();
+  if(name==='kpi'){
+    const d=salesData[selectedDate]||{};
+    document.getElementById('aura-input').value=d.aura||'';
+    document.getElementById('aura-link-input').value=d.auraLink||'';
+  }
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; 
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
 }
 
 init();
