@@ -1,625 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#eff6ff">
-<title>Pharmacy Sales Widget</title>
-<style>
-/* === LIGHT NAVY & GLASSMORPHISM THEME === */
-:root {
-  --boots-navy: #1e3a8a;
-  --boots-blue: #005eb8;
-  --aura-pink: #d81b60;
-  --aura-purple: #8e24aa;
-  
-  /* Glass colors */
-  --bg: transparent; 
-  --card: rgba(255, 255, 255, 0.45);
-  --card2: rgba(255, 255, 255, 0.6);
-  --bg3: rgba(255, 255, 255, 0.3);
-  --border: rgba(255, 255, 255, 0.6);
-  
-  --accent: #005eb8;
-  --accent2: #4ba3e3;
-  --green: #16a34a;
-  --red: #ef4444;
-  --orange: #d97706;
-  --purple: #9333ea;
-  
-  /* Dark text for light glass */
-  --text: #0f172a;
-  --text2: #334155;
-  --text3: #475569;
-  
-  --mono: 'Courier New', Courier, monospace;
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-  --serif: 'Times New Roman', Times, serif;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#eff6ff">
+  <title>Pharmacy Sales & Shift Tracker</title>
+  <style>
+    :root {
+      --boots-navy: #1e3a8a;
+      --boots-blue: #005eb8;
+      --aura-pink: #d81b60;
+      --aura-purple: #8e24aa;
+      --bg: transparent;
+      --card: rgba(255, 255, 255, 0.45);
+      --card2: rgba(255, 255, 255, 0.6);
+      --border: rgba(255, 255, 255, 0.6);
+      --accent: #005eb8;
+      --green: #16a34a;
+      --red: #ef4444;
+      --orange: #d97706;
+      --purple: #9333ea;
+      --text: #0f172a;
+      --text2: #334155;
+      --mono: 'Courier New', Courier, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--sans);
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23eff6ff"><rect width="100" height="100"/></svg>') center/cover fixed;
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+    }
+    .app-wrapper {
+      width: 100%;
+      max-width: 550px;
+      min-height: 100dvh;
+      background: rgba(239, 246, 255, 0.25);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-left: 1px solid rgba(255,255,255,0.4);
+      border-right: 1px solid rgba(255,255,255,0.4);
+      box-shadow: 0 0 30px rgba(0,0,0,0.08);
+      position: relative;
+      padding-bottom: 100px;
+    }
+    .glass-panel {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(20px);
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-title { font-family: 'Times New Roman', serif; font-style: italic; font-size: 24px; font-weight: 700; color: var(--boots-navy); }
+    .store-badge { background: var(--boots-navy); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+    .screen { display: none; padding: 0 0 20px; animation: fadeIn .25s; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    .shift-card {
+      margin: 16px 20px; padding: 18px; border-radius: 20px;
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.8);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .shift-timer {
+      font-size: 36px; font-weight: 900; font-family: var(--mono);
+      color: var(--boots-navy); letter-spacing: 1px;
+    }
+    .shift-meta { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--text2); }
+    .shift-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .btn {
+      flex: 1; padding: 14px; border-radius: 14px; border: none;
+      font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s;
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);
+      border: 1px solid var(--border); color: var(--boots-navy);
+    }
+    .btn.primary { background: var(--boots-navy); color: white; border: none; }
+    .btn.danger { background: var(--aura-pink); color: white; border: none; }
+    .btn:active { transform: scale(0.96); }
 
-body {
-  font-family: var(--sans);
-  /* Using your uploaded image as the background */
-  background: url('image_8e6294.jpg') center center / cover fixed no-repeat;
-  color: var(--text);
-  min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
+    .companion-row {
+      display: flex; align-items: center; gap: 8px; margin: 5px 0;
+    }
+    .companion-row input {
+      flex:1; background: rgba(255,255,255,0.6); border:1px solid var(--border);
+      border-radius: 10px; padding: 10px; font-weight: 600;
+    }
 
-/* DESKTOP WIDGET CONTAINER */
-.app-wrapper {
-  width: 100%;
-  max-width: 550px; /* Wider than mobile, acts like a desktop widget */
-  min-height: 100dvh;
-  background: rgba(239, 246, 255, 0.2); /* Very light blue tint */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-left: 1px solid rgba(255,255,255,0.4);
-  border-right: 1px solid rgba(255,255,255,0.4);
-  box-shadow: 0 0 30px rgba(0,0,0,0.1);
-  position: relative;
-  /* Extra padding to prevent taskbar hiding */
-  padding-bottom: 110px; 
-  overflow-x: hidden;
-}
-
-/* Glass properties applied to all cards */
-.glass-panel {
-  background: var(--card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.status-bar { height: env(safe-area-inset-top, 20px); }
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 12px 20px 10px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.topbar-title { font-family: var(--serif); font-style: italic; font-size: 24px; font-weight: 700; color: var(--boots-navy); }
-.topbar-date { font-size: 12px; color: var(--text2); font-family: var(--mono); font-weight: 600; }
-.store-badge { background: var(--boots-navy); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
-
-.screen { display: none; padding: 0 0 20px; animation: fadeIn .25s ease; }
-.screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-.section-label { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--boots-navy); padding: 18px 20px 8px; }
-
-.date-scroll { display: flex; gap: 8px; padding: 6px 20px 2px; overflow-x: auto; scrollbar-width: none; }
-.date-scroll::-webkit-scrollbar { display: none; }
-.date-chip { flex-shrink: 0; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 14px; text-align: center; cursor: pointer; transition: all .15s; min-width: 56px; backdrop-filter: blur(10px); }
-.date-chip.active { background: var(--boots-navy); border-color: var(--boots-navy); box-shadow: 0 4px 12px rgba(30,58,138,0.3); }
-.date-chip .day-name { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: .5px; }
-.date-chip.active .day-name { color: rgba(255,255,255,0.9); }
-.date-chip .day-num { font-size: 18px; font-weight: 800; line-height: 1.1; margin-top: 2px; color: var(--text); }
-.date-chip.active .day-num { color: #fff; }
-
-.target-bar { margin: 12px 20px; border-radius: 16px; padding: 14px 16px; }
-.target-bar-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.target-label { font-size: 11px; font-weight: 800; color: var(--boots-navy); letter-spacing: .5px; }
-.target-pct { font-size: 22px; font-weight: 800; }
-.target-pct.good { color: var(--green); } .target-pct.bad { color: var(--red); } .target-pct.warn { color: var(--orange); }
-.target-sub { font-size: 12px; color: var(--text2); font-weight: 600; font-family: var(--mono); }
-.prog-track { background: rgba(0,0,0,0.1); border-radius: 4px; height: 6px; overflow: hidden; }
-.prog-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
-.prog-fill.good { background: linear-gradient(90deg, #16a34a, #4ade80); }
-.prog-fill.bad { background: linear-gradient(90deg, #ef4444, #f87171); }
-.prog-fill.warn { background: linear-gradient(90deg, #d97706, #fbbf24); }
-
-.slot-tabs { display: flex; gap: 6px; padding: 4px 20px 0; }
-.slot-tab { flex: 1; background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 10px; font-weight: 800; color: var(--text2); cursor: pointer; transition: all .15s; backdrop-filter: blur(5px); }
-.slot-tab.active { background: var(--boots-blue); border-color: var(--boots-blue); color: #fff; }
-
-.entry-grid { margin: 12px 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.entry-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 14px; backdrop-filter: blur(10px); }
-.entry-card label { font-size: 10px; font-weight: 800; color: var(--boots-navy); letter-spacing: 1px; display: block; margin-bottom: 4px; }
-.entry-card input { background: transparent; border: none; outline: none; color: var(--text); font-size: 22px; font-weight: 800; font-family: var(--mono); width: 100%; }
-.entry-card input::placeholder { color: rgba(0,0,0,0.3); }
-.entry-card .calc-row { margin-top: 4px; font-size: 11px; font-weight: 600; color: var(--text2); font-family: var(--mono); }
-
-/* Aura Gradient Button */
-.save-btn { margin: 16px 20px 0; background: linear-gradient(145deg, var(--aura-pink), var(--aura-purple)); color: #fff; border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 800; width: calc(100% - 40px); cursor: pointer; transition: all .15s; box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3); }
-.save-btn:active { transform: scale(.97); box-shadow: none; }
-
-.kpi-row { display: flex; gap: 10px; padding: 12px 20px 0; overflow-x: auto; scrollbar-width: none; }
-.kpi-row::-webkit-scrollbar { display: none; }
-.kpi-chip { flex-shrink: 0; background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 16px; min-width: 110px; backdrop-filter: blur(10px); }
-.kpi-chip .kpi-name { font-size: 10px; font-weight: 800; color: var(--boots-navy); letter-spacing: .8px; }
-.kpi-chip .kpi-val { font-size: 20px; font-weight: 800; font-family: var(--mono); margin-top: 2px; color: var(--text); }
-.kpi-chip .kpi-sub { font-size: 10px; font-weight: 600; color: var(--text2); margin-top: 1px; }
-
-.week-table-wrap { margin: 10px 20px 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--card); backdrop-filter: blur(10px); }
-.week-row { display: grid; grid-template-columns: 60px 1fr 1fr 60px 60px 50px; gap: 0; padding: 11px 12px; border-bottom: 1px solid var(--border); align-items: center; }
-.week-row.header { background: rgba(0,0,0,0.05); padding: 8px 12px; }
-.week-row.header span { font-size: 9px; font-weight: 800; color: var(--boots-navy); letter-spacing: .8px; }
-.week-day { font-size: 12px; font-weight: 800; color: var(--text); }
-.week-day .date-small { font-size: 10px; color: var(--text2); }
-.week-sales { font-size: 13px; font-weight: 800; font-family: var(--mono); color: var(--text); }
-.week-target { font-size: 11px; color: var(--text2); font-weight: 600; font-family: var(--mono); }
-.week-pct { font-size: 12px; font-weight: 800; text-align: right; }
-.week-pct.good { color: var(--green); } .week-pct.bad { color: var(--red); } .week-pct.warn { color: var(--orange); }
-.week-no7 { font-size: 11px; font-family: var(--mono); font-weight: 700; color: var(--purple); text-align: right; }
-.week-atv { font-size: 11px; font-family: var(--mono); font-weight: 700; color: var(--text2); text-align: right; }
-
-.history-card { margin: 8px 20px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; backdrop-filter: blur(10px); }
-.history-card:active { background: var(--card2); }
-.h-date { font-size: 13px; font-weight: 800; color: var(--boots-navy); }
-.h-sub { font-size: 11px; font-weight: 600; color: var(--text2); margin-top: 2px; }
-.h-sales { font-size: 18px; font-weight: 800; font-family: var(--mono); text-align: right; color: var(--text); }
-
-/* Taskbar fix: Bottom Nav restricted to container width */
-.bottom-nav { 
-  position: absolute; 
-  bottom: 0; 
-  left: 0; 
-  width: 100%; 
-  z-index: 200; 
-  background: rgba(255, 255, 255, 0.75); 
-  backdrop-filter: blur(20px); 
-  -webkit-backdrop-filter: blur(20px); 
-  border-top: 1px solid var(--border); 
-  display: flex; 
-  padding-bottom: env(safe-area-inset-bottom, 15px); 
-}
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0 8px; cursor: pointer; border: none; background: none; color: var(--text3); }
-.nav-btn.active { color: var(--boots-navy); }
-.nav-btn .nav-icon { font-size: 22px; line-height: 1; }
-.nav-btn .nav-label { font-size: 10px; font-weight: 800; margin-top: 3px; }
-
-.toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--green); color: #fff; padding: 10px 22px; border-radius: 50px; font-size: 13px; font-weight: 800; z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-.settings-group { margin: 10px 20px 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; backdrop-filter: blur(10px); }
-.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-.settings-label { font-size: 14px; font-weight: 700; color: var(--boots-navy); }
-.settings-sub { font-size: 11px; font-weight: 600; color: var(--text2); margin-top: 2px; }
-.settings-input { background: rgba(255,255,255,0.5); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: var(--text); font-size: 14px; font-weight: 800; font-family: var(--mono); width: 110px; text-align: right; outline: none; }
-
-.slot-summary { margin: 10px 20px 0; display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-.slot-sum-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; backdrop-filter: blur(10px); }
-.slot-sum-card .ss-label { font-size: 9px; font-weight: 800; color: var(--boots-navy); }
-.slot-sum-card .ss-val { font-size: 15px; font-weight: 800; font-family: var(--mono); margin-top: 3px; color: var(--text); }
-
-/* Dashboard Adjustments */
-.dash-header { padding: 24px 20px 16px; }
-.dash-title { font-size: 40px; font-weight: 900; color: var(--boots-navy); letter-spacing: 2px; line-height: 1.1; margin-bottom: 4px; }
-.dash-subtitle { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: var(--text2); text-transform: uppercase; }
-.dash-week-tag { background: rgba(75,163,227,.2); border: 1px solid var(--accent2); color: var(--boots-navy); font-size: 10px; font-weight: 800; padding: 4px 14px; border-radius: 100px; display: inline-block; margin-top: 10px; }
-
-.dash-progress { margin: 0 20px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; backdrop-filter: blur(15px); }
-.dash-prog-label { font-size: 9px; font-weight: 800; color: var(--boots-navy); margin-bottom: 4px; }
-.dash-prog-val { font-size: 32px; font-weight: 900; color: var(--text); font-family: var(--mono); }
-.dash-prog-pct { font-size: 24px; font-weight: 900; }
-
-.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
-.dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; backdrop-filter: blur(15px); }
-.dc-aura { background: linear-gradient(145deg, rgba(216,27,96,0.8), rgba(142,36,170,0.8)); border: none; }
-.dc-aura .dc-label, .dc-aura .dc-value { color: #fff; }
-.dc-label { font-size: 9px; font-weight: 800; color: var(--boots-navy); margin-bottom: 8px; }
-.dc-value { font-size: 36px; font-weight: 900; color: var(--text); font-family: var(--mono); margin-bottom: 10px; }
-
-.dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 12px 16px 0; }
-.dash-grid-3 .dash-card { padding: 14px 12px; }
-.dash-grid-3 .dc-value { font-size: 26px; }
-
-.dash-actions { display: flex; gap: 10px; padding: 16px 16px 0; }
-.dash-action-btn { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; color: var(--boots-navy); backdrop-filter: blur(10px); cursor: pointer; }
-.cloud-status { text-align: center; font-size: 11px; font-weight: 600; color: var(--text2); margin-top: 10px; }
-</style>
+    .section-label { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--boots-navy); padding: 18px 20px 8px; }
+    .entry-grid { margin: 12px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .entry-card { background: var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; backdrop-filter: blur(10px); }
+    .entry-card label { font-size:10px; font-weight:800; color:var(--boots-navy); }
+    .entry-card input { background:transparent; border:none; font-size:20px; font-weight:800; font-family:var(--mono); width:100%; outline:none; }
+    .save-btn { margin:16px 20px; background:linear-gradient(145deg, var(--aura-pink), var(--aura-purple)); color:#fff; border:none; border-radius:14px; padding:16px; width:calc(100% - 40px); font-weight:800; }
+    .bottom-nav { position:absolute; bottom:0; width:100%; background:rgba(255,255,255,0.75); backdrop-filter:blur(20px); display:flex; border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom,15px); }
+    .nav-btn { flex:1; padding:10px 0; text-align:center; font-size:10px; font-weight:800; color:var(--text3); background:none; border:none; }
+    .nav-btn.active { color:var(--boots-navy); }
+    .toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:var(--green); color:#fff; padding:10px 22px; border-radius:50px; z-index:999; opacity:0; transition:.3s; }
+    .toast.show { opacity:1; }
+    .history-card { margin:8px 20px; background:var(--card); border-radius:14px; padding:14px; display:flex; justify-content:space-between; cursor:pointer; }
+    .kpi-row { display:flex; gap:10px; padding:0 20px; overflow-x:auto; }
+    .kpi-chip { background:var(--card); border-radius:14px; padding:12px 16px; min-width:100px; }
+  </style>
 </head>
 <body>
-
 <div class="app-wrapper">
-  <div class="status-bar"></div>
-
   <div class="topbar">
-    <div>
-      <div class="topbar-title">Boots <span style="font-weight:600;color:var(--text2);font-size:16px;">Tracker</span></div>
-      <div class="topbar-date" id="todayStr"></div>
-    </div>
-    <div class="store-badge" id="storeBadge">BOOTS DXB T3</div>
+    <div class="topbar-title">Boots <span style="font-weight:600;">Tracker</span></div>
+    <div class="store-badge" id="storeBadge">DXB T3</div>
   </div>
+  <div class="toast" id="toast">✓ Saved</div>
 
-  <div class="toast" id="toast">✓ Saved!</div>
-
+  <!-- DASHBOARD -->
   <div class="screen active" id="screen-dashboard">
-    <div class="dash-header">
-      <div class="dash-title">PHARMACY<br>SALES</div>
-      <div class="dash-subtitle">Daily Performance Dashboard</div>
-      <div class="dash-week-tag" id="dash-week-tag">Week —</div>
+    <div class="shift-card" id="shiftWidget">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-weight:800; color:var(--boots-navy);">⏱️ SHIFT TIMER</span>
+        <span style="font-size:12px;" id="shiftStatus">Not started</span>
+      </div>
+      <div class="shift-timer" id="liveTimer">00:00:00</div>
+      <div class="shift-meta">
+        <span id="shiftInLabel">In: --:--</span>
+        <span id="shiftOutLabel">Out: --:--</span>
+        <span id="shiftTotal">0h 0m</span>
+      </div>
+      <div class="companion-row">
+        <input type="text" id="companionInput" placeholder="👤 Staff companion (optional)">
+      </div>
+      <div class="shift-actions">
+        <button class="btn primary" id="btnStartShift" onclick="handleStartShift()">▶ START</button>
+        <button class="btn danger" id="btnEndShift" onclick="endShift()" disabled>⏹ END</button>
+      </div>
+      <button class="btn" id="btnRestartManual" style="display:none; margin-top:6px;" onclick="restartOrManual()">🔄 Restart / ✏️ Manual</button>
     </div>
-    <div class="dash-progress glass-panel">
-      <div class="dash-prog-row">
-        <div>
-          <div class="dash-prog-label">TODAY'S TOTAL REGISTER</div>
-          <div class="dash-prog-val" id="dp-sales">AED 0</div>
-        </div>
-        <div style="text-align:right">
-          <div class="dash-prog-label">ACHIEVED</div>
-          <div class="dash-prog-pct" id="dp-pct" style="color:var(--accent2)">—%</div>
-        </div>
-      </div>
-      <div class="prog-track"><div class="prog-fill" id="dp-fill"></div></div>
-    </div>
-    
-    <div class="dash-grid">
-      <div class="dash-card dc-aura">
-        <div class="dc-label">✨ AURA LINKAGE</div>
-        <div class="dc-value" id="dk-aura">—</div>
-      </div>
-      <div class="dash-card">
-        <div class="dc-label">🧴 NO7 FOCUS %</div>
-        <div class="dc-value" id="dk-no7pct">—</div>
-      </div>
-    </div>
-    <div class="dash-grid-3">
-      <div class="dash-card">
-        <div class="dc-label">💳 ATV</div>
-        <div class="dc-value" id="dk-atv">—</div>
-      </div>
-      <div class="dash-card">
-        <div class="dc-label">🛍️ NO7 SALES</div>
-        <div class="dc-value" id="dk-no7s">—</div>
-      </div>
-      <div class="dash-card">
-        <div class="dc-label">🧾 TRN</div>
-        <div class="dc-value" id="dk-trn">—</div>
-      </div>
-    </div>
-    <div class="dash-actions">
-      <div class="dash-action-btn" onclick="showScreen('today')"><div class="dai">💊</div><div>Enter Data</div></div>
-      <div class="dash-action-btn" onclick="showScreen('weekly')"><div class="dai">🗓️</div><div>Weekly</div></div>
-      <div class="dash-action-btn" onclick="showScreen('kpi')"><div class="dai">⚕️</div><div>KPIs</div></div>
-      <div class="dash-action-btn" onclick="showScreen('history')"><div class="dai">🗂️</div><div>History</div></div>
-    </div>
+    <div class="section-label">TODAY'S SUMMARY</div>
+    <div class="kpi-row" id="dashKpis"></div>
+    <div style="padding:0 20px;"><button class="btn" onclick="showScreen('today')">📝 Enter Sales Data</button></div>
   </div>
 
+  <!-- ENTRY SCREEN -->
   <div class="screen" id="screen-today">
-    <div class="date-scroll" id="dateChips"></div>
-    <div class="target-bar glass-panel">
-      <div class="target-bar-row">
-        <div>
-          <div class="target-label">📈 TODAY'S PROGRESS</div>
-          <div class="target-sub" id="targetSubText">All Slots Combined</div>
-        </div>
-        <div class="target-pct" id="targetPct">—%</div>
-      </div>
-      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="section-label">SALES ENTRY</div>
+    <div class="entry-grid">
+      <div class="entry-card"><label>💰 SALE (AED)</label><input type="number" id="inp-sale" placeholder="0"></div>
+      <div class="entry-card"><label>🧴 NO7</label><input type="number" id="inp-no7" placeholder="0"></div>
+      <div class="entry-card"><label>🧾 TRN</label><input type="number" id="inp-trn" placeholder="0"></div>
+      <div class="entry-card"><label>👥 FOOTFALL</label><input type="number" id="inp-footfall" placeholder="0"></div>
     </div>
-    <div class="slot-summary">
-      <div class="slot-sum-card"><div class="ss-label">🌙 12A–6A</div><div class="ss-val" id="sum0">—</div></div>
-      <div class="slot-sum-card"><div class="ss-label">☀️ 6A–2P</div><div class="ss-val" id="sum1">—</div></div>
-      <div class="slot-sum-card"><div class="ss-label">🌆 2P–10P</div><div class="ss-val" id="sum2">—</div></div>
-    </div>
-    
-    <div class="section-label">EDIT / ENTER DATA BY SLOT</div>
-    <div class="slot-tabs">
-      <div class="slot-tab active" onclick="switchSlot(0)" id="stab0">🌙 12AM–6AM</div>
-      <div class="slot-tab" onclick="switchSlot(1)" id="stab1">☀️ 6AM–2PM</div>
-      <div class="slot-tab" onclick="switchSlot(2)" id="stab2">🌆 2PM–10PM</div>
-    </div>
-    <div class="entry-grid" id="entryGrid"></div>
-    <button class="save-btn" onclick="saveSlot()">💾 Save & Sync Data</button>
-    <div class="cloud-status" id="syncStatus">Status: Up to date</div>
+    <button class="save-btn" onclick="saveSales()">💾 Save Sales</button>
   </div>
 
-  <div class="screen" id="screen-weekly">
-    <div class="section-label">THIS WEEK OVERVIEW</div>
-    <div class="kpi-row">
-      <div class="kpi-chip"><div class="kpi-name">WEEK SALES</div><div class="kpi-val" id="wk-sales">—</div></div>
-      <div class="kpi-chip"><div class="kpi-name">NO7</div><div class="kpi-val" id="wk-no7" style="color:var(--purple)">—</div></div>
-      <div class="kpi-chip"><div class="kpi-name">AVG ATV</div><div class="kpi-val" id="wk-atv" style="color:var(--orange)">—</div></div>
-    </div>
-    <div class="section-label">DAILY BREAKDOWN</div>
-    <div class="week-table-wrap">
-      <div class="week-row header">
-        <span>DAY</span><span>SALES</span><span>TARGET</span><span>%ACH</span><span>NO7</span><span>ATV</span>
-      </div>
-      <div id="weekRows"></div>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-kpi">
-    <div class="section-label">TODAY'S KPIS</div>
-    <div id="kpiCards"></div>
-    <div class="section-label">AURA / CSAT</div>
-    <div class="entry-grid" id="auraIptGrid">
-      <div class="entry-card"><label>⭐ AURA SCORE</label><input type="number" id="aura-input" placeholder="4.5"></div>
-      <div class="entry-card"><label>🔗 AURA LINK%</label><input type="number" id="aura-link-input" placeholder="75"></div>
-    </div>
-    <button class="save-btn" onclick="saveKPIs()">💾 Save KPIs</button>
-  </div>
-
+  <!-- HISTORY -->
   <div class="screen" id="screen-history">
-    <div class="section-label">PREVIOUS ENTRIES (CLICK TO EDIT)</div>
+    <div class="section-label">SHIFT & SALES HISTORY</div>
     <div id="historyList"></div>
   </div>
 
-  <div class="screen" id="screen-settings">
-    <div class="section-label">STORE CONFIG</div>
-    <div class="settings-group">
-      <div class="settings-row">
-        <div><div class="settings-label">Store Name</div></div>
-        <input class="settings-input" id="set-store" placeholder="BOOTS DXB T3" oninput="saveSetting('storeName',this.value)">
-      </div>
-    </div>
-    
-    <div class="section-label">CLOUD SYNC</div>
-    <div class="settings-group">
-      <div class="settings-row" style="cursor:pointer" onclick="forceCloudSync()">
-        <div><div class="settings-label" style="color:var(--aura-purple)">☁️ Push to Cloud</div><div class="settings-sub">Manually sync data to database</div></div>
-        <div style="color:var(--aura-pink);font-size:18px">›</div>
-      </div>
-    </div>
-  </div>
-
   <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-dashboard" onclick="showScreen('dashboard')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
-    <button class="nav-btn" id="nav-today" onclick="showScreen('today')"><span class="nav-icon">✏️</span><span class="nav-label">Entry</span></button>
-    <button class="nav-btn" id="nav-weekly" onclick="showScreen('weekly')"><span class="nav-icon">🗓️</span><span class="nav-label">Weekly</span></button>
-    <button class="nav-btn" id="nav-history" onclick="showScreen('history')"><span class="nav-icon">🗂️</span><span class="nav-label">History</span></button>
-    <button class="nav-btn" id="nav-settings" onclick="showScreen('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+    <button class="nav-btn active" id="nav-dashboard" onclick="showScreen('dashboard')">🏠 Home</button>
+    <button class="nav-btn" id="nav-today" onclick="showScreen('today')">✏️ Entry</button>
+    <button class="nav-btn" id="nav-history" onclick="showScreen('history')">🗂️ History</button>
   </div>
 </div>
 
 <script>
-const DAYS_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DEFAULT_TGT=[40000,35000,35000,35000,38000,45000,45000]; 
+  const STORAGE_KEY = 'pharmacy_tracker_v2';
+  let appData = {};
+  let shiftInterval = null;
+  let currentScreen = 'dashboard';
 
-let settings = {};
-let salesData = {};
-let selectedDate = new Date().toISOString().slice(0,10);
-let selectedSlot = 0;
-
-function lsGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
-function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-
-// CLOUD MOCKUP
-function simulateCloudSave() {
-  return new Promise(resolve => setTimeout(() => resolve('Success'), 800));
-}
-
-function init(){
-  settings = lsGet('dst_settings') || {};
-  salesData = lsGet('dst_data') || {};
-  updateTopbar();
-  buildDateChips();
-  renderEntryGrid();
-  document.getElementById('set-store').value=settings.storeName||'BOOTS DXB T3';
-  refreshAll();
-}
-
-function updateTopbar(){
-  const now=new Date();
-  document.getElementById('todayStr').textContent=
-    DAYS_FULL[now.getDay()]+', '+now.getDate()+' '+MONTHS[now.getMonth()];
-  document.getElementById('storeBadge').textContent=settings.storeName||'BOOTS DXB T3';
-}
-
-function buildDateChips(){
-  const c=document.getElementById('dateChips'); c.innerHTML='';
-  const today=new Date();
-  for(let i=6;i>=0;i--){
-    const d=new Date(today); d.setDate(today.getDate()-i);
-    const key=d.toISOString().slice(0,10);
-    const chip=document.createElement('div');
-    chip.className='date-chip'+(key===selectedDate?' active':'');
-    chip.innerHTML=`<div class="day-name">${DAYS_SHORT[d.getDay()]}</div><div class="day-num">${d.getDate()}</div>`;
-    chip.onclick=()=>{ selectedDate=key; buildDateChips(); refreshAll(); loadSlotData(); };
-    c.appendChild(chip);
+  // Load data
+  function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try { appData = JSON.parse(saved); } catch(e){ appData = {}; }
+    }
+    if (!appData.shifts) appData.shifts = {};
+    if (!appData.sales) appData.sales = {};
+    if (!appData.settings) appData.settings = { storeName: 'BOOTS DXB T3' };
+    if (!appData.activeShift) appData.activeShift = null; // { startTime, companion, manualStart }
+    document.getElementById('storeBadge').textContent = appData.settings.storeName || 'DXB T3';
+    document.getElementById('companionInput').value = appData.activeShift?.companion || '';
   }
-}
 
-function switchSlot(i){
-  selectedSlot=i;
-  [0,1,2].forEach(j=>{
-    document.getElementById('stab'+j).className='slot-tab'+(j===i?' active':'');
-  });
-  loadSlotData();
-}
-
-function renderEntryGrid(){
-  document.getElementById('entryGrid').innerHTML=`
-    <div class="entry-card">
-      <label>💰 SALE (AED)</label>
-      <input type="number" inputmode="decimal" id="inp-sale" placeholder="0.00" oninput="autoCalc()">
-    </div>
-    <div class="entry-card">
-      <label>🧴 NO7 SALES</label>
-      <input type="number" inputmode="decimal" id="inp-no7" placeholder="0.00" oninput="autoCalc()">
-    </div>
-    <div class="entry-card">
-      <label>🧾 TRANSACTIONS</label>
-      <input type="number" inputmode="numeric" id="inp-trn" placeholder="0" oninput="autoCalc()">
-      <div class="calc-row" id="calc-atv">ATV: —</div>
-    </div>
-    <div class="entry-card">
-      <label>👥 FOOTFALL</label>
-      <input type="number" inputmode="numeric" id="inp-footfall" placeholder="0" oninput="autoCalc()">
-    </div>`;
-  loadSlotData();
-}
-
-function autoCalc(){
-  const sale=parseFloat(document.getElementById('inp-sale')?.value)||0;
-  const trn=parseFloat(document.getElementById('inp-trn')?.value)||0;
-  const atvEl=document.getElementById('calc-atv');
-  if(atvEl) atvEl.textContent=trn>0?'ATV: '+(sale/trn).toFixed(1)+' AED':'ATV: —';
-}
-
-function loadSlotData(){
-  const slot=(salesData[selectedDate]||{})['slot_'+selectedSlot]||{};
-  ['sale','no7','trn','footfall'].forEach(f=>{
-    const el=document.getElementById('inp-'+f);
-    if(el) el.value=slot[f]||'';
-  });
-  autoCalc();
-}
-
-async function saveSlot(){
-  const stat = document.getElementById('syncStatus');
-  stat.textContent = 'Status: Saving to cloud...';
-  
-  if(!salesData[selectedDate]) salesData[selectedDate]={};
-  const slot={};
-  ['sale','no7','trn','footfall'].forEach(f=>{
-    const el=document.getElementById('inp-'+f);
-    if(el&&el.value!=='') slot[f]=parseFloat(el.value);
-  });
-  if(slot.sale&&slot.trn) slot.atv=slot.sale/slot.trn;
-  salesData[selectedDate]['slot_'+selectedSlot]=slot;
-  lsSet('dst_data',salesData);
-  
-  await simulateCloudSave();
-  stat.textContent = 'Status: Up to date';
-  showToast('✓ Saved to Cloud!');
-  refreshAll();
-}
-
-function saveKPIs(){
-  if(!salesData[selectedDate]) salesData[selectedDate]={};
-  salesData[selectedDate].aura=parseFloat(document.getElementById('aura-input')?.value)||null;
-  salesData[selectedDate].auraLink=parseFloat(document.getElementById('aura-link-input')?.value)||null;
-  lsSet('dst_data',salesData);
-  showToast('✓ KPIs saved!');
-}
-
-function saveSetting(k,v){ settings[k]=v; lsSet('dst_settings',settings); updateTopbar(); }
-
-async function forceCloudSync() {
-  showToast('⏳ Syncing to cloud...');
-  await simulateCloudSave();
-  showToast('✓ Cloud Sync Complete!');
-}
-
-function getDayTotals(key){
-  const d=salesData[key]||{};
-  let sale=0,no7=0,trn=0,ff=0;
-  for(let i=0;i<3;i++){const s=d['slot_'+i]||{};sale+=s.sale||0;no7+=s.no7||0;trn+=s.trn||0;ff+=s.footfall||0;}
-  return{sale,no7,trn,footfall:ff, atv:trn>0?sale/trn:0, no7Pct:sale>0?no7/sale*100:0, aura:d.aura, auraLink:d.auraLink};
-}
-
-function refreshAll(){
-  refreshTargetBar();
-  refreshDashboard();
-  if(document.getElementById('screen-weekly').classList.contains('active')) refreshWeekly();
-  if(document.getElementById('screen-history').classList.contains('active')) refreshHistory();
-}
-
-function refreshTargetBar(){
-  const t=getDayTotals(selectedDate);
-  const tgt=DEFAULT_TGT[new Date(selectedDate+'T12:00:00').getDay()];
-  const pct=tgt>0?t.sale/tgt*100:0;
-  document.getElementById('targetPct').textContent=pct>0?pct.toFixed(0)+'%':'—%';
-  document.getElementById('progFill').style.width=Math.min(pct,100)+'%';
-  
-  const d=salesData[selectedDate]||{};
-  for(let i=0;i<3;i++){
-    const s=d['slot_'+i]||{};
-    document.getElementById('sum'+i).textContent=s.sale?'AED '+Math.round(s.sale):'—';
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
   }
-}
 
-function refreshDashboard(){
-  const t=getDayTotals(selectedDate);
-  const tgt=DEFAULT_TGT[new Date(selectedDate+'T12:00:00').getDay()];
-  const pct=tgt>0?Math.round(t.sale/tgt*100):0;
-  
-  document.getElementById('dp-sales').textContent='AED '+t.sale.toLocaleString();
-  document.getElementById('dp-pct').textContent=t.sale>0?pct+'%':'—%';
-  document.getElementById('dp-fill').style.width=Math.min(pct,100)+'%';
-  document.getElementById('dk-aura').textContent=t.auraLink?t.auraLink+'%':'—';
-  document.getElementById('dk-no7pct').textContent=t.no7Pct>0?t.no7Pct.toFixed(1)+'%':'—';
-  document.getElementById('dk-atv').textContent=t.atv>0?Math.round(t.atv):'—';
-  document.getElementById('dk-no7s').textContent=t.no7>0?Math.round(t.no7):'—';
-  document.getElementById('dk-trn').textContent=t.trn>0?t.trn:'—';
-}
-
-function refreshWeekly(){
-  const c=document.getElementById('weekRows'); c.innerHTML='';
-  const today=new Date();
-  const start=new Date(today); start.setDate(today.getDate()-today.getDay()+1); // Start Monday
-  for(let i=0;i<7;i++){
-    const d=new Date(start); d.setDate(start.getDate()+i);
-    const key=d.toISOString().slice(0,10);
-    const t=getDayTotals(key);
-    const tgt=DEFAULT_TGT[d.getDay()];
-    const pct=tgt>0?t.sale/tgt*100:0;
-    const row=document.createElement('div');
-    row.className='week-row';
-    row.innerHTML=`
-      <div class="week-day">${DAYS_SHORT[d.getDay()]}<div class="date-small">${d.getDate()}</div></div>
-      <div class="week-sales">${t.sale>0?Math.round(t.sale):'—'}</div>
-      <div class="week-target">${tgt}</div>
-      <div class="week-pct ${pct>=100?'good':pct>=80?'warn':'bad'}">${pct>0?pct.toFixed(0)+'%':'—'}</div>
-      <div class="week-no7">${t.no7>0?Math.round(t.no7):'—'}</div>
-      <div class="week-atv">${t.atv>0?Math.round(t.atv):'—'}</div>`;
-    c.appendChild(row);
+  function todayKey() {
+    const d = new Date();
+    return d.toISOString().slice(0,10);
   }
-}
 
-function refreshHistory(){
-  const c=document.getElementById('historyList');
-  const keys=Object.keys(salesData).sort().reverse();
-  c.innerHTML='';
-  keys.forEach(key=>{
-    const t=getDayTotals(key);
-    if(t.sale===0) return;
-    const d=new Date(key+'T12:00:00');
-    const card=document.createElement('div');
-    card.className='history-card';
-    card.innerHTML=`
-      <div>
-        <div class="h-date">${DAYS_FULL[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}</div>
-        <div class="h-sub">TRN: ${t.trn} · No7: ${t.no7>0?Math.round(t.no7):'—'}</div>
-      </div>
-      <div class="h-sales">AED ${Math.round(t.sale)}</div>`;
-    card.onclick=()=>{ selectedDate=key; buildDateChips(); showScreen('today'); loadSlotData(); refreshAll(); };
-    c.appendChild(card);
-  });
-}
-
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
-  if(name==='history') refreshHistory();
-  if(name==='weekly') refreshWeekly();
-  if(name==='kpi'){
-    const d=salesData[selectedDate]||{};
-    document.getElementById('aura-input').value=d.aura||'';
-    document.getElementById('aura-link-input').value=d.auraLink||'';
+  function formatTime(date) {
+    return date.toTimeString().slice(0,5);
   }
-}
 
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
+  function getShiftState() {
+    const active = appData.activeShift;
+    if (!active) return { running: false, elapsed: 0, start: null };
+    const now = Date.now();
+    const start = active.startTime;
+    const elapsed = Math.max(0, Math.floor((now - start) / 1000));
+    return { running: true, elapsed, start: new Date(start), companion: active.companion, manualStart: active.manualStart };
+  }
 
-init();
+  function updateShiftUI() {
+    const state = getShiftState();
+    const timerEl = document.getElementById('liveTimer');
+    const statusEl = document.getElementById('shiftStatus');
+    const inLabel = document.getElementById('shiftInLabel');
+    const outLabel = document.getElementById('shiftOutLabel');
+    const totalEl = document.getElementById('shiftTotal');
+    const btnStart = document.getElementById('btnStartShift');
+    const btnEnd = document.getElementById('btnEndShift');
+    const btnRestart = document.getElementById('btnRestartManual');
+
+    if (state.running) {
+      const hrs = Math.floor(state.elapsed / 3600);
+      const mins = Math.floor((state.elapsed % 3600) / 60);
+      const secs = state.elapsed % 60;
+      timerEl.textContent = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      statusEl.textContent = '🔵 Active';
+      inLabel.textContent = `In: ${formatTime(state.start)}`;
+      outLabel.textContent = 'Out: --:--';
+      totalEl.textContent = `${hrs}h ${mins}m`;
+      btnStart.style.display = 'none';
+      btnEnd.disabled = false;
+      btnRestart.style.display = 'block';
+    } else {
+      timerEl.textContent = '00:00:00';
+      statusEl.textContent = '⚪ Idle';
+      if (appData.activeShift?.endTime) {
+        const end = new Date(appData.activeShift.endTime);
+        outLabel.textContent = `Out: ${formatTime(end)}`;
+        const dur = Math.floor((end - new Date(appData.activeShift.startTime))/1000);
+        totalEl.textContent = `${Math.floor(dur/3600)}h ${Math.floor((dur%3600)/60)}m`;
+      } else {
+        outLabel.textContent = 'Out: --:--';
+        totalEl.textContent = '0h 0m';
+      }
+      btnStart.style.display = 'block';
+      btnEnd.disabled = true;
+      btnRestart.style.display = 'none';
+      inLabel.textContent = appData.activeShift?.startTime ? `In: ${formatTime(new Date(appData.activeShift.startTime))}` : 'In: --:--';
+    }
+    renderDashboardKPIs();
+  }
+
+  function startShiftTimer() {
+    if (shiftInterval) clearInterval(shiftInterval);
+    shiftInterval = setInterval(updateShiftUI, 1000);
+  }
+
+  function handleStartShift() {
+    const companion = document.getElementById('companionInput').value.trim();
+    const now = Date.now();
+    appData.activeShift = {
+      startTime: now,
+      companion: companion || '',
+      manualStart: false,
+      date: todayKey()
+    };
+    saveData();
+    updateShiftUI();
+    startShiftTimer();
+    showToast('Shift started!');
+  }
+
+  function endShift() {
+    if (!appData.activeShift || !appData.activeShift.startTime) return;
+    const now = Date.now();
+    const start = appData.activeShift.startTime;
+    const durationSec = Math.floor((now - start) / 1000);
+    
+    // Save completed shift to history
+    const shiftRecord = {
+      startTime: start,
+      endTime: now,
+      duration: durationSec,
+      companion: appData.activeShift.companion || '',
+      date: todayKey()
+    };
+    const key = todayKey();
+    if (!appData.shifts[key]) appData.shifts[key] = [];
+    appData.shifts[key].push(shiftRecord);
+    
+    // Clear active shift
+    appData.activeShift = null;
+    saveData();
+    updateShiftUI();
+    if (shiftInterval) clearInterval(shiftInterval);
+    showToast('Shift ended & saved.');
+    renderHistory();
+  }
+
+  function restartOrManual() {
+    const choice = confirm('Press OK to RESTART shift from now, or Cancel to ENTER MANUAL start time.');
+    if (choice) {
+      // Restart: clear current and start fresh
+      if (shiftInterval) clearInterval(shiftInterval);
+      appData.activeShift = null;
+      saveData();
+      handleStartShift();
+    } else {
+      // Manual time entry
+      const manualTime = prompt('Enter shift START time (HH:MM, 24h format):', '09:00');
+      if (!manualTime) return;
+      const [h, m] = manualTime.split(':').map(Number);
+      if (isNaN(h) || isNaN(m) || h<0 || h>23 || m<0 || m>59) {
+        alert('Invalid time format.'); return;
+      }
+      const now = new Date();
+      const manualDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+      if (manualDate > now) {
+        alert('Start time cannot be in the future.'); return;
+      }
+      const companion = document.getElementById('companionInput').value.trim();
+      appData.activeShift = {
+        startTime: manualDate.getTime(),
+        companion: companion || '',
+        manualStart: true,
+        date: todayKey()
+      };
+      saveData();
+      updateShiftUI();
+      startShiftTimer();
+      showToast(`Manual start set to ${manualTime}. Clock running.`);
+    }
+  }
+
+  function saveSales() {
+    const sale = parseFloat(document.getElementById('inp-sale').value) || 0;
+    const no7 = parseFloat(document.getElementById('inp-no7').value) || 0;
+    const trn = parseInt(document.getElementById('inp-trn').value) || 0;
+    const footfall = parseInt(document.getElementById('inp-footfall').value) || 0;
+    const key = todayKey();
+    if (!appData.sales[key]) appData.sales[key] = {};
+    appData.sales[key] = { sale, no7, trn, footfall, atv: trn>0 ? sale/trn : 0 };
+    saveData();
+    showToast('Sales saved!');
+    renderDashboardKPIs();
+  }
+
+  function renderDashboardKPIs() {
+    const key = todayKey();
+    const sales = appData.sales[key] || {};
+    const shiftState = getShiftState();
+    let shiftHours = 0;
+    if (shiftState.running) shiftHours = shiftState.elapsed / 3600;
+    else if (appData.activeShift?.endTime) {
+      shiftHours = (appData.activeShift.endTime - appData.activeShift.startTime) / 3600000;
+    }
+    const container = document.getElementById('dashKpis');
+    container.innerHTML = `
+      <div class="kpi-chip"><div>💰 Sales</div><strong>AED ${(sales.sale||0).toLocaleString()}</strong></div>
+      <div class="kpi-chip"><div>🧴 NO7</div><strong>${sales.no7||0}</strong></div>
+      <div class="kpi-chip"><div>🧾 TRN</div><strong>${sales.trn||0}</strong></div>
+      <div class="kpi-chip"><div>⏱️ Shift</div><strong>${shiftHours.toFixed(1)}h</strong></div>
+    `;
+  }
+
+  function renderHistory() {
+    const container = document.getElementById('historyList');
+    if (!container) return;
+    const allDates = Object.keys(appData.shifts).sort().reverse();
+    let html = '';
+    allDates.forEach(date => {
+      const shifts = appData.shifts[date] || [];
+      const sales = appData.sales[date] || {};
+      shifts.forEach((shift, idx) => {
+        const start = new Date(shift.startTime);
+        const end = new Date(shift.endTime);
+        const durMin = Math.floor(shift.duration / 60);
+        html += `<div class="history-card" onclick="editHistory('${date}',${idx})">
+          <div><strong>${date}</strong> ${formatTime(start)} - ${formatTime(end)} (${Math.floor(durMin/60)}h ${durMin%60}m)</div>
+          <div>👤 ${shift.companion || '—'} | AED ${(sales.sale||0).toLocaleString()}</div>
+        </div>`;
+      });
+    });
+    container.innerHTML = html || '<p style="padding:20px;">No history yet.</p>';
+  }
+
+  function editHistory(date, idx) {
+    alert('History detail view (demo). Shift saved.');
+  }
+
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-' + name).classList.add('active');
+    currentScreen = name;
+    if (name === 'history') renderHistory();
+    if (name === 'dashboard') renderDashboardKPIs();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  // Auto-save at midnight & cloud simulation
+  function scheduleMidnightReset() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24,0,0,0);
+    const msUntilMidnight = midnight - now;
+    setTimeout(() => {
+      if (appData.activeShift && appData.activeShift.date !== todayKey()) {
+        endShift(); // auto end shift if crosses midnight
+      }
+      saveData();
+      showToast('Auto-saved at midnight');
+      scheduleMidnightReset();
+    }, msUntilMidnight);
+  }
+
+  window.onload = () => {
+    loadData();
+    updateShiftUI();
+    if (appData.activeShift) startShiftTimer();
+    renderDashboardKPIs();
+    scheduleMidnightReset();
+  };
 </script>
 </body>
 </html>
