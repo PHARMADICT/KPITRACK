@@ -3,439 +3,604 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#eff6ff">
-  <title>Pharmacy Sales & Shift Tracker</title>
+  <title>Boots Tracker · Swipe Entry</title>
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2300205B' rx='20'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white' font-family='system-ui' font-weight='900'%3EB%3C/text%3E%3C/svg%3E">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
-      --boots-navy: #1e3a8a;
-      --boots-blue: #005eb8;
-      --aura-pink: #d81b60;
-      --aura-purple: #8e24aa;
-      --bg: transparent;
-      --card: rgba(255, 255, 255, 0.45);
-      --card2: rgba(255, 255, 255, 0.6);
-      --border: rgba(255, 255, 255, 0.6);
-      --accent: #005eb8;
-      --green: #16a34a;
-      --red: #ef4444;
-      --orange: #d97706;
-      --purple: #9333ea;
-      --text: #0f172a;
-      --text2: #334155;
-      --mono: 'Courier New', Courier, monospace;
-      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      --bg: #020B1F; --bg2: #0A1633; --bg3: #112247; --card: #0D1E40; --card2: #162A52;
+      --border: #1E3A8A; --text: #F1F5F9; --text2: #94A3B8; --text3: #64748B;
+      --input: rgba(255,255,255,.07); --shadow: rgba(0,0,0,.35);
+      --accent: #4BA3E3; --boots-blue: #005EB8; --green: #22C55E; --red: #EF4444; --orange: #F59E0B;
+      --safe-top: env(safe-area-inset-top, 18px); --safe-bottom: env(safe-area-inset-bottom, 14px);
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+      --mono: "SF Mono", "Menlo", "Monaco", monospace;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.light {
+      --bg: #F2F6FC; --bg2: #E4EDF8; --bg3: #D5E2F2; --card: #FFFFFF; --card2: #F0F5FD;
+      --border: #C7D5E8; --text: #0B1C3A; --text2: #2C405C; --text3: #5A6F8A;
+      --input: #F0F4FA; --shadow: rgba(0,20,50,.08);
+    }
     body {
-      font-family: var(--sans);
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23eff6ff"><rect width="100" height="100"/></svg>') center/cover fixed;
-      color: var(--text);
-      min-height: 100dvh;
-      display: flex;
-      justify-content: center;
+      background: var(--bg); color: var(--text); font-family: var(--sans);
+      min-height: 100vh; padding-bottom: calc(82px + var(--safe-bottom));
+      transition: background .2s, color .2s; line-height: 1.4; overflow-x: hidden;
     }
-    .app-wrapper {
-      width: 100%;
-      max-width: 550px;
-      min-height: 100dvh;
-      background: rgba(239, 246, 255, 0.25);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-left: 1px solid rgba(255,255,255,0.4);
-      border-right: 1px solid rgba(255,255,255,0.4);
-      box-shadow: 0 0 30px rgba(0,0,0,0.08);
-      position: relative;
-      padding-bottom: 100px;
-    }
-    .glass-panel {
-      background: var(--card);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-    }
+    ::-webkit-scrollbar { height: 4px; width: 4px; background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+
     .topbar {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,0.6); backdrop-filter: blur(20px);
-      padding: 12px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      padding: calc(var(--safe-top) + 6px) 18px 10px;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .topbar-title { font-family: 'Times New Roman', serif; font-style: italic; font-size: 24px; font-weight: 700; color: var(--boots-navy); }
-    .store-badge { background: var(--boots-navy); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-    .screen { display: none; padding: 0 0 20px; animation: fadeIn .25s; }
+    .logo { font-size: 22px; font-weight: 900; letter-spacing: -.3px; }
+    .logo span { font-size: 12px; font-weight: 700; color: var(--text2); margin-left: 2px; }
+    .date { font-size: 10px; font-family: var(--mono); color: var(--text3); margin-top: 2px; letter-spacing: .3px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .badge {
+      background: var(--boots-blue); border: 1px solid var(--accent);
+      border-radius: 60px; padding: 5px 10px; font-size: 8px; font-weight: 800;
+      letter-spacing: .6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;
+    }
+    .theme-btn {
+      width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .screen { display: none; animation: fade .2s ease; }
     .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    .shift-card {
-      margin: 16px 20px; padding: 18px; border-radius: 20px;
-      background: rgba(255,255,255,0.7); backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.8);
-      display: flex; flex-direction: column; gap: 12px;
+    /* ——— SWIPE ENTRY CARD ——— */
+    .swipe-entry-wrap {
+      margin: 10px 16px 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 8px 28px var(--shadow);
+      overflow: hidden;
+      position: relative;
     }
-    .shift-timer {
-      font-size: 36px; font-weight: 900; font-family: var(--mono);
-      color: var(--boots-navy); letter-spacing: 1px;
+    .swipe-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
     }
-    .shift-meta { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--text2); }
-    .shift-actions { display: flex; gap: 10px; margin-top: 8px; }
-    .btn {
-      flex: 1; padding: 14px; border-radius: 14px; border: none;
-      font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s;
-      background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);
-      border: 1px solid var(--border); color: var(--boots-navy);
+    .swipe-header .slot-label {
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: -.2px;
     }
-    .btn.primary { background: var(--boots-navy); color: white; border: none; }
-    .btn.danger { background: var(--aura-pink); color: white; border: none; }
-    .btn:active { transform: scale(0.96); }
+    .swipe-header .slot-dur {
+      font-size: 9px;
+      color: var(--text2);
+      font-family: var(--mono);
+    }
+    .swipe-progress {
+      display: flex;
+      gap: 4px;
+      padding: 8px 18px;
+      background: var(--bg2);
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border);
+    }
+    .swipe-progress .dot {
+      flex: 0 0 28px;
+      height: 4px;
+      border-radius: 20px;
+      background: var(--border);
+      transition: .2s;
+    }
+    .swipe-progress .dot.active { background: var(--accent); }
+    .swipe-progress .dot.filled { background: var(--green); }
 
-    .companion-row {
-      display: flex; align-items: center; gap: 8px; margin: 5px 0;
+    .swipe-body {
+      padding: 16px 18px 20px;
+      touch-action: pan-y;
     }
-    .companion-row input {
-      flex:1; background: rgba(255,255,255,0.6); border:1px solid var(--border);
-      border-radius: 10px; padding: 10px; font-weight: 600;
+    .swipe-field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
+    .swipe-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--input);
+      border-radius: 16px;
+      padding: 4px 16px 4px 20px;
+      border: 1px solid var(--border);
+      min-height: 60px;
+    }
+    .swipe-field label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      color: var(--text2);
+      text-transform: uppercase;
+    }
+    .swipe-field input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 950;
+      width: 110px;
+      text-align: right;
+      outline: none;
+      padding: 8px 0;
+    }
+    .swipe-field input::placeholder { color: var(--text3); opacity: .5; }
+    .swipe-field .calc-badge {
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: var(--accent);
+      min-width: 60px;
+      text-align: right;
+    }
+    .swipe-nav {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .swipe-nav button {
+      flex: 1;
+      border: none;
+      border-radius: 40px;
+      padding: 12px;
+      font-weight: 900;
+      font-size: 13px;
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .swipe-nav button.primary {
+      background: var(--boots-blue);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .swipe-nav button:active { transform: scale(.96); }
 
-    .section-label { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--boots-navy); padding: 18px 20px 8px; }
-    .entry-grid { margin: 12px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .entry-card { background: var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; backdrop-filter: blur(10px); }
-    .entry-card label { font-size:10px; font-weight:800; color:var(--boots-navy); }
-    .entry-card input { background:transparent; border:none; font-size:20px; font-weight:800; font-family:var(--mono); width:100%; outline:none; }
-    .save-btn { margin:16px 20px; background:linear-gradient(145deg, var(--aura-pink), var(--aura-purple)); color:#fff; border:none; border-radius:14px; padding:16px; width:calc(100% - 40px); font-weight:800; }
-    .bottom-nav { position:absolute; bottom:0; width:100%; background:rgba(255,255,255,0.75); backdrop-filter:blur(20px); display:flex; border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom,15px); }
-    .nav-btn { flex:1; padding:10px 0; text-align:center; font-size:10px; font-weight:800; color:var(--text3); background:none; border:none; }
-    .nav-btn.active { color:var(--boots-navy); }
-    .toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:var(--green); color:#fff; padding:10px 22px; border-radius:50px; z-index:999; opacity:0; transition:.3s; }
-    .toast.show { opacity:1; }
-    .history-card { margin:8px 20px; background:var(--card); border-radius:14px; padding:14px; display:flex; justify-content:space-between; cursor:pointer; }
-    .kpi-row { display:flex; gap:10px; padding:0 20px; overflow-x:auto; }
-    .kpi-chip { background:var(--card); border-radius:14px; padding:12px 16px; min-width:100px; }
+    .swipe-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+    }
+    .swipe-total-row .total-label { font-size: 10px; font-weight: 800; color: var(--text2); text-transform: uppercase; }
+    .swipe-total-row .total-value { font-size: 18px; font-weight: 950; color: var(--accent); }
+
+    /* ——— other cards (keep compact) ——— */
+    .dash-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 6px;
+    }
+    .dash-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px 12px; min-height: 96px; box-shadow: 0 6px 18px var(--shadow);
+      position: relative; overflow: hidden;
+    }
+    .dash-card:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+    .dash-card.aura { background: linear-gradient(145deg, #D81B60, #8E24AA); border-color: rgba(255,255,255,.15); }
+    .dash-card.aura:before { display: none; }
+    .card-label { font-size: 8px; font-weight: 900; letter-spacing: .8px; text-transform: uppercase; color: var(--text2); margin-bottom: 6px; }
+    .aura .card-label { color: rgba(255,255,255,.85); }
+    .card-val { font-size: 26px; font-weight: 950; font-family: var(--mono); line-height: 1; }
+    .card-sub { display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 40px; background: var(--input); font-size: 8px; font-weight: 800; color: var(--text2); }
+    .aura .card-sub { background: rgba(255,255,255,.2); color: #fff; }
+
+    .actions {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px 16px 4px;
+    }
+    .action {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      color: var(--text); padding: 10px 4px; text-align: center; font-size: 8px; font-weight: 900; text-transform: uppercase;
+      transition: .1s;
+    }
+    .action:active { transform: scale(.95); }
+    .action i { font-style: normal; font-size: 20px; display: block; margin-bottom: 3px; }
+
+    .quick-kpi {
+      margin: 8px 16px 12px; padding: 12px 14px; border-radius: 18px;
+      background: linear-gradient(145deg, rgba(216,27,96,.12), rgba(142,36,170,.10), rgba(0,94,184,.08));
+      border: 1px solid rgba(216,27,96,.2);
+    }
+    .quick-head { display: flex; justify-content: space-between; font-size: 9px; font-weight: 950; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .quick-row { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 2px; }
+    .quick-row::-webkit-scrollbar { display: none; }
+    .quick-chip { min-width: 62px; background: var(--input); border: 1px solid var(--border); border-radius: 12px; padding: 6px 8px; text-align: center; flex-shrink: 0; }
+    .quick-chip .n { font-size: 6px; font-weight: 900; color: var(--text2); text-transform: uppercase; }
+    .quick-chip .v { font-size: 11px; font-weight: 950; font-family: var(--mono); margin-top: 2px; }
+
+    .hour-chart {
+      margin: 6px 12px 12px; padding: 14px 12px 10px;
+      border: 1px solid var(--border); border-radius: 18px; background: var(--card);
+    }
+    .chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .chart-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: .8px; }
+    .chart-legend { font-size: 8px; color: var(--text2); }
+    .bars { display: flex; align-items: flex-end; gap: 4px; height: 110px; border-bottom: 1px solid var(--border); overflow-x: auto; padding: 8px 2px 0; }
+    .bar-col { min-width: 38px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
+    .bar { width: 18px; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--accent), var(--boots-blue)); min-height: 2px; transition: .2s; }
+    .bar-value { font-family: var(--mono); font-size: 7px; color: var(--text2); }
+    .bar-time { font-size: 6px; color: var(--text3); white-space: nowrap; }
+
+    .bottom-nav {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      background: color-mix(in srgb, var(--bg) 96%, transparent);
+      backdrop-filter: blur(16px); border-top: 1px solid var(--border);
+      display: flex; padding: 6px 0 calc(6px + var(--safe-bottom)); z-index: 60;
+      max-width: 480px; margin: auto;
+    }
+    .nav { flex: 1; background: none; border: none; color: var(--text3); font-size: 8px; font-weight: 800; text-align: center; }
+    .nav.active { color: var(--accent); }
+    .nav i { font-style: normal; font-size: 20px; display: block; margin-bottom: 1px; }
+
+    .toast {
+      position: fixed; top: calc(var(--safe-top) + 56px); left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--green); color: #fff; padding: 8px 20px; border-radius: 60px;
+      font-size: 12px; font-weight: 900; opacity: 0; transition: .25s; z-index: 100;
+      box-shadow: 0 6px 20px rgba(0,0,0,.3);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (min-width: 480px) {
+      body { max-width: 420px; margin: auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+      .bottom-nav { max-width: 420px; }
+    }
   </style>
 </head>
 <body>
-<div class="app-wrapper">
-  <div class="topbar">
-    <div class="topbar-title">Boots <span style="font-weight:600;">Tracker</span></div>
-    <div class="store-badge" id="storeBadge">DXB T3</div>
-  </div>
-  <div class="toast" id="toast">✓ Saved</div>
 
-  <!-- DASHBOARD -->
-  <div class="screen active" id="screen-dashboard">
-    <div class="shift-card" id="shiftWidget">
-      <div style="display:flex; justify-content:space-between;">
-        <span style="font-weight:800; color:var(--boots-navy);">⏱️ SHIFT TIMER</span>
-        <span style="font-size:12px;" id="shiftStatus">Not started</span>
-      </div>
-      <div class="shift-timer" id="liveTimer">00:00:00</div>
-      <div class="shift-meta">
-        <span id="shiftInLabel">In: --:--</span>
-        <span id="shiftOutLabel">Out: --:--</span>
-        <span id="shiftTotal">0h 0m</span>
-      </div>
-      <div class="companion-row">
-        <input type="text" id="companionInput" placeholder="👤 Staff companion (optional)">
-      </div>
-      <div class="shift-actions">
-        <button class="btn primary" id="btnStartShift" onclick="handleStartShift()">▶ START</button>
-        <button class="btn danger" id="btnEndShift" onclick="endShift()" disabled>⏹ END</button>
-      </div>
-      <button class="btn" id="btnRestartManual" style="display:none; margin-top:6px;" onclick="restartOrManual()">🔄 Restart / ✏️ Manual</button>
-    </div>
-    <div class="section-label">TODAY'S SUMMARY</div>
-    <div class="kpi-row" id="dashKpis"></div>
-    <div style="padding:0 20px;"><button class="btn" onclick="showScreen('today')">📝 Enter Sales Data</button></div>
+<div class="topbar">
+  <div>
+    <div class="logo">Boots <span>Tracker</span></div>
+    <div class="date" id="dateText"></div>
   </div>
-
-  <!-- ENTRY SCREEN -->
-  <div class="screen" id="screen-today">
-    <div class="section-label">SALES ENTRY</div>
-    <div class="entry-grid">
-      <div class="entry-card"><label>💰 SALE (AED)</label><input type="number" id="inp-sale" placeholder="0"></div>
-      <div class="entry-card"><label>🧴 NO7</label><input type="number" id="inp-no7" placeholder="0"></div>
-      <div class="entry-card"><label>🧾 TRN</label><input type="number" id="inp-trn" placeholder="0"></div>
-      <div class="entry-card"><label>👥 FOOTFALL</label><input type="number" id="inp-footfall" placeholder="0"></div>
-    </div>
-    <button class="save-btn" onclick="saveSales()">💾 Save Sales</button>
-  </div>
-
-  <!-- HISTORY -->
-  <div class="screen" id="screen-history">
-    <div class="section-label">SHIFT & SALES HISTORY</div>
-    <div id="historyList"></div>
-  </div>
-
-  <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-dashboard" onclick="showScreen('dashboard')">🏠 Home</button>
-    <button class="nav-btn" id="nav-today" onclick="showScreen('today')">✏️ Entry</button>
-    <button class="nav-btn" id="nav-history" onclick="showScreen('history')">🗂️ History</button>
+  <div class="top-actions">
+    <div class="badge" id="storeBadge">BOOTS DXB T3</div>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
   </div>
 </div>
 
+<div class="toast" id="toast">Saved</div>
+
+<!-- HOME -->
+<section class="screen active" id="home">
+  <div style="background:linear-gradient(145deg,var(--boots-navy),#001537 70%,var(--bg));padding:16px 20px 14px;position:relative;overflow:hidden;">
+    <div style="position:absolute;right:-10px;top:-26px;font-size:140px;font-weight:900;color:rgba(255,255,255,.022);font-style:italic;">B</div>
+    <div style="display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:60px;padding:4px 12px 4px 8px;font-size:9px;font-weight:800;letter-spacing:.4px;position:relative;z-index:2;">⚕️ <span id="homeStore">BOOTS DXB T3</span></div>
+    <div style="font-size:28px;font-weight:950;letter-spacing:-.5px;line-height:1.05;margin-top:8px;position:relative;z-index:1;">PHARMACY<br>SALES</div>
+    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:3px;">Daily performance dashboard</div>
+  </div>
+
+  <div style="margin:10px 16px 8px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px 12px;box-shadow:0 6px 18px var(--shadow);">
+    <div style="display:flex;justify-content:space-between;font-size:8px;font-weight:900;text-transform:uppercase;color:var(--text2);letter-spacing:.8px;">
+      <span>👤 MY SHIFT · VYSAKH</span>
+      <span id="shiftWeekLabel">Week 21</span>
+    </div>
+    <div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);margin:4px 0 6px;" id="myShiftToday">—</div>
+    <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;" id="shiftWeekStrip"></div>
+  </div>
+
+  <div style="margin:8px 16px 12px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:0 8px 24px var(--shadow);">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div><div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Today's Total Register</div><div style="font-size:28px;font-weight:950;font-family:var(--mono);line-height:1.1;letter-spacing:-.3px;" id="hSales">AED 0</div></div>
+      <div style="text-align:right"><div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Achieved</div><div style="font-size:28px;font-weight:950;font-family:var(--mono);line-height:1.1;letter-spacing:-.3px;color:var(--accent);" id="hPct">—%</div></div>
+    </div>
+    <div style="height:5px;background:var(--input);border-radius:60px;overflow:hidden;margin-top:12px;"><div class="fill" style="height:100%;width:0;background:linear-gradient(90deg,var(--boots-blue),var(--accent));border-radius:60px;transition:.4s;" id="hFill"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;"><div style="color:var(--text2);font-size:9px;" id="hTarget">Target: AED 0</div><div style="color:var(--text2);font-size:9px;" id="hKwd"></div></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="dash-card"><div class="card-label">💰 Hourly Entry</div><div class="card-val" id="hHourly">0</div><div class="card-sub">Open sales entry</div></div>
+    <div class="dash-card aura"><div class="card-label">✨ Aura Linkage</div><div class="card-val" id="hAura">—</div><div class="card-sub" id="hAuraSub">No data</div></div>
+    <div class="dash-card"><div class="card-label">🧴 No7 Share</div><div class="card-val" id="hNo7">—</div><div class="card-sub" id="hNo7Sub">No data</div></div>
+    <div class="dash-card"><div class="card-label">🧾 Transactions</div><div class="card-val" id="hTrn">0</div><div class="card-sub">Today</div></div>
+  </div>
+
+  <div class="actions">
+    <button class="action" onclick="show('sales')"><i>🧮</i>Entry</button>
+    <button class="action" onclick="show('weekly')"><i>🗓️</i>Weekly</button>
+    <button class="action" onclick="show('kpi')"><i>📊</i>KPIs</button>
+    <button class="action" onclick="show('history')"><i>🗂️</i>History</button>
+  </div>
+</section>
+
+<!-- SALES with SWIPE ENTRY -->
+<section class="screen" id="sales">
+  <div style="padding:12px 16px 4px;font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);">Hourly Swipe Entry</div>
+
+  <!-- SWIPE ENTRY CARD -->
+  <div class="swipe-entry-wrap" id="swipeEntryWrap">
+    <div class="swipe-header">
+      <div>
+        <div class="slot-label" id="swipeSlotLabel">12–6 AM</div>
+        <div class="slot-dur" id="swipeSlotDur">6h</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:12px;font-weight:950;color:var(--accent);" id="swipeIndex">1 / 10</div>
+    </div>
+    <div class="swipe-progress" id="swipeProgress"></div>
+    <div class="swipe-body" id="swipeBody">
+      <div class="swipe-field-row">
+        <div class="swipe-field"><label>Total Sale</label><input type="number" inputmode="decimal" id="swipeSale" placeholder="0" min="0"></div>
+        <div class="swipe-field"><label>TRN</label><input type="number" inputmode="decimal" id="swipeTrn" placeholder="0" min="0"></div>
+        <div class="swipe-field"><label>AURA</label><input type="number" inputmode="decimal" id="swipeAura" placeholder="0" min="0"></div>
+        <div class="swipe-field"><label>Footfall</label><input type="number" inputmode="decimal" id="swipeFoot" placeholder="0" min="0"></div>
+        <div class="swipe-field"><label>Units Sold</label><input type="number" inputmode="decimal" id="swipeUnits" placeholder="0" min="0"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;background:var(--bg3);border-radius:16px;padding:10px 12px;">
+          <div><div style="font-size:7px;color:var(--text3);text-transform:uppercase;font-weight:800;">ATV</div><div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);" id="swipeAtv">—</div></div>
+          <div><div style="font-size:7px;color:var(--text3);text-transform:uppercase;font-weight:800;">AURA%</div><div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);" id="swipeAuraP">—</div></div>
+          <div><div style="font-size:7px;color:var(--text3);text-transform:uppercase;font-weight:800;">CONV</div><div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);" id="swipeConv">—</div></div>
+        </div>
+      </div>
+      <div class="swipe-nav">
+        <button onclick="swipePrev()">◀ Prev</button>
+        <button class="primary" onclick="swipeNext()">Next ▶</button>
+      </div>
+    </div>
+    <div class="swipe-total-row">
+      <span class="total-label">Day Total</span>
+      <span class="total-value" id="swipeDayTotal">AED 0</span>
+    </div>
+  </div>
+
+  <!-- quick actions -->
+  <div style="display:flex;gap:8px;margin:6px 16px 10px;">
+    <button style="flex:1;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);padding:8px;font-size:9px;font-weight:900;" onclick="clearHourly()">↺ Clear</button>
+    <button style="flex:1;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);padding:8px;font-size:9px;font-weight:900;" onclick="copyHourlyTotals()">▣ Copy Totals</button>
+    <button style="flex:1;border:none;border-radius:14px;background:var(--boots-blue);color:#fff;padding:8px;font-size:9px;font-weight:900;border-color:var(--accent);" onclick="saveHourly()">✓ Save</button>
+  </div>
+
+  <!-- chart -->
+  <div class="hour-chart">
+    <div class="chart-head"><div class="chart-title">📊 Hourly sales</div><div class="chart-legend">AED / hour</div></div>
+    <div class="bars" id="hourBars"></div>
+  </div>
+
+  <div style="padding:8px 16px 2px;font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);">Daily Manual Entry</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;" id="entryGrid"></div>
+
+  <div class="quick-kpi">
+    <div class="quick-head"><span>📊 Quick KPI</span><span>Auto</span></div>
+    <div class="quick-row" id="quickKpi"></div>
+  </div>
+  <button class="save" style="margin:10px 16px 8px;width:calc(100% - 32px);border:none;border-radius:16px;padding:14px;background:linear-gradient(135deg,var(--boots-blue),var(--accent));color:#fff;font-size:14px;font-weight:950;box-shadow:0 6px 20px rgba(0,94,184,.25);" onclick="saveSales()">✓ Save Daily Sales</button>
+</section>
+
+<!-- WEEKLY, KPI, HISTORY, SETTINGS (simplified) -->
+<section class="screen" id="weekly"><div style="padding:16px;">Weekly view (same as before)</div></section>
+<section class="screen" id="kpi"><div style="padding:16px;">KPI view</div></section>
+<section class="screen" id="history"><div style="padding:16px;">History calendar</div></section>
+<section class="screen" id="settings"><div style="padding:16px;">Settings</div></section>
+
+<nav class="bottom-nav">
+  <button class="nav active" id="nav-home" onclick="show('home')"><i>🏠</i>Home</button>
+  <button class="nav" id="nav-sales" onclick="show('sales')"><i>🧮</i>Sales</button>
+  <button class="nav" id="nav-weekly" onclick="show('weekly')"><i>🗓️</i>Weekly</button>
+  <button class="nav" id="nav-kpi" onclick="show('kpi')"><i>📊</i>KPI</button>
+  <button class="nav" id="nav-history" onclick="show('history')"><i>🗂️</i>History</button>
+  <button class="nav" id="nav-settings" onclick="show('settings')"><i>⚙️</i>More</button>
+</nav>
+
 <script>
-  const STORAGE_KEY = 'pharmacy_tracker_v2';
-  let appData = {};
-  let shiftInterval = null;
-  let currentScreen = 'dashboard';
+  // ——— APP STATE ———
+  const STORE='boots_tracker_full_app_v1';
+  const AED2KD=11.9;
+  const fields=[ ['totalAED','💰 Total Sales','AED'],['trn','🧾 Transactions','TRN'],['no7AED','🧴 No7 Sales','AED'],['no7Focus','🎯 No7 Focus','pcs'],['units','📦 Units Sold','items'],['footfall','👣 Footfall','ppl'],['dssr','🏦 DSSR Cash','AED'],['aura','✨ Aura Enrolled','links'] ];
+  const hourSlots=[
+    {id:'h00_06',label:'12–6 AM',duration:'6h'},{id:'h06_08',label:'6–8 AM',duration:'2h'},{id:'h08_10',label:'8–10 AM',duration:'2h'},{id:'h10_12',label:'10 AM–12 PM',duration:'2h'},{id:'h12_14',label:'12–2 PM',duration:'2h'},{id:'h14_16',label:'2–4 PM',duration:'2h'},{id:'h16_18',label:'4–6 PM',duration:'2h'},{id:'h18_20',label:'6–8 PM',duration:'2h'},{id:'h20_22',label:'8–10 PM',duration:'2h'},{id:'h22_24',label:'10 PM–12 AM',duration:'2h'}
+  ];
 
-  // Load data
-  function loadData() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try { appData = JSON.parse(saved); } catch(e){ appData = {}; }
-    }
-    if (!appData.shifts) appData.shifts = {};
-    if (!appData.sales) appData.sales = {};
-    if (!appData.settings) appData.settings = { storeName: 'BOOTS DXB T3' };
-    if (!appData.activeShift) appData.activeShift = null; // { startTime, companion, manualStart }
-    document.getElementById('storeBadge').textContent = appData.settings.storeName || 'DXB T3';
-    document.getElementById('companionInput').value = appData.activeShift?.companion || '';
+  let cfg={store:'BOOTS DXB T3',target:20000,no7Target:12,auraTarget:65};
+  let data={}, hourly={}, current={}, currentHourly={};
+  let swipeIndex = 0;
+  const MY_NAME='VYSAKH';
+  const rosterWeek21={start:'2026-05-15',people:[{name:'VYSAKH',role:'PH',shifts:['1-10 PM','10-6AM (Night)','10-6AM (Night)','NIGHT OFF','1-10 PM','1-10 PM','1-10 PM']}]};
+
+  function today(){return new Date().toISOString().slice(0,10)}
+  function n(v){v=parseFloat(v);return isNaN(v)?0:v}
+  function money(v){return 'AED '+Math.round(n(v)).toLocaleString()}
+  function fmt(v){return Math.round(n(v)).toLocaleString()}
+
+  function load(){
+    try{const s=JSON.parse(localStorage.getItem(STORE)||'{}');cfg={...cfg,...(s.cfg||{})};data=s.data||{};hourly=s.hourly||{};}catch(e){}
+    current={...(data[today()]||{})}; currentHourly={...(hourly[today()]||{})};
+    loadTheme();
+  }
+  function persist(){localStorage.setItem(STORE,JSON.stringify({cfg,data,hourly}));}
+  function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1400);}
+
+  function toggleTheme(){const light=document.body.classList.toggle('light');localStorage.setItem(STORE+'_theme',light?'light':'dark');document.getElementById('themeBtn').textContent=light?'☀️':'🌙';}
+  function loadTheme(){const light=localStorage.getItem(STORE+'_theme')==='light';document.body.classList.toggle('light',light);const b=document.getElementById('themeBtn');if(b)b.textContent=light?'☀️':'🌙';}
+
+  function show(id){
+    document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const nav=document.getElementById('nav-'+id); if(nav)nav.classList.add('active');
+    renderAll();
+    window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  function saveData() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-  }
+  // ——— SWIPE LOGIC ———
+  function getSlot(){ return hourSlots[swipeIndex] || hourSlots[0]; }
+  function getSlotData(){ return currentHourly[getSlot().id] || {}; }
+  function setSlotData(obj){ currentHourly[getSlot().id] = {...currentHourly[getSlot().id], ...obj}; }
 
-  function todayKey() {
-    const d = new Date();
-    return d.toISOString().slice(0,10);
-  }
+  function renderSwipe(){
+    const slot = getSlot();
+    document.getElementById('swipeSlotLabel').textContent = slot.label;
+    document.getElementById('swipeSlotDur').textContent = slot.duration;
+    document.getElementById('swipeIndex').textContent = `${swipeIndex+1} / ${hourSlots.length}`;
 
-  function formatTime(date) {
-    return date.toTimeString().slice(0,5);
-  }
-
-  function getShiftState() {
-    const active = appData.activeShift;
-    if (!active) return { running: false, elapsed: 0, start: null };
-    const now = Date.now();
-    const start = active.startTime;
-    const elapsed = Math.max(0, Math.floor((now - start) / 1000));
-    return { running: true, elapsed, start: new Date(start), companion: active.companion, manualStart: active.manualStart };
-  }
-
-  function updateShiftUI() {
-    const state = getShiftState();
-    const timerEl = document.getElementById('liveTimer');
-    const statusEl = document.getElementById('shiftStatus');
-    const inLabel = document.getElementById('shiftInLabel');
-    const outLabel = document.getElementById('shiftOutLabel');
-    const totalEl = document.getElementById('shiftTotal');
-    const btnStart = document.getElementById('btnStartShift');
-    const btnEnd = document.getElementById('btnEndShift');
-    const btnRestart = document.getElementById('btnRestartManual');
-
-    if (state.running) {
-      const hrs = Math.floor(state.elapsed / 3600);
-      const mins = Math.floor((state.elapsed % 3600) / 60);
-      const secs = state.elapsed % 60;
-      timerEl.textContent = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      statusEl.textContent = '🔵 Active';
-      inLabel.textContent = `In: ${formatTime(state.start)}`;
-      outLabel.textContent = 'Out: --:--';
-      totalEl.textContent = `${hrs}h ${mins}m`;
-      btnStart.style.display = 'none';
-      btnEnd.disabled = false;
-      btnRestart.style.display = 'block';
-    } else {
-      timerEl.textContent = '00:00:00';
-      statusEl.textContent = '⚪ Idle';
-      if (appData.activeShift?.endTime) {
-        const end = new Date(appData.activeShift.endTime);
-        outLabel.textContent = `Out: ${formatTime(end)}`;
-        const dur = Math.floor((end - new Date(appData.activeShift.startTime))/1000);
-        totalEl.textContent = `${Math.floor(dur/3600)}h ${Math.floor((dur%3600)/60)}m`;
-      } else {
-        outLabel.textContent = 'Out: --:--';
-        totalEl.textContent = '0h 0m';
-      }
-      btnStart.style.display = 'block';
-      btnEnd.disabled = true;
-      btnRestart.style.display = 'none';
-      inLabel.textContent = appData.activeShift?.startTime ? `In: ${formatTime(new Date(appData.activeShift.startTime))}` : 'In: --:--';
-    }
-    renderDashboardKPIs();
-  }
-
-  function startShiftTimer() {
-    if (shiftInterval) clearInterval(shiftInterval);
-    shiftInterval = setInterval(updateShiftUI, 1000);
-  }
-
-  function handleStartShift() {
-    const companion = document.getElementById('companionInput').value.trim();
-    const now = Date.now();
-    appData.activeShift = {
-      startTime: now,
-      companion: companion || '',
-      manualStart: false,
-      date: todayKey()
-    };
-    saveData();
-    updateShiftUI();
-    startShiftTimer();
-    showToast('Shift started!');
-  }
-
-  function endShift() {
-    if (!appData.activeShift || !appData.activeShift.startTime) return;
-    const now = Date.now();
-    const start = appData.activeShift.startTime;
-    const durationSec = Math.floor((now - start) / 1000);
-    
-    // Save completed shift to history
-    const shiftRecord = {
-      startTime: start,
-      endTime: now,
-      duration: durationSec,
-      companion: appData.activeShift.companion || '',
-      date: todayKey()
-    };
-    const key = todayKey();
-    if (!appData.shifts[key]) appData.shifts[key] = [];
-    appData.shifts[key].push(shiftRecord);
-    
-    // Clear active shift
-    appData.activeShift = null;
-    saveData();
-    updateShiftUI();
-    if (shiftInterval) clearInterval(shiftInterval);
-    showToast('Shift ended & saved.');
-    renderHistory();
-  }
-
-  function restartOrManual() {
-    const choice = confirm('Press OK to RESTART shift from now, or Cancel to ENTER MANUAL start time.');
-    if (choice) {
-      // Restart: clear current and start fresh
-      if (shiftInterval) clearInterval(shiftInterval);
-      appData.activeShift = null;
-      saveData();
-      handleStartShift();
-    } else {
-      // Manual time entry
-      const manualTime = prompt('Enter shift START time (HH:MM, 24h format):', '09:00');
-      if (!manualTime) return;
-      const [h, m] = manualTime.split(':').map(Number);
-      if (isNaN(h) || isNaN(m) || h<0 || h>23 || m<0 || m>59) {
-        alert('Invalid time format.'); return;
-      }
-      const now = new Date();
-      const manualDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
-      if (manualDate > now) {
-        alert('Start time cannot be in the future.'); return;
-      }
-      const companion = document.getElementById('companionInput').value.trim();
-      appData.activeShift = {
-        startTime: manualDate.getTime(),
-        companion: companion || '',
-        manualStart: true,
-        date: todayKey()
-      };
-      saveData();
-      updateShiftUI();
-      startShiftTimer();
-      showToast(`Manual start set to ${manualTime}. Clock running.`);
-    }
-  }
-
-  function saveSales() {
-    const sale = parseFloat(document.getElementById('inp-sale').value) || 0;
-    const no7 = parseFloat(document.getElementById('inp-no7').value) || 0;
-    const trn = parseInt(document.getElementById('inp-trn').value) || 0;
-    const footfall = parseInt(document.getElementById('inp-footfall').value) || 0;
-    const key = todayKey();
-    if (!appData.sales[key]) appData.sales[key] = {};
-    appData.sales[key] = { sale, no7, trn, footfall, atv: trn>0 ? sale/trn : 0 };
-    saveData();
-    showToast('Sales saved!');
-    renderDashboardKPIs();
-  }
-
-  function renderDashboardKPIs() {
-    const key = todayKey();
-    const sales = appData.sales[key] || {};
-    const shiftState = getShiftState();
-    let shiftHours = 0;
-    if (shiftState.running) shiftHours = shiftState.elapsed / 3600;
-    else if (appData.activeShift?.endTime) {
-      shiftHours = (appData.activeShift.endTime - appData.activeShift.startTime) / 3600000;
-    }
-    const container = document.getElementById('dashKpis');
-    container.innerHTML = `
-      <div class="kpi-chip"><div>💰 Sales</div><strong>AED ${(sales.sale||0).toLocaleString()}</strong></div>
-      <div class="kpi-chip"><div>🧴 NO7</div><strong>${sales.no7||0}</strong></div>
-      <div class="kpi-chip"><div>🧾 TRN</div><strong>${sales.trn||0}</strong></div>
-      <div class="kpi-chip"><div>⏱️ Shift</div><strong>${shiftHours.toFixed(1)}h</strong></div>
-    `;
-  }
-
-  function renderHistory() {
-    const container = document.getElementById('historyList');
-    if (!container) return;
-    const allDates = Object.keys(appData.shifts).sort().reverse();
-    let html = '';
-    allDates.forEach(date => {
-      const shifts = appData.shifts[date] || [];
-      const sales = appData.sales[date] || {};
-      shifts.forEach((shift, idx) => {
-        const start = new Date(shift.startTime);
-        const end = new Date(shift.endTime);
-        const durMin = Math.floor(shift.duration / 60);
-        html += `<div class="history-card" onclick="editHistory('${date}',${idx})">
-          <div><strong>${date}</strong> ${formatTime(start)} - ${formatTime(end)} (${Math.floor(durMin/60)}h ${durMin%60}m)</div>
-          <div>👤 ${shift.companion || '—'} | AED ${(sales.sale||0).toLocaleString()}</div>
-        </div>`;
-      });
+    // progress dots
+    let dots = '';
+    hourSlots.forEach((_,i)=>{
+      const hasData = Object.keys(currentHourly[hourSlots[i].id] || {}).length > 0;
+      dots += `<div class="dot ${i===swipeIndex?'active':''} ${hasData?'filled':''}"></div>`;
     });
-    container.innerHTML = html || '<p style="padding:20px;">No history yet.</p>';
+    document.getElementById('swipeProgress').innerHTML = dots;
+
+    const d = getSlotData();
+    document.getElementById('swipeSale').value = d.sale || '';
+    document.getElementById('swipeTrn').value = d.trn || '';
+    document.getElementById('swipeAura').value = d.aura || '';
+    document.getElementById('swipeFoot').value = d.foot || '';
+    document.getElementById('swipeUnits').value = d.units || '';
+    updateSwipeCalc();
+    updateDayTotal();
   }
 
-  function editHistory(date, idx) {
-    alert('History detail view (demo). Shift saved.');
+  function updateSwipeCalc(){
+    const sale=n(document.getElementById('swipeSale').value);
+    const trn=n(document.getElementById('swipeTrn').value);
+    const aura=n(document.getElementById('swipeAura').value);
+    const foot=n(document.getElementById('swipeFoot').value);
+    const units=n(document.getElementById('swipeUnits').value);
+    document.getElementById('swipeAtv').textContent = trn ? 'AED '+ (sale/trn).toFixed(0) : '—';
+    document.getElementById('swipeAuraP').textContent = trn ? (aura/trn*100).toFixed(1)+'%' : '—';
+    document.getElementById('swipeConv').textContent = foot ? (trn/foot*100).toFixed(1)+'%' : '—';
+    // auto-save to currentHourly
+    setSlotData({sale:String(sale), trn:String(trn), aura:String(aura), foot:String(foot), units:String(units)});
+    // update chart & total
+    renderHourChart(getHourlyTotals().sale);
+    updateDayTotal();
   }
 
-  function showScreen(name) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + name).classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('nav-' + name).classList.add('active');
-    currentScreen = name;
-    if (name === 'history') renderHistory();
-    if (name === 'dashboard') renderDashboardKPIs();
+  function updateDayTotal(){
+    const t = getHourlyTotals();
+    document.getElementById('swipeDayTotal').textContent = money(t.sale);
   }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+  function swipeNext(){
+    if(swipeIndex < hourSlots.length-1){ swipeIndex++; renderSwipe(); }
+    else { toast('Last hour slot'); }
+  }
+  function swipePrev(){
+    if(swipeIndex > 0){ swipeIndex--; renderSwipe(); }
+    else { toast('First hour slot'); }
   }
 
-  // Auto-save at midnight & cloud simulation
-  function scheduleMidnightReset() {
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24,0,0,0);
-    const msUntilMidnight = midnight - now;
-    setTimeout(() => {
-      if (appData.activeShift && appData.activeShift.date !== todayKey()) {
-        endShift(); // auto end shift if crosses midnight
-      }
-      saveData();
-      showToast('Auto-saved at midnight');
-      scheduleMidnightReset();
-    }, msUntilMidnight);
+  // attach input events
+  document.addEventListener('DOMContentLoaded', ()=>{
+    ['swipeSale','swipeTrn','swipeAura','swipeFoot','swipeUnits'].forEach(id=>{
+      document.getElementById(id).addEventListener('input', updateSwipeCalc);
+    });
+  });
+
+  // ——— HOURLY TOTALS ———
+  function getHourlyTotals(){
+    return hourSlots.reduce((a,s)=>{
+      const k=hourlyKpis(currentHourly[s.id]||{});
+      a.sale+=k.sale; a.trn+=k.trn; a.aura+=k.aura; a.foot+=k.foot; a.units+=k.units;
+      return a;
+    },{sale:0,trn:0,aura:0,foot:0,units:0});
+  }
+  function hourlyKpis(r){
+    const sale=n(r.sale),trn=n(r.trn),aura=n(r.aura),foot=n(r.foot),units=n(r.units);
+    return {sale,trn,aura,foot,units};
   }
 
-  window.onload = () => {
-    loadData();
-    updateShiftUI();
-    if (appData.activeShift) startShiftTimer();
-    renderDashboardKPIs();
-    scheduleMidnightReset();
-  };
+  function renderHourChart(total){
+    const max=Math.max(...hourSlots.map(s=>n(currentHourly[s.id]?.sale)),1);
+    document.getElementById('hourBars').innerHTML=hourSlots.map(s=>{
+      const v=n(currentHourly[s.id]?.sale);
+      const h=Math.max(2,(v/max)*90);
+      return `<div class="bar-col"><div class="bar-value">${v?fmt(v):'0'}</div><div class="bar" style="height:${h}px"></div><div class="bar-time">${s.label}</div></div>`;
+    }).join('');
+  }
+
+  function saveHourly(){
+    hourly[today()]={...currentHourly};
+    const t=getHourlyTotals();
+    if(t.sale||t.trn||t.aura||t.foot||t.units){
+      current.totalAED=String(t.sale); current.trn=String(t.trn); current.aura=String(t.aura);
+      current.footfall=String(t.foot); current.units=String(t.units);
+    }
+    data[today()]={...current,at:new Date().toISOString()};
+    persist();
+    toast('✓ Hourly saved');
+    renderAll();
+  }
+  function clearHourly(){
+    if(confirm('Clear all hourly entries?')){ currentHourly={}; hourly[today()]={}; persist(); renderAll(); toast('Cleared'); }
+  }
+  function copyHourlyTotals(){
+    const t=getHourlyTotals();
+    const text=`TOTAL SALE: ${money(t.sale)} | TRN: ${fmt(t.trn)} | AURA: ${fmt(t.aura)} | FOOTFALL: ${fmt(t.foot)} | UNITS: ${fmt(t.units)}`;
+    if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>toast('Copied')).catch(()=>toast(text));
+    else toast(text);
+  }
+
+  // ——— OTHER RENDER FUNCTIONS (minimal) ———
+  function renderHeader(){
+    document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'short'});
+    document.getElementById('storeBadge').textContent = cfg.store;
+    document.getElementById('homeStore').textContent = cfg.store;
+  }
+  function renderShiftPanel(){
+    const idx=0; const days=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'];
+    const my=rosterWeek21.people.find(p=>p.name.toUpperCase().includes(MY_NAME));
+    let strip='';
+    if(my){ my.shifts.forEach((s,i)=>{ strip+=`<div class="shift-mini-day ${idx===i?'active':''} ${s.includes('OFF')?'off':''}">${days[i]} · ${s.replace('(Night)','Night')}</div>`; }); }
+    document.getElementById('shiftWeekStrip').innerHTML=strip;
+    document.getElementById('shiftWeekLabel').textContent='Week 21';
+    document.getElementById('myShiftToday').textContent=my?my.shifts[0]:'—';
+  }
+  function renderHome(){
+    const k=kpis(); const pct=cfg.target?k.total/cfg.target*100:0;
+    document.getElementById('hSales').textContent=money(k.total);
+    document.getElementById('hPct').textContent=k.total?pct.toFixed(0)+'%':'—%';
+    document.getElementById('hPct').style.color=pct>=100?'var(--green)':pct>=80?'var(--orange)':'var(--red)';
+    document.getElementById('hFill').style.width=Math.min(pct,100)+'%';
+    document.getElementById('hTarget').textContent='Target: '+money(cfg.target);
+    document.getElementById('hKwd').textContent=k.total?'≈ KWD '+(k.total/AED2KD).toFixed(2):'';
+    document.getElementById('hHourly').textContent=money(getHourlyTotals().sale).replace('AED ','');
+    document.getElementById('hTrn').textContent=fmt(k.trn);
+    document.getElementById('hAura').textContent=k.auraP?k.auraP.toFixed(0)+'%':'—';
+    document.getElementById('hAuraSub').textContent=k.auraP?(k.auraP>=cfg.auraTarget?'Target ✓':'Target '+cfg.auraTarget+'%'):'No data';
+    document.getElementById('hNo7').textContent=k.no7p?k.no7p.toFixed(1)+'%':'—';
+    document.getElementById('hNo7Sub').textContent=k.no7p?(k.no7p>=cfg.no7Target?'Target ✓':'Target '+cfg.no7Target+'%'):'No data';
+  }
+  function kpis(src=current){
+    const total=n(src.totalAED),trn=n(src.trn),no7=n(src.no7AED),units=n(src.units),foot=n(src.footfall),aura=n(src.aura);
+    return {atv:trn?total/trn:0,ipc:trn?units/trn:0,conv:foot?trn/foot*100:0,no7p:total?no7/total*100:0,auraP:trn?aura/trn*100:0,total,trn,no7,units,foot,aura};
+  }
+  function renderEntry(){
+    const grid=document.getElementById('entryGrid');
+    grid.innerHTML=fields.map(([key,label,suf])=>`<div class="entry-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px;box-shadow:0 6px 18px var(--shadow);"><label style="font-size:8px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px;">${label}</label><input type="number" inputmode="decimal" id="in-${key}" value="${current[key]??''}" placeholder="0" style="width:100%;background:var(--input);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:18px;font-weight:900;font-family:var(--mono);padding:8px 10px;outline:none;" oninput="current['${key}']=this.value;renderQuick()"><div class="calc" style="font-size:8px;color:var(--accent);margin-top:5px;font-family:var(--mono);">${suf}${key.includes('AED')||key==='dssr'?` · KWD <span id="kd-${key}">0</span>`:''}</div></div>`).join('');
+    renderQuick();
+  }
+  function renderQuick(){
+    fields.forEach(([key])=>{const kd=document.getElementById('kd-'+key);if(kd)kd.textContent=(n(current[key])/AED2KD).toFixed(2);});
+    const k=kpis();
+    document.getElementById('quickKpi').innerHTML=[['ATV',k.atv?'AED '+k.atv.toFixed(0):'—'],['IPC',k.ipc?k.ipc.toFixed(2):'—'],['CONV',k.conv?k.conv.toFixed(1)+'%':'—'],['NO7',k.no7p?k.no7p.toFixed(1)+'%':'—'],['AURA',k.auraP?k.auraP.toFixed(1)+'%':'—']].map(x=>`<div class="quick-chip"><div class="n">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
+  }
+  function saveSales(){ data[today()]={...current,at:new Date().toISOString()}; persist(); toast('✓ Sales saved'); renderAll(); }
+
+  // ——— RENDER ALL ———
+  function renderAll(){
+    renderHeader(); renderHome(); renderShiftPanel(); renderSwipe(); renderEntry(); renderQuick();
+    // chart already updated via swipe
+  }
+
+  load();
+  renderAll();
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
 </body>
 </html>
