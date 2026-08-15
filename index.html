@@ -1,606 +1,334 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Boots Tracker · Swipe Entry</title>
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2300205B' rx='20'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white' font-family='system-ui' font-weight='900'%3EB%3C/text%3E%3C/svg%3E">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    :root {
-      --bg: #020B1F; --bg2: #0A1633; --bg3: #112247; --card: #0D1E40; --card2: #162A52;
-      --border: #1E3A8A; --text: #F1F5F9; --text2: #94A3B8; --text3: #64748B;
-      --input: rgba(255,255,255,.07); --shadow: rgba(0,0,0,.35);
-      --accent: #4BA3E3; --boots-blue: #005EB8; --green: #22C55E; --red: #EF4444; --orange: #F59E0B;
-      --safe-top: env(safe-area-inset-top, 18px); --safe-bottom: env(safe-area-inset-bottom, 14px);
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-      --mono: "SF Mono", "Menlo", "Monaco", monospace;
-    }
-    body.light {
-      --bg: #F2F6FC; --bg2: #E4EDF8; --bg3: #D5E2F2; --card: #FFFFFF; --card2: #F0F5FD;
-      --border: #C7D5E8; --text: #0B1C3A; --text2: #2C405C; --text3: #5A6F8A;
-      --input: #F0F4FA; --shadow: rgba(0,20,50,.08);
-    }
-    body {
-      background: var(--bg); color: var(--text); font-family: var(--sans);
-      min-height: 100vh; padding-bottom: calc(82px + var(--safe-bottom));
-      transition: background .2s, color .2s; line-height: 1.4; overflow-x: hidden;
-    }
-    ::-webkit-scrollbar { height: 4px; width: 4px; background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .topbar {
-      position: sticky; top: 0; z-index: 50;
-      padding: calc(var(--safe-top) + 6px) 18px 10px;
-      background: color-mix(in srgb, var(--bg) 92%, transparent);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .logo { font-size: 22px; font-weight: 900; letter-spacing: -.3px; }
-    .logo span { font-size: 12px; font-weight: 700; color: var(--text2); margin-left: 2px; }
-    .date { font-size: 10px; font-family: var(--mono); color: var(--text3); margin-top: 2px; letter-spacing: .3px; }
-    .top-actions { display: flex; align-items: center; gap: 8px; }
-    .badge {
-      background: var(--boots-blue); border: 1px solid var(--accent);
-      border-radius: 60px; padding: 5px 10px; font-size: 8px; font-weight: 800;
-      letter-spacing: .6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;
-    }
-    .theme-btn {
-      width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
-      background: var(--card); color: var(--text); font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .screen { display: none; animation: fade .2s ease; }
-    .screen.active { display: block; }
-    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f0f2f5;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
 
-    /* ——— SWIPE ENTRY CARD ——— */
-    .swipe-entry-wrap {
-      margin: 10px 16px 8px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: 0 8px 28px var(--shadow);
-      overflow: hidden;
-      position: relative;
-    }
-    .swipe-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px 8px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg3);
-    }
-    .swipe-header .slot-label {
-      font-size: 15px;
-      font-weight: 950;
-      letter-spacing: -.2px;
-    }
-    .swipe-header .slot-dur {
-      font-size: 9px;
-      color: var(--text2);
-      font-family: var(--mono);
-    }
-    .swipe-progress {
-      display: flex;
-      gap: 4px;
-      padding: 8px 18px;
-      background: var(--bg2);
-      overflow-x: auto;
-      border-bottom: 1px solid var(--border);
-    }
-    .swipe-progress .dot {
-      flex: 0 0 28px;
-      height: 4px;
-      border-radius: 20px;
-      background: var(--border);
-      transition: .2s;
-    }
-    .swipe-progress .dot.active { background: var(--accent); }
-    .swipe-progress .dot.filled { background: var(--green); }
+.card {
+  width: 1080px;
+  height: 1350px;
+  background: linear-gradient(145deg, #0033A0 0%, #002266 100%);
+  border-radius: 40px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
 
-    .swipe-body {
-      padding: 16px 18px 20px;
-      touch-action: pan-y;
-    }
-    .swipe-field-row {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .swipe-field {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--input);
-      border-radius: 16px;
-      padding: 4px 16px 4px 20px;
-      border: 1px solid var(--border);
-      min-height: 60px;
-    }
-    .swipe-field label {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .4px;
-      color: var(--text2);
-      text-transform: uppercase;
-    }
-    .swipe-field input {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 950;
-      width: 110px;
-      text-align: right;
-      outline: none;
-      padding: 8px 0;
-    }
-    .swipe-field input::placeholder { color: var(--text3); opacity: .5; }
-    .swipe-field .calc-badge {
-      font-size: 11px;
-      font-family: var(--mono);
-      font-weight: 900;
-      color: var(--accent);
-      min-width: 60px;
-      text-align: right;
-    }
-    .swipe-nav {
-      display: flex;
-      gap: 10px;
-      margin-top: 18px;
-    }
-    .swipe-nav button {
-      flex: 1;
-      border: none;
-      border-radius: 40px;
-      padding: 12px;
-      font-weight: 900;
-      font-size: 13px;
-      background: var(--bg3);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .swipe-nav button.primary {
-      background: var(--boots-blue);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .swipe-nav button:active { transform: scale(.96); }
+/* Decorative elements */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
 
-    .swipe-total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 18px;
-      background: var(--bg3);
-      border-top: 1px solid var(--border);
-      font-family: var(--mono);
-    }
-    .swipe-total-row .total-label { font-size: 10px; font-weight: 800; color: var(--text2); text-transform: uppercase; }
-    .swipe-total-row .total-value { font-size: 18px; font-weight: 950; color: var(--accent); }
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
 
-    /* ——— other cards (keep compact) ——— */
-    .dash-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 6px;
-    }
-    .dash-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 14px 12px; min-height: 96px; box-shadow: 0 6px 18px var(--shadow);
-      position: relative; overflow: hidden;
-    }
-    .dash-card:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
-    .dash-card.aura { background: linear-gradient(145deg, #D81B60, #8E24AA); border-color: rgba(255,255,255,.15); }
-    .dash-card.aura:before { display: none; }
-    .card-label { font-size: 8px; font-weight: 900; letter-spacing: .8px; text-transform: uppercase; color: var(--text2); margin-bottom: 6px; }
-    .aura .card-label { color: rgba(255,255,255,.85); }
-    .card-val { font-size: 26px; font-weight: 950; font-family: var(--mono); line-height: 1; }
-    .card-sub { display: inline-block; margin-top: 8px; padding: 3px 8px; border-radius: 40px; background: var(--input); font-size: 8px; font-weight: 800; color: var(--text2); }
-    .aura .card-sub { background: rgba(255,255,255,.2); color: #fff; }
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
 
-    .actions {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px 16px 4px;
-    }
-    .action {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      color: var(--text); padding: 10px 4px; text-align: center; font-size: 8px; font-weight: 900; text-transform: uppercase;
-      transition: .1s;
-    }
-    .action:active { transform: scale(.95); }
-    .action i { font-style: normal; font-size: 20px; display: block; margin-bottom: 3px; }
+.boots-logo {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #FFFFFF;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
 
-    .quick-kpi {
-      margin: 8px 16px 12px; padding: 12px 14px; border-radius: 18px;
-      background: linear-gradient(145deg, rgba(216,27,96,.12), rgba(142,36,170,.10), rgba(0,94,184,.08));
-      border: 1px solid rgba(216,27,96,.2);
-    }
-    .quick-head { display: flex; justify-content: space-between; font-size: 9px; font-weight: 950; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-    .quick-row { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 2px; }
-    .quick-row::-webkit-scrollbar { display: none; }
-    .quick-chip { min-width: 62px; background: var(--input); border: 1px solid var(--border); border-radius: 12px; padding: 6px 8px; text-align: center; flex-shrink: 0; }
-    .quick-chip .n { font-size: 6px; font-weight: 900; color: var(--text2); text-transform: uppercase; }
-    .quick-chip .v { font-size: 11px; font-weight: 950; font-family: var(--mono); margin-top: 2px; }
+.boots-logo span {
+  color: #FFD700;
+}
 
-    .hour-chart {
-      margin: 6px 12px 12px; padding: 14px 12px 10px;
-      border: 1px solid var(--border); border-radius: 18px; background: var(--card);
-    }
-    .chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .chart-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: .8px; }
-    .chart-legend { font-size: 8px; color: var(--text2); }
-    .bars { display: flex; align-items: flex-end; gap: 4px; height: 110px; border-bottom: 1px solid var(--border); overflow-x: auto; padding: 8px 2px 0; }
-    .bar-col { min-width: 38px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
-    .bar { width: 18px; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, var(--accent), var(--boots-blue)); min-height: 2px; transition: .2s; }
-    .bar-value { font-family: var(--mono); font-size: 7px; color: var(--text2); }
-    .bar-time { font-size: 6px; color: var(--text3); white-space: nowrap; }
+.tagline {
+  font-size: 18px;
+  opacity: 0.9;
+  margin-top: 5px;
+  font-weight: 300;
+}
 
-    .bottom-nav {
-      position: fixed; left: 0; right: 0; bottom: 0;
-      background: color-mix(in srgb, var(--bg) 96%, transparent);
-      backdrop-filter: blur(16px); border-top: 1px solid var(--border);
-      display: flex; padding: 6px 0 calc(6px + var(--safe-bottom)); z-index: 60;
-      max-width: 480px; margin: auto;
-    }
-    .nav { flex: 1; background: none; border: none; color: var(--text3); font-size: 8px; font-weight: 800; text-align: center; }
-    .nav.active { color: var(--accent); }
-    .nav i { font-style: normal; font-size: 20px; display: block; margin-bottom: 1px; }
+.pharmacist-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+  position: relative;
+  z-index: 1;
+}
 
-    .toast {
-      position: fixed; top: calc(var(--safe-top) + 56px); left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      background: var(--green); color: #fff; padding: 8px 20px; border-radius: 60px;
-      font-size: 12px; font-weight: 900; opacity: 0; transition: .25s; z-index: 100;
-      box-shadow: 0 6px 20px rgba(0,0,0,.3);
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.pharmacist {
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(145deg, #FFFFFF, #E8EEF2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  border: 4px solid #FFD700;
+}
 
-    @media (min-width: 480px) {
-      body { max-width: 420px; margin: auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
-      .bottom-nav { max-width: 420px; }
-    }
-  </style>
+.pharmacist-char {
+  font-size: 100px;
+  line-height: 1;
+}
+
+.stars-container {
+  text-align: center;
+  margin: 10px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.stars {
+  font-size: 45px;
+  color: #FFD700;
+  letter-spacing: 6px;
+  text-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+
+.rating-text {
+  color: white;
+  font-size: 20px;
+  font-weight: 300;
+  margin-top: 3px;
+}
+
+.main-content {
+  background: rgba(255,255,255,0.95);
+  border-radius: 25px;
+  padding: 30px 35px;
+  margin: 15px 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.main-content h2 {
+  color: #0033A0;
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.main-content p {
+  color: #333;
+  font-size: 17px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.review-presets {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 12px 0;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.review-chip {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(5px);
+}
+
+.qr-section {
+  background: white;
+  border-radius: 25px;
+  padding: 25px;
+  text-align: center;
+  margin: 15px 0;
+  position: relative;
+  z-index: 1;
+  border: 3px dashed #FFD700;
+}
+
+.qr-placeholder {
+  width: 160px;
+  height: 160px;
+  background: #f5f5f5;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  border: 2px solid #ddd;
+}
+
+.qr-placeholder img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+
+.qr-text {
+  color: #0033A0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.qr-sub {
+  color: #666;
+  font-size: 14px;
+}
+
+.cta-button {
+  background: linear-gradient(135deg, #FFD700, #FFC000);
+  color: #0033A0;
+  padding: 18px 35px;
+  border-radius: 50px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin: 12px 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 8px 30px rgba(255,215,0,0.3);
+  cursor: pointer;
+  transition: transform 0.3s;
+  border: none;
+  width: 100%;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.cta-button:hover {
+  transform: scale(1.02);
+}
+
+.cta-button small {
+  font-size: 15px;
+  font-weight: 400;
+  display: block;
+  opacity: 0.8;
+}
+
+.google-badge {
+  display: inline-block;
+  background: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  color: #0033A0;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 5px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.footer {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 12px;
+}
+
+@media (max-width: 1100px) {
+  .card {
+    width: 100%;
+    height: auto;
+    min-height: 1350px;
+    border-radius: 20px;
+    padding: 25px;
+  }
+}
+</style>
 </head>
 <body>
 
-<div class="topbar">
-  <div>
-    <div class="logo">Boots <span>Tracker</span></div>
-    <div class="date" id="dateText"></div>
+<div class="card">
+  <div class="header">
+    <div class="boots-logo">⚕️ BOOTS <span>PHARMACY</span></div>
+    <div class="tagline">Terminal 3 · Arrivals · Dubai</div>
   </div>
-  <div class="top-actions">
-    <div class="badge" id="storeBadge">BOOTS DXB T3</div>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+
+  <div class="pharmacist-container">
+    <div class="pharmacist">
+      <div class="pharmacist-char">👨‍⚕️</div>
+    </div>
+  </div>
+
+  <div class="stars-container">
+    <div class="stars">★★★★★</div>
+    <div class="rating-text">Rate your experience</div>
+  </div>
+
+  <div class="main-content">
+    <h2>✨ Thank You for Visiting! ✨</h2>
+    <p>
+      We value your feedback! Please take a moment to share your experience 
+      at <strong>Boots Pharmacy - Terminal 3 Arrivals</strong>.
+    </p>
+    <p style="font-size: 14px; color: #666; margin-top: 8px;">
+      Your review helps us serve you better ❤️
+    </p>
+  </div>
+
+  <div class="review-presets">
+    <span class="review-chip">⭐ Amazing Service</span>
+    <span class="review-chip">🙏 Thank You Vysakh</span>
+    <span class="review-chip">💊 Professional Care</span>
+    <span class="review-chip">🛫 Best Airport Pharmacy</span>
+  </div>
+
+  <div class="qr-section">
+    <div class="qr-placeholder">
+      <!-- QR Code Image - Replace src with your generated QR code -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://maps.app.goo.gl/adYjEZ7SwSJ7Fw9s7?g_st=ic" alt="QR Code">
+    </div>
+    <div class="qr-text">📱 Scan to Review</div>
+    <div class="qr-sub">Google Maps · One Click</div>
+  </div>
+
+  <a href="https://maps.app.goo.gl/adYjEZ7SwSJ7Fw9s7?g_st=ic" target="_blank" class="cta-button">
+    ⭐ WRITE A REVIEW ⭐
+    <small>Tap here or scan QR code</small>
+  </a>
+
+  <div style="text-align: center; margin: 8px 0; position: relative; z-index: 1;">
+    <span class="google-badge">📍 Google Maps ★ 4.9</span>
+  </div>
+
+  <div class="footer">
+    <strong>VYSAKH · Pharmacist</strong> · Boots Terminal 3 Arrivals · Dubai<br>
+    Your health, our priority ❤️
   </div>
 </div>
 
-<div class="toast" id="toast">Saved</div>
-
-<!-- HOME -->
-<section class="screen active" id="home">
-  <div style="background:linear-gradient(145deg,var(--boots-navy),#001537 70%,var(--bg));padding:16px 20px 14px;position:relative;overflow:hidden;">
-    <div style="position:absolute;right:-10px;top:-26px;font-size:140px;font-weight:900;color:rgba(255,255,255,.022);font-style:italic;">B</div>
-    <div style="display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:60px;padding:4px 12px 4px 8px;font-size:9px;font-weight:800;letter-spacing:.4px;position:relative;z-index:2;">⚕️ <span id="homeStore">BOOTS DXB T3</span></div>
-    <div style="font-size:28px;font-weight:950;letter-spacing:-.5px;line-height:1.05;margin-top:8px;position:relative;z-index:1;">PHARMACY<br>SALES</div>
-    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:3px;">Daily performance dashboard</div>
-  </div>
-
-  <div style="margin:10px 16px 8px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px 12px;box-shadow:0 6px 18px var(--shadow);">
-    <div style="display:flex;justify-content:space-between;font-size:8px;font-weight:900;text-transform:uppercase;color:var(--text2);letter-spacing:.8px;">
-      <span>👤 MY SHIFT · VYSAKH</span>
-      <span id="shiftWeekLabel">Week 21</span>
-    </div>
-    <div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);margin:4px 0 6px;" id="myShiftToday">—</div>
-    <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;" id="shiftWeekStrip"></div>
-  </div>
-
-  <div style="margin:8px 16px 12px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:0 8px 24px var(--shadow);">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div><div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Today's Total Register</div><div style="font-size:28px;font-weight:950;font-family:var(--mono);line-height:1.1;letter-spacing:-.3px;" id="hSales">AED 0</div></div>
-      <div style="text-align:right"><div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);">Achieved</div><div style="font-size:28px;font-weight:950;font-family:var(--mono);line-height:1.1;letter-spacing:-.3px;color:var(--accent);" id="hPct">—%</div></div>
-    </div>
-    <div style="height:5px;background:var(--input);border-radius:60px;overflow:hidden;margin-top:12px;"><div class="fill" style="height:100%;width:0;background:linear-gradient(90deg,var(--boots-blue),var(--accent));border-radius:60px;transition:.4s;" id="hFill"></div></div>
-    <div style="display:flex;justify-content:space-between;margin-top:8px;"><div style="color:var(--text2);font-size:9px;" id="hTarget">Target: AED 0</div><div style="color:var(--text2);font-size:9px;" id="hKwd"></div></div>
-  </div>
-
-  <div class="dash-grid">
-    <div class="dash-card"><div class="card-label">💰 Hourly Entry</div><div class="card-val" id="hHourly">0</div><div class="card-sub">Open sales entry</div></div>
-    <div class="dash-card aura"><div class="card-label">✨ Aura Linkage</div><div class="card-val" id="hAura">—</div><div class="card-sub" id="hAuraSub">No data</div></div>
-    <div class="dash-card"><div class="card-label">🧴 No7 Share</div><div class="card-val" id="hNo7">—</div><div class="card-sub" id="hNo7Sub">No data</div></div>
-    <div class="dash-card"><div class="card-label">🧾 Transactions</div><div class="card-val" id="hTrn">0</div><div class="card-sub">Today</div></div>
-  </div>
-
-  <div class="actions">
-    <button class="action" onclick="show('sales')"><i>🧮</i>Entry</button>
-    <button class="action" onclick="show('weekly')"><i>🗓️</i>Weekly</button>
-    <button class="action" onclick="show('kpi')"><i>📊</i>KPIs</button>
-    <button class="action" onclick="show('history')"><i>🗂️</i>History</button>
-  </div>
-</section>
-
-<!-- SALES with SWIPE ENTRY -->
-<section class="screen" id="sales">
-  <div style="padding:12px 16px 4px;font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);">Hourly Swipe Entry</div>
-
-  <!-- SWIPE ENTRY CARD -->
-  <div class="swipe-entry-wrap" id="swipeEntryWrap">
-    <div class="swipe-header">
-      <div>
-        <div class="slot-label" id="swipeSlotLabel">12–6 AM</div>
-        <div class="slot-dur" id="swipeSlotDur">6h</div>
-      </div>
-      <div style="font-family:var(--mono);font-size:12px;font-weight:950;color:var(--accent);" id="swipeIndex">1 / 10</div>
-    </div>
-    <div class="swipe-progress" id="swipeProgress"></div>
-    <div class="swipe-body" id="swipeBody">
-      <div class="swipe-field-row">
-        <div class="swipe-field"><label>Total Sale</label><input type="number" inputmode="decimal" id="swipeSale" placeholder="0" min="0"></div>
-        <div class="swipe-field"><label>TRN</label><input type="number" inputmode="decimal" id="swipeTrn" placeholder="0" min="0"></div>
-        <div class="swipe-field"><label>AURA</label><input type="number" inputmode="decimal" id="swipeAura" placeholder="0" min="0"></div>
-        <div class="swipe-field"><label>Footfall</label><input type="number" inputmode="decimal" id="swipeFoot" placeholder="0" min="0"></div>
-        <div class="swipe-field"><label>Units Sold</label><input type="number" inputmode="decimal" id="swipeUnits" placeholder="0" min="0"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;background:var(--bg3);border-radius:16px;padding:10px 12px;">
-          <div><div style="font-size:7px;color:var(--text3);text-transform:uppercase;font-weight:800;">ATV</div><div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);" id="swipeAtv">—</div></div>
-          <div><div style="font-size:7px;color:var(--text3);text-transform:uppercase;font-weight:800;">AURA%</div><div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);" id="swipeAuraP">—</div></div>
-          <div><div style="font-size:7px;color:var(--text3);text-transform:uppercase;font-weight:800;">CONV</div><div style="font-family:var(--mono);font-size:14px;font-weight:950;color:var(--accent);" id="swipeConv">—</div></div>
-        </div>
-      </div>
-      <div class="swipe-nav">
-        <button onclick="swipePrev()">◀ Prev</button>
-        <button class="primary" onclick="swipeNext()">Next ▶</button>
-      </div>
-    </div>
-    <div class="swipe-total-row">
-      <span class="total-label">Day Total</span>
-      <span class="total-value" id="swipeDayTotal">AED 0</span>
-    </div>
-  </div>
-
-  <!-- quick actions -->
-  <div style="display:flex;gap:8px;margin:6px 16px 10px;">
-    <button style="flex:1;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);padding:8px;font-size:9px;font-weight:900;" onclick="clearHourly()">↺ Clear</button>
-    <button style="flex:1;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);padding:8px;font-size:9px;font-weight:900;" onclick="copyHourlyTotals()">▣ Copy Totals</button>
-    <button style="flex:1;border:none;border-radius:14px;background:var(--boots-blue);color:#fff;padding:8px;font-size:9px;font-weight:900;border-color:var(--accent);" onclick="saveHourly()">✓ Save</button>
-  </div>
-
-  <!-- chart -->
-  <div class="hour-chart">
-    <div class="chart-head"><div class="chart-title">📊 Hourly sales</div><div class="chart-legend">AED / hour</div></div>
-    <div class="bars" id="hourBars"></div>
-  </div>
-
-  <div style="padding:8px 16px 2px;font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);">Daily Manual Entry</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;" id="entryGrid"></div>
-
-  <div class="quick-kpi">
-    <div class="quick-head"><span>📊 Quick KPI</span><span>Auto</span></div>
-    <div class="quick-row" id="quickKpi"></div>
-  </div>
-  <button class="save" style="margin:10px 16px 8px;width:calc(100% - 32px);border:none;border-radius:16px;padding:14px;background:linear-gradient(135deg,var(--boots-blue),var(--accent));color:#fff;font-size:14px;font-weight:950;box-shadow:0 6px 20px rgba(0,94,184,.25);" onclick="saveSales()">✓ Save Daily Sales</button>
-</section>
-
-<!-- WEEKLY, KPI, HISTORY, SETTINGS (simplified) -->
-<section class="screen" id="weekly"><div style="padding:16px;">Weekly view (same as before)</div></section>
-<section class="screen" id="kpi"><div style="padding:16px;">KPI view</div></section>
-<section class="screen" id="history"><div style="padding:16px;">History calendar</div></section>
-<section class="screen" id="settings"><div style="padding:16px;">Settings</div></section>
-
-<nav class="bottom-nav">
-  <button class="nav active" id="nav-home" onclick="show('home')"><i>🏠</i>Home</button>
-  <button class="nav" id="nav-sales" onclick="show('sales')"><i>🧮</i>Sales</button>
-  <button class="nav" id="nav-weekly" onclick="show('weekly')"><i>🗓️</i>Weekly</button>
-  <button class="nav" id="nav-kpi" onclick="show('kpi')"><i>📊</i>KPI</button>
-  <button class="nav" id="nav-history" onclick="show('history')"><i>🗂️</i>History</button>
-  <button class="nav" id="nav-settings" onclick="show('settings')"><i>⚙️</i>More</button>
-</nav>
-
-<script>
-  // ——— APP STATE ———
-  const STORE='boots_tracker_full_app_v1';
-  const AED2KD=11.9;
-  const fields=[ ['totalAED','💰 Total Sales','AED'],['trn','🧾 Transactions','TRN'],['no7AED','🧴 No7 Sales','AED'],['no7Focus','🎯 No7 Focus','pcs'],['units','📦 Units Sold','items'],['footfall','👣 Footfall','ppl'],['dssr','🏦 DSSR Cash','AED'],['aura','✨ Aura Enrolled','links'] ];
-  const hourSlots=[
-    {id:'h00_06',label:'12–6 AM',duration:'6h'},{id:'h06_08',label:'6–8 AM',duration:'2h'},{id:'h08_10',label:'8–10 AM',duration:'2h'},{id:'h10_12',label:'10 AM–12 PM',duration:'2h'},{id:'h12_14',label:'12–2 PM',duration:'2h'},{id:'h14_16',label:'2–4 PM',duration:'2h'},{id:'h16_18',label:'4–6 PM',duration:'2h'},{id:'h18_20',label:'6–8 PM',duration:'2h'},{id:'h20_22',label:'8–10 PM',duration:'2h'},{id:'h22_24',label:'10 PM–12 AM',duration:'2h'}
-  ];
-
-  let cfg={store:'BOOTS DXB T3',target:20000,no7Target:12,auraTarget:65};
-  let data={}, hourly={}, current={}, currentHourly={};
-  let swipeIndex = 0;
-  const MY_NAME='VYSAKH';
-  const rosterWeek21={start:'2026-05-15',people:[{name:'VYSAKH',role:'PH',shifts:['1-10 PM','10-6AM (Night)','10-6AM (Night)','NIGHT OFF','1-10 PM','1-10 PM','1-10 PM']}]};
-
-  function today(){return new Date().toISOString().slice(0,10)}
-  function n(v){v=parseFloat(v);return isNaN(v)?0:v}
-  function money(v){return 'AED '+Math.round(n(v)).toLocaleString()}
-  function fmt(v){return Math.round(n(v)).toLocaleString()}
-
-  function load(){
-    try{const s=JSON.parse(localStorage.getItem(STORE)||'{}');cfg={...cfg,...(s.cfg||{})};data=s.data||{};hourly=s.hourly||{};}catch(e){}
-    current={...(data[today()]||{})}; currentHourly={...(hourly[today()]||{})};
-    loadTheme();
-  }
-  function persist(){localStorage.setItem(STORE,JSON.stringify({cfg,data,hourly}));}
-  function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1400);}
-
-  function toggleTheme(){const light=document.body.classList.toggle('light');localStorage.setItem(STORE+'_theme',light?'light':'dark');document.getElementById('themeBtn').textContent=light?'☀️':'🌙';}
-  function loadTheme(){const light=localStorage.getItem(STORE+'_theme')==='light';document.body.classList.toggle('light',light);const b=document.getElementById('themeBtn');if(b)b.textContent=light?'☀️':'🌙';}
-
-  function show(id){
-    document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    const nav=document.getElementById('nav-'+id); if(nav)nav.classList.add('active');
-    renderAll();
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
-
-  // ——— SWIPE LOGIC ———
-  function getSlot(){ return hourSlots[swipeIndex] || hourSlots[0]; }
-  function getSlotData(){ return currentHourly[getSlot().id] || {}; }
-  function setSlotData(obj){ currentHourly[getSlot().id] = {...currentHourly[getSlot().id], ...obj}; }
-
-  function renderSwipe(){
-    const slot = getSlot();
-    document.getElementById('swipeSlotLabel').textContent = slot.label;
-    document.getElementById('swipeSlotDur').textContent = slot.duration;
-    document.getElementById('swipeIndex').textContent = `${swipeIndex+1} / ${hourSlots.length}`;
-
-    // progress dots
-    let dots = '';
-    hourSlots.forEach((_,i)=>{
-      const hasData = Object.keys(currentHourly[hourSlots[i].id] || {}).length > 0;
-      dots += `<div class="dot ${i===swipeIndex?'active':''} ${hasData?'filled':''}"></div>`;
-    });
-    document.getElementById('swipeProgress').innerHTML = dots;
-
-    const d = getSlotData();
-    document.getElementById('swipeSale').value = d.sale || '';
-    document.getElementById('swipeTrn').value = d.trn || '';
-    document.getElementById('swipeAura').value = d.aura || '';
-    document.getElementById('swipeFoot').value = d.foot || '';
-    document.getElementById('swipeUnits').value = d.units || '';
-    updateSwipeCalc();
-    updateDayTotal();
-  }
-
-  function updateSwipeCalc(){
-    const sale=n(document.getElementById('swipeSale').value);
-    const trn=n(document.getElementById('swipeTrn').value);
-    const aura=n(document.getElementById('swipeAura').value);
-    const foot=n(document.getElementById('swipeFoot').value);
-    const units=n(document.getElementById('swipeUnits').value);
-    document.getElementById('swipeAtv').textContent = trn ? 'AED '+ (sale/trn).toFixed(0) : '—';
-    document.getElementById('swipeAuraP').textContent = trn ? (aura/trn*100).toFixed(1)+'%' : '—';
-    document.getElementById('swipeConv').textContent = foot ? (trn/foot*100).toFixed(1)+'%' : '—';
-    // auto-save to currentHourly
-    setSlotData({sale:String(sale), trn:String(trn), aura:String(aura), foot:String(foot), units:String(units)});
-    // update chart & total
-    renderHourChart(getHourlyTotals().sale);
-    updateDayTotal();
-  }
-
-  function updateDayTotal(){
-    const t = getHourlyTotals();
-    document.getElementById('swipeDayTotal').textContent = money(t.sale);
-  }
-
-  function swipeNext(){
-    if(swipeIndex < hourSlots.length-1){ swipeIndex++; renderSwipe(); }
-    else { toast('Last hour slot'); }
-  }
-  function swipePrev(){
-    if(swipeIndex > 0){ swipeIndex--; renderSwipe(); }
-    else { toast('First hour slot'); }
-  }
-
-  // attach input events
-  document.addEventListener('DOMContentLoaded', ()=>{
-    ['swipeSale','swipeTrn','swipeAura','swipeFoot','swipeUnits'].forEach(id=>{
-      document.getElementById(id).addEventListener('input', updateSwipeCalc);
-    });
-  });
-
-  // ——— HOURLY TOTALS ———
-  function getHourlyTotals(){
-    return hourSlots.reduce((a,s)=>{
-      const k=hourlyKpis(currentHourly[s.id]||{});
-      a.sale+=k.sale; a.trn+=k.trn; a.aura+=k.aura; a.foot+=k.foot; a.units+=k.units;
-      return a;
-    },{sale:0,trn:0,aura:0,foot:0,units:0});
-  }
-  function hourlyKpis(r){
-    const sale=n(r.sale),trn=n(r.trn),aura=n(r.aura),foot=n(r.foot),units=n(r.units);
-    return {sale,trn,aura,foot,units};
-  }
-
-  function renderHourChart(total){
-    const max=Math.max(...hourSlots.map(s=>n(currentHourly[s.id]?.sale)),1);
-    document.getElementById('hourBars').innerHTML=hourSlots.map(s=>{
-      const v=n(currentHourly[s.id]?.sale);
-      const h=Math.max(2,(v/max)*90);
-      return `<div class="bar-col"><div class="bar-value">${v?fmt(v):'0'}</div><div class="bar" style="height:${h}px"></div><div class="bar-time">${s.label}</div></div>`;
-    }).join('');
-  }
-
-  function saveHourly(){
-    hourly[today()]={...currentHourly};
-    const t=getHourlyTotals();
-    if(t.sale||t.trn||t.aura||t.foot||t.units){
-      current.totalAED=String(t.sale); current.trn=String(t.trn); current.aura=String(t.aura);
-      current.footfall=String(t.foot); current.units=String(t.units);
-    }
-    data[today()]={...current,at:new Date().toISOString()};
-    persist();
-    toast('✓ Hourly saved');
-    renderAll();
-  }
-  function clearHourly(){
-    if(confirm('Clear all hourly entries?')){ currentHourly={}; hourly[today()]={}; persist(); renderAll(); toast('Cleared'); }
-  }
-  function copyHourlyTotals(){
-    const t=getHourlyTotals();
-    const text=`TOTAL SALE: ${money(t.sale)} | TRN: ${fmt(t.trn)} | AURA: ${fmt(t.aura)} | FOOTFALL: ${fmt(t.foot)} | UNITS: ${fmt(t.units)}`;
-    if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>toast('Copied')).catch(()=>toast(text));
-    else toast(text);
-  }
-
-  // ——— OTHER RENDER FUNCTIONS (minimal) ———
-  function renderHeader(){
-    document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'short'});
-    document.getElementById('storeBadge').textContent = cfg.store;
-    document.getElementById('homeStore').textContent = cfg.store;
-  }
-  function renderShiftPanel(){
-    const idx=0; const days=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'];
-    const my=rosterWeek21.people.find(p=>p.name.toUpperCase().includes(MY_NAME));
-    let strip='';
-    if(my){ my.shifts.forEach((s,i)=>{ strip+=`<div class="shift-mini-day ${idx===i?'active':''} ${s.includes('OFF')?'off':''}">${days[i]} · ${s.replace('(Night)','Night')}</div>`; }); }
-    document.getElementById('shiftWeekStrip').innerHTML=strip;
-    document.getElementById('shiftWeekLabel').textContent='Week 21';
-    document.getElementById('myShiftToday').textContent=my?my.shifts[0]:'—';
-  }
-  function renderHome(){
-    const k=kpis(); const pct=cfg.target?k.total/cfg.target*100:0;
-    document.getElementById('hSales').textContent=money(k.total);
-    document.getElementById('hPct').textContent=k.total?pct.toFixed(0)+'%':'—%';
-    document.getElementById('hPct').style.color=pct>=100?'var(--green)':pct>=80?'var(--orange)':'var(--red)';
-    document.getElementById('hFill').style.width=Math.min(pct,100)+'%';
-    document.getElementById('hTarget').textContent='Target: '+money(cfg.target);
-    document.getElementById('hKwd').textContent=k.total?'≈ KWD '+(k.total/AED2KD).toFixed(2):'';
-    document.getElementById('hHourly').textContent=money(getHourlyTotals().sale).replace('AED ','');
-    document.getElementById('hTrn').textContent=fmt(k.trn);
-    document.getElementById('hAura').textContent=k.auraP?k.auraP.toFixed(0)+'%':'—';
-    document.getElementById('hAuraSub').textContent=k.auraP?(k.auraP>=cfg.auraTarget?'Target ✓':'Target '+cfg.auraTarget+'%'):'No data';
-    document.getElementById('hNo7').textContent=k.no7p?k.no7p.toFixed(1)+'%':'—';
-    document.getElementById('hNo7Sub').textContent=k.no7p?(k.no7p>=cfg.no7Target?'Target ✓':'Target '+cfg.no7Target+'%'):'No data';
-  }
-  function kpis(src=current){
-    const total=n(src.totalAED),trn=n(src.trn),no7=n(src.no7AED),units=n(src.units),foot=n(src.footfall),aura=n(src.aura);
-    return {atv:trn?total/trn:0,ipc:trn?units/trn:0,conv:foot?trn/foot*100:0,no7p:total?no7/total*100:0,auraP:trn?aura/trn*100:0,total,trn,no7,units,foot,aura};
-  }
-  function renderEntry(){
-    const grid=document.getElementById('entryGrid');
-    grid.innerHTML=fields.map(([key,label,suf])=>`<div class="entry-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px;box-shadow:0 6px 18px var(--shadow);"><label style="font-size:8px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px;">${label}</label><input type="number" inputmode="decimal" id="in-${key}" value="${current[key]??''}" placeholder="0" style="width:100%;background:var(--input);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:18px;font-weight:900;font-family:var(--mono);padding:8px 10px;outline:none;" oninput="current['${key}']=this.value;renderQuick()"><div class="calc" style="font-size:8px;color:var(--accent);margin-top:5px;font-family:var(--mono);">${suf}${key.includes('AED')||key==='dssr'?` · KWD <span id="kd-${key}">0</span>`:''}</div></div>`).join('');
-    renderQuick();
-  }
-  function renderQuick(){
-    fields.forEach(([key])=>{const kd=document.getElementById('kd-'+key);if(kd)kd.textContent=(n(current[key])/AED2KD).toFixed(2);});
-    const k=kpis();
-    document.getElementById('quickKpi').innerHTML=[['ATV',k.atv?'AED '+k.atv.toFixed(0):'—'],['IPC',k.ipc?k.ipc.toFixed(2):'—'],['CONV',k.conv?k.conv.toFixed(1)+'%':'—'],['NO7',k.no7p?k.no7p.toFixed(1)+'%':'—'],['AURA',k.auraP?k.auraP.toFixed(1)+'%':'—']].map(x=>`<div class="quick-chip"><div class="n">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
-  }
-  function saveSales(){ data[today()]={...current,at:new Date().toISOString()}; persist(); toast('✓ Sales saved'); renderAll(); }
-
-  // ——— RENDER ALL ———
-  function renderAll(){
-    renderHeader(); renderHome(); renderShiftPanel(); renderSwipe(); renderEntry(); renderQuick();
-    // chart already updated via swipe
-  }
-
-  load();
-  renderAll();
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
-</script>
 </body>
 </html>
