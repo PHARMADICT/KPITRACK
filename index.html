@@ -1,304 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShelfRx Pro & MY Offline Tracker</title>
-    <style>
-        :root {
-            /* Midnight Dark Theme (Default) */
-            --bg-color: #0f172a;
-            --surface-color: rgba(30, 41, 59, 0.7);
-            --border-color: rgba(168, 85, 247, 0.3);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-glow: #a855f7;
-            --success-color: #10b981;
-            --shelf-bg: linear-gradient(180deg, #d9a05b 0%, #8b5a2b 100%);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitamin D Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        [data-theme="light"] {
-            /* Mint Light Theme */
-            --bg-color: #f0fdf4;
-            --surface-color: rgba(255, 255, 255, 0.8);
-            --border-color: rgba(16, 185, 129, 0.3);
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --accent-glow: #10b981;
-            --success-color: #059669;
-            --shelf-bg: linear-gradient(180deg, #fef3c7 0%, #f59e0b 100%);
-        }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0A1633;
+    color: #F1F5F9;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  h1 {
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 4px;
+  }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
+  .sub {
+    text-align: center;
+    font-size: 11px;
+    color: #64748B;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
 
-        /* Glassmorphism Utilities */
-        .glass {
-            background: var(--surface-color);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
+  /* SHELF */
+  .shelf {
+    max-width: 420px;
+    margin: 0 auto 24px;
+    background: #111A2C;
+    border-radius: 10px;
+    border: 2px solid #C8933A;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
 
-        .glass-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-        }
+  .wood-top {
+    height: 8px;
+    background: linear-gradient(180deg, #E8C47A, #C8933A);
+    border-bottom: 1px solid #5a4020;
+  }
 
-        .glass-btn:hover { background: var(--border-color); box-shadow: 0 0 15px var(--accent-glow); }
+  .wood-bottom {
+    height: 12px;
+    background: linear-gradient(180deg, #C8933A, #8B5E1A);
+    border-top: 1px solid rgba(255,255,255,0.3);
+  }
 
-        /* Cinematic Loader */
-        #loader {
-            position: fixed; inset: 0; background: #0f172a; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease;
-        }
-        
-        .loader-terminal { color: #10b981; font-family: monospace; font-size: 1.2rem; margin-bottom: 20px; }
-        .loader-reveal {
-            opacity: 0; color: #f8fafc; font-size: 1.5rem; font-weight: 300; letter-spacing: 2px;
-            animation: revealText 2.5s forwards 1.5s;
-        }
-        @keyframes revealText { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
-        
-        /* Main Application Header */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
-        .app-title { font-size: 1.5rem; font-weight: 800; text-shadow: 0 0 10px var(--accent-glow); }
+  .shelf-label {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px dashed #C8933A;
+    font-size: 10px;
+    font-weight: 800;
+    color: #E8C47A;
+    letter-spacing: 1px;
+  }
 
-        /* 4-Door Navigation Portal */
-        #portal-nav {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px;
-        }
-        
-        .portal-door {
-            padding: 40px 20px; text-align: center; cursor: pointer; transition: transform 0.3s ease;
-        }
-        .portal-door:hover { transform: translateY(-5px); box-shadow: 0 10px 40px var(--accent-glow); }
-        .portal-door h2 { font-size: 1.2rem; margin-bottom: 10px; }
-        
-        /* Views */
-        .view-section { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .shelf-face {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 130px;
+    padding: 12px;
+    gap: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent);
+  }
 
-        /* Module: KPI Table */
-        .kpi-table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 12px; }
-        table { width: 100%; min-width: 700px; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background: rgba(0,0,0,0.2); font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); }
-        input[type="text"] { 
-            width: 80px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); 
-            color: var(--text-main); padding: 8px; border-radius: 6px; outline: none;
-        }
-        input[type="text"]:focus { border-color: var(--accent-glow); box-shadow: 0 0 8px var(--accent-glow); }
+  /* PRODUCT SLOT */
+  .slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    width: 80px;
+    transition: transform 0.15s;
+    user-select: none;
+  }
 
-        /* Module: Planner & Inventory */
-        .sku-widget {
-            display: inline-block; padding: 15px 30px; font-size: 1.5rem; font-weight: 800;
-            color: var(--success-color); border: 2px solid var(--success-color); border-radius: 12px; margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); cursor: pointer;
-        }
-        .wooden-rack { background: var(--shelf-bg); padding: 20px 10px; border-radius: 8px; display: flex; gap: 15px; border-bottom: 8px solid #5c3a18; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .bottle { width: 60px; height: 100px; background: rgba(255,255,255,0.9); border-radius: 8px 8px 2px 2px; position: relative; border: 2px solid #ccc; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; color: #333; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
-        .badge-exp { position: absolute; top: -5px; right: -5px; width: 15px; height: 15px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 8px #ef4444; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+  .slot:active { transform: scale(0.95); }
 
-        /* Utilities */
-        .back-btn { margin-bottom: 20px; }
-        .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        select { background: var(--surface-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; }
+  .bottle {
+    width: 56px;
+    height: 84px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    transition: all 0.25s ease;
+    position: relative;
+    background: rgba(255,255,255,0.9);
+  }
 
-    </style>
+  /* STATE: AVAILABLE */
+  .slot.available .bottle {
+    border: 3px solid #22C55E;
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.6);
+    background: rgba(34, 197, 94, 0.08);
+  }
+
+  /* STATE: UNAVAILABLE */
+  .slot.unavailable .bottle {
+    border: 3px solid #EF4444;
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.08);
+  }
+
+  /* STATE: EMPTY (black dotted) */
+  .slot.empty .bottle {
+    border: 3px dotted #000;
+    background: rgba(255,255,255,0.05);
+    box-shadow: none;
+    opacity: 0.4;
+  }
+
+  /* ORDER TICK */
+  .tick {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #1E3A8A;
+    border: 2px solid #4BA3E3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    color: transparent;
+    transition: all 0.2s;
+  }
+
+  .slot.ticked .tick {
+    background: #4BA3E3;
+    color: #fff;
+  }
+
+  .ground-shadow {
+    width: 46px;
+    height: 5px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, transparent 70%);
+    margin-top: -2px;
+    border-radius: 50%;
+  }
+
+  .label {
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 6px;
+    color: #F1F5F9;
+    max-width: 80px;
+    line-height: 1.2;
+  }
+
+  .state-text {
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .slot.available .state-text { color: #22C55E; }
+  .slot.unavailable .state-text { color: #EF4444; }
+  .slot.empty .state-text { color: #64748B; }
+
+  /* ORDER LIST */
+  .order-panel {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #0D1E40;
+    border: 1px solid #1E3A8A;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .order-title {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #94A3B8;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .order-count {
+    background: #4BA3E3;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+  }
+
+  .order-list {
+    list-style: none;
+    font-size: 12px;
+    color: #F1F5F9;
+  }
+
+  .order-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #1E3A8A;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'SF Mono', monospace;
+  }
+
+  .order-list li:last-child { border-bottom: none; }
+
+  .order-empty {
+    font-size: 11px;
+    color: #64748B;
+    text-align: center;
+    padding: 12px 0;
+    font-style: italic;
+  }
+
+  /* HINT */
+  .hint {
+    text-align: center;
+    font-size: 10px;
+    color: #64748B;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+</style>
 </head>
 <body>
 
-    <!-- Cinematic Loader -->
-    <div id="loader">
-        <div class="loader-terminal" id="terminal-text">Booting ShelfRx OS...</div>
-        <div class="loader-reveal">Designed & Developed by VYSAKH CHANDRAN</div>
-    </div>
+  <h1>💊 Vitamin D Tracker</h1>
+  <div class="sub">Rack 1 · Shelf 1</div>
 
-    <!-- Main Interface -->
-    <div id="app" style="display: none;">
-        <header>
-            <div class="app-title">ShelfRx Pro <span style="font-size: 0.8rem; font-weight:400; color:var(--text-muted);">| BY VYSAKH</span></div>
-            <button class="glass-btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
-        </header>
-
-        <!-- 4-Door Portal -->
-        <div id="portal-nav">
-            <div class="glass portal-door" onclick="openView('view-kpi')">
-                <h2>📊 KPI & Agenda</h2>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Hourly inputs, cumulative math, ATV & Aura %</p>
-            </div>
-            <div class="glass portal-door" onclick="openView('view-planner')">
-                <h2>📦 Inventory & Planner</h2>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Planogram racks, total SKU audit, labeling</p>
-            </div>
-            <div class="glass portal-door" onclick="openView('view-rota')">
-                <h2>⏰ Duty Rota & Time</h2>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">RTA shift tracking, 12-language guides</p>
-            </div>
-            <div class="glass portal-door" onclick="openView('view-scanner')">
-                <h2>📷 Scanner & Expiry</h2>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">GS1 Parser, Data Logger telemetry</p>
-            </div>
+  <!-- SHELF -->
+  <div class="shelf">
+    <div class="wood-top"></div>
+    <div class="shelf-label">SHELF 1.1</div>
+    <div class="shelf-face">
+      <div class="slot available" id="slot" onclick="cycleState()">
+        <div class="bottle">
+          💊
+          <div class="tick" onclick="toggleTick(event)">✓</div>
         </div>
-
-        <!-- KPI & Agenda View -->
-        <section id="view-kpi" class="view-section">
-            <button class="glass-btn back-btn" onclick="goHome()">← Back to Portal</button>
-            <div class="glass" style="padding: 20px;">
-                <h2 style="margin-bottom: 10px;">Daily Agenda & KPIs</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted);">Math supported in fields (e.g., type "25+15" and click away)</p>
-                <div class="kpi-table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Hours</th>
-                                <th>Sale (AED)</th>
-                                <th>TRN</th>
-                                <th>ATV</th>
-                                <th>No7 %</th>
-                                <th>Aura %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Example Rows for Clubbed Times -->
-                            <tr><td>12:00 AM - 06:00 AM</td><td><input type="text" onblur="calcField(this)" placeholder="0"></td><td><input type="text" onblur="calcField(this)" placeholder="0"></td><td>Auto</td><td>Auto</td><td>Auto</td></tr>
-                            <tr><td>06:00 AM - 08:00 AM</td><td><input type="text" onblur="calcField(this)" placeholder="0"></td><td><input type="text" onblur="calcField(this)" placeholder="0"></td><td>Auto</td><td>Auto</td><td>Auto</td></tr>
-                            <tr><td>08:00 AM - 10:00 AM</td><td><input type="text" onblur="calcField(this)" placeholder="0"></td><td><input type="text" onblur="calcField(this)" placeholder="0"></td><td>Auto</td><td>Auto</td><td>Auto</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- Inventory & Planner View -->
-        <section id="view-planner" class="view-section">
-            <button class="glass-btn back-btn" onclick="goHome()">← Back to Portal</button>
-            <div class="glass" style="padding: 20px; text-align: center;">
-                <div class="sku-widget" onclick="alert('Launching Interactive SKU & Out-Of-Stock Audit Modal...')">
-                    TOTAL SKU / STOCK UNITS<br>122 / 840
-                </div>
-                
-                <h3 style="text-align: left; margin-bottom: 15px;">Dermatology Rack A</h3>
-                <div class="wooden-rack">
-                    <div class="bottle" onclick="alert('Opening QuickLabel Creator for Item 1...')"><div class="badge-exp"></div>Item 1</div>
-                    <div class="bottle">Item 2</div>
-                    <div class="bottle">Item 3</div>
-                    <div class="bottle"><div class="badge-exp" style="background:#f59e0b; box-shadow:0 0 8px #f59e0b;"></div>Item 4</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Duty Rota & Time View -->
-        <section id="view-rota" class="view-section">
-            <button class="glass-btn back-btn" onclick="goHome()">← Back to Portal</button>
-            <div class="glass" style="padding: 20px;">
-                <div class="grid-header">
-                    <h2>⭐ TODAY SHIFT: VYSAKH</h2>
-                    <select id="lang-selector">
-                        <option>English</option>
-                        <option>Chinese (Mandarin)</option>
-                        <option>Russian</option>
-                        <option>French</option>
-                        <option>Spanish</option>
-                        <option>Arabic</option>
-                        <option>Portuguese</option>
-                        <option>Korean</option>
-                        <option>Japanese</option>
-                        <option>Indonesian</option>
-                        <option>Swahili</option>
-                        <option>Kazakh/Kyrgyz</option>
-                    </select>
-                </div>
-                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                    <h1 id="live-clock" style="font-size: 3rem; font-family: monospace; color: var(--accent-glow);">00:00:00</h1>
-                    <p style="color: var(--text-muted); margin-bottom: 15px;">Scheduled: 06:00 AM - 03:00 PM</p>
-                    <button class="glass-btn" style="background: var(--success-color);">Clock In</button>
-                    <button class="glass-btn">Start Break</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Scanner & Expiry View -->
-        <section id="view-scanner" class="view-section">
-            <button class="glass-btn back-btn" onclick="goHome()">← Back to Portal</button>
-            <div class="glass" style="padding: 20px;">
-                <h2>Scanner & Data Logger</h2>
-                <div style="height: 200px; border: 2px dashed var(--border-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 20px 0;">
-                    <p style="color: var(--text-muted);">📷 Camera Viewfinder / GS1 Dropzone</p>
-                </div>
-                <button class="glass-btn" style="width: 100%;">Export CSV Order Sheet</button>
-            </div>
-        </section>
+        <div class="ground-shadow"></div>
+        <div class="label">Vitamin D3 1000 IU</div>
+        <div class="state-text" id="stateText">Available</div>
+      </div>
     </div>
+    <div class="wood-bottom"></div>
+  </div>
 
-    <script>
-        // Cinematic Loader Sequence
-        setTimeout(() => {
-            document.getElementById('terminal-text').innerText = "Loading UI Constraints...";
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                }, 800);
-            }, 2500); // Wait for reveal text to finish
-        }, 1000);
+  <!-- ORDER LIST -->
+  <div class="order-panel">
+    <div class="order-title">
+      <span>📋 Order List</span>
+      <span class="order-count" id="orderCount">0</span>
+    </div>
+    <ul class="order-list" id="orderList">
+      <li class="order-empty">No items ticked yet</li>
+    </ul>
+  </div>
 
-        // Theme Toggle Logic
-        let isLight = false;
-        function toggleTheme() {
-            isLight = !isLight;
-            document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
-        }
+  <div class="hint">
+    Tap the bottle → cycle Available / Unavailable / Empty<br>
+    Tap the ✓ badge → add to order list
+  </div>
 
-        // 4-Door Navigation Logic
-        function openView(viewId) {
-            document.getElementById('portal-nav').style.display = 'none';
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-        }
+<script>
+  // STATES
+  const STATES = ['available', 'unavailable', 'empty'];
+  const LABELS = { available: 'Available', unavailable: 'Unavailable', empty: 'Empty' };
 
-        function goHome() {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('portal-nav').style.display = 'grid';
-        }
+  let currentState = 0;
+  let ticked = false;
 
-        // Math Evaluation for KPI Inputs (e.g., typing "25+10" returns "35")
-        function calcField(input) {
-            try {
-                if (input.value && /^[0-9+\-*/().\s]+$/.test(input.value)) {
-                    // Safe evaluation using Function
-                    input.value = new Function('return ' + input.value)();
-                }
-            } catch (e) {
-                console.warn("Invalid math entry");
-            }
-        }
+  const slot = document.getElementById('slot');
+  const stateText = document.getElementById('stateText');
+  const orderList = document.getElementById('orderList');
+  const orderCount = document.getElementById('orderCount');
 
-        // Live Clock for Rota
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('live-clock').innerText = now.toLocaleTimeString();
-        }, 1000);
-    </script>
+  // PRODUCT DATA
+  const product = {
+    name: 'Vitamin D3 1000 IU',
+    barcode: '5012345678900'
+  };
+
+  // CYCLE STATE (tap the bottle)
+  function cycleState() {
+    // Remove all state classes
+    STATES.forEach(s => slot.classList.remove(s));
+    // Move to next state
+    currentState = (currentState + 1) % STATES.length;
+    const newState = STATES[currentState];
+    slot.classList.add(newState);
+    stateText.textContent = LABELS[newState];
+  }
+
+  // TOGGLE TICK (tap the ✓)
+  function toggleTick(e) {
+    e.stopPropagation(); // don't trigger the state cycle
+    ticked = !ticked;
+    slot.classList.toggle('ticked', ticked);
+    renderOrderList();
+  }
+
+  // RENDER ORDER LIST
+  function renderOrderList() {
+    if (ticked) {
+      orderList.innerHTML = `
+        <li>
+          <span>${product.name}</span>
+          <span style="color:#4BA3E3;">×1</span>
+        </li>
+      `;
+      orderCount.textContent = '1';
+    } else {
+      orderList.innerHTML = `<li class="order-empty">No items ticked yet</li>`;
+      orderCount.textContent = '0';
+    }
+  }
+
+  renderOrderList();
+</script>
+
 </body>
 </html>
