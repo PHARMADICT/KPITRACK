@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>PharmaTrack Pro — Vitamins Module (UAE)</title>
+  <title>KPI & TRACK— Vitamins Module (UAE)</title>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     :root {
@@ -309,8 +309,8 @@
     </div>
     <nav class="nav" id="nav">
       <button class="active" data-page="dashboard"><span class="ico">◈</span>Dashboard</button>
-      <button data-page="sales"><span class="ico">▥</span>Sales Entry</button>
-      <button data-page="inventory"><span class="ico">▦</span>Inventory</button>
+      <button data-page="sales"><span class="ico">▥</span>DAILY AGENDA-HOUR</button>
+      <button data-page="RE BALANCE "><span class="ico">▦</span>RE BALANCE </button>
       <button data-page="scanner"><span class="ico">⌗</span>GS1 Scanner</button>
       <button data-page="expiry"><span class="ico">◷</span>Expiry Tracker</button>
       <button data-page="shelf"><span class="ico">▤</span>Shelf Map</button>
@@ -329,7 +329,7 @@
   <!-- Main Content Areas -->
   <main class="main">
     <header class="topbar">
-      <div class="crumb">PharmaTrack Pro / <b id="crumb">Dashboard</b></div>
+      <div class="crumb">KPI & TRACK/ <b id="crumb">Dashboard</b></div>
       <div class="top-actions">
         <button class="btn primary" id="quickAdd">＋ Add Product</button>
         <button class="btn" id="exportJson">Backup</button>
@@ -344,7 +344,7 @@
             <div>
               <div class="badge ok" style="margin-bottom:8px">Live UAE Node</div>
               <h2>Good evening, <span class="editable-val" id="userName" contenteditable="true" title="Click to edit name">Vysakh</span></h2>
-              <p>Branch: <span class="editable-val" id="branchNameDash" contenteditable="true" title="Click to edit branch">Boots DXB T3 Arrivals</span></p>
+              <p>Branch: <span class="editable-val" id="branchNameDash" contenteditable="true" title="Click to edit branch">STORE DXB T3 Arrivals</span></p>
             </div>
             <div class="actions">
               <button class="btn primary" data-goto="sales">Enter Sales</button>
@@ -377,10 +377,10 @@
         </div>
       </section>
 
-      <!-- 2. SALES ENTRY -->
+      <!-- 2. DAILY AGENDA-HOUR -->
       <section class="page" id="page-sales">
         <div class="page-head">
-          <div><h1>Sales Entry</h1><p>10 hourly tracking blocks · automatic metric pacing.</p></div>
+          <div><h1>DAILY AGENDA-HOUR</h1><p>10 hourly tracking blocks · automatic metric pacing.</p></div>
           <div class="actions">
             <button class="btn green" id="saveSales">Save Checkpoint</button>
           </div>
@@ -389,10 +389,10 @@
         <div class="card panel"><div class="table-wrap"><table class="table" id="salesTable"></table></div></div>
       </section>
 
-      <!-- 3. INVENTORY -->
-      <section class="page" id="page-inventory">
+      <!-- 3. RE BALANCE  -->
+      <section class="page" id="page-RE BALANCE ">
         <div class="page-head">
-          <div><h1>Inventory Master</h1><p>Full GTIN database, batch codes, and shelf allocations.</p></div>
+          <div><h1>RE BALANCE  Master</h1><p>Full GTIN database, batch codes, and shelf allocations.</p></div>
           <div class="actions">
             <button class="btn primary" id="addProduct">＋ Add Product</button>
             <button class="btn" id="downloadCsv">CSV Template</button>
@@ -590,7 +590,7 @@ function defaultState() {
       footfall: [40, 35, 50, 30, 60, 75, 70, 58, 45, 35][i]
     }))
   };
-  return { version: 2, settings: { branch: 'Boots DXB T3 Arrivals', currency: 'AED', target: 60000, userName: 'Vysakh' }, products, sales, scans: [], notes: '' };
+  return { version: 2, settings: { branch: 'STORE DXB T3 Arrivals', currency: 'AED', target: 60000, userName: 'Vysakh' }, products, sales, scans: [], notes: '' };
 }
 
 function addDays(base, n) { const d = new Date(base); d.setDate(d.getDate() + n); return iso(d); }
@@ -672,7 +672,7 @@ function renderDashboard() {
   `).join('') : '<div style="color:var(--muted)">All stock healthy.</div>';
 }
 
-/* Render Sales Entry */
+/* Render DAILY AGENDA-HOUR */
 function renderSales() {
   const t = totals();
   document.getElementById('salesKpis').innerHTML = [
@@ -691,8 +691,8 @@ function renderSales() {
   document.getElementById('salesTable').innerHTML = html;
 }
 
-/* Render Inventory */
-function renderInventory() {
+/* Render RE BALANCE  */
+function renderRE BALANCE () {
   const q = (document.getElementById('invSearch')?.value || '').toLowerCase();
   const f = document.getElementById('invFilter')?.value || 'all';
   const filtered = state.products.filter(p => {
@@ -912,7 +912,7 @@ document.getElementById('exportJson').onclick = () => {
 function renderAll() {
   renderDashboard();
   renderSales();
-  renderInventory();
+  renderRE BALANCE ();
   renderExpiry();
   renderShelf();
   renderRestock();
