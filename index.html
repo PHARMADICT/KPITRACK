@@ -1,924 +1,928 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>PharmaTrack Pro — Pharmacy Inventory Management</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0e1a;
-  --surface: rgba(255, 255, 255, 0.06);
-  --surface-mid: rgba(255, 255, 255, 0.10);
-  --surface-strong: #0d1220;
-  --text: #e8edf8;
-  --fg: #8b99c4;
-  --accent: #6c8fff;
-  --accent-2: #a78bfa;
-  --accent-3: #34d399;
-  --muted: #3d4a6e;
-  --primary: #6c8fff;
-  --border: rgba(108, 143, 255, 0.18);
-  --border-light: rgba(255, 255, 255, 0.08);
-  --text-on-accent: #ffffff;
-  --text-display-accent: #a5c0ff;
-  --glass-bg: rgba(255, 255, 255, 0.055);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --chart-1: #6c8fff;
-  --chart-2: #a78bfa;
-  --chart-3: #34d399;
-  --chart-4: #fb923c;
-  --status-red: #f87171;
-  --status-amber: #fb923c;
-  --status-green: #34d399;
-  --aura-bg: #c2185b;
-  --teal-d: #0277bd;
-  --nav-height: 64px;
-}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>PharmaTrack Pro — Vitamins Module (UAE)</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #060913;
+      --panel: rgba(14, 20, 36, 0.72);
+      --panel2: rgba(10, 15, 28, 0.85);
+      --text: #f1f5f9;
+      --muted: #8fa0c7;
+      --accent: #60a5fa;
+      --purple: #a78bfa;
+      --solar-gold: #f59e0b;
+      --solar-amber: rgba(245, 158, 11, 0.18);
+      --green: #34d399;
+      --amber: #fb923c;
+      --red: #f87171;
+      --cyan: #38bdf8;
+      --border: rgba(255, 255, 255, 0.09);
+      --border2: rgba(96, 165, 250, 0.28);
+      --glass: rgba(255, 255, 255, 0.04);
+      --shadow: 0 16px 45px rgba(0, 0, 0, 0.55);
+      --r: 18px;
+      --r2: 12px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font: 14px/1.5 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 18% 4%, rgba(245, 158, 11, 0.16), transparent 38%),
+        radial-gradient(circle at 82% 12%, rgba(96, 165, 250, 0.18), transparent 42%),
+        radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.08), transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.12), transparent 40%);
+      background-attachment: fixed;
+    }
 
-[data-theme="light"] {
-  --bg: #f0fdf4;
-  --surface: rgba(0, 0, 0, 0.04);
-  --surface-mid: rgba(0, 0, 0, 0.06);
-  --surface-strong: #ffffff;
-  --text: #0f172a;
-  --fg: #475569;
-  --accent: #10b981;
-  --accent-2: #059669;
-  --accent-3: #047857;
-  --muted: #94a3b8;
-  --primary: #10b981;
-  --border: rgba(16, 185, 129, 0.28);
-  --border-light: rgba(0, 0, 0, 0.08);
-  --text-on-accent: #ffffff;
-  --text-display-accent: #065f46;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(16, 185, 129, 0.25);
-}
+    /* Solar Lines & Grid Overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: 
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255, 255, 255, 0.015) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255, 255, 255, 0.015) 60px);
+      z-index: 0;
+    }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 14px;
-  min-height: 100vh;
-  overflow-x: hidden;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
 
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, color-mix(in srgb, var(--accent-2) 8%, transparent) 0%, transparent 55%);
-  pointer-events: none; z-index: 0;
-}
+    /* Splash Screen */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.5s ease; backdrop-filter: blur(25px);
+    }
+    .splash-logo {
+      font-size: 58px; margin-bottom: 12px;
+      animation: solarPulse 2.4s infinite ease-in-out;
+      background: linear-gradient(135deg, #fbbf24, var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .splash-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin: 0; }
+    .splash-loader {
+      width: 170px; height: 3px; background: rgba(255,255,255,.08);
+      border-radius: 4px; margin-top: 26px; overflow: hidden; position: relative;
+    }
+    .splash-loader-bar {
+      position: absolute; top: 0; left: 0; width: 45%; height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #60a5fa);
+      animation: solarLoad 1.2s infinite ease-in-out;
+    }
+    @keyframes solarPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(245,158,11,0.4)); } 50% { transform: scale(1.08); filter: drop-shadow(0 0 28px rgba(167,139,250,0.6)); } }
+    @keyframes solarLoad { 0% { left: -45%; } 100% { left: 100%; } }
 
-.glass {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-radius: 16px;
-}
+    /* Layout Structure */
+    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; position: relative; z-index: 1; }
+    
+    /* Sidebar Navigation */
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; padding: 20px 16px;
+      border-right: 1px solid var(--border); background: rgba(6, 9, 19, 0.85);
+      backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 6px 8px 22px; }
+    .mark {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, #f59e0b, #6366f1);
+      display: grid; place-items: center; font-weight: 900; font-size: 18px;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+    }
+    .brand b { font-size: 17px; font-weight: 800; }
+    .brand span { color: #f59e0b; }
+    .nav { display: grid; gap: 6px; }
+    .nav button {
+      border: 1px solid transparent; background: transparent; color: var(--muted);
+      padding: 11px 14px; border-radius: 12px; text-align: left; display: flex;
+      gap: 12px; align-items: center; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav button:hover { background: rgba(255,255,255,0.05); color: var(--text); transform: translateX(3px); }
+    .nav button.active {
+      background: linear-gradient(90deg, rgba(245,158,11,0.14), rgba(96,165,250,0.08));
+      border-color: rgba(245, 158, 11, 0.3); color: #fff;
+    }
+    .nav .ico { font-size: 17px; width: 22px; text-align: center; }
+    .sidebar-foot { margin-top: auto; display: grid; gap: 10px; font-size: 12px; }
+    .status-card { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--glass); color: var(--muted); }
 
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-  padding: 0.7rem 1.4rem; border-radius: 10px; font-weight: 700; cursor: pointer;
-  border: none; transition: all 0.2s ease; font-size: 13px; text-decoration: none;
-}
-.btn-primary {
-  background-color: var(--primary); color: var(--text-on-accent);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent);
-}
-.btn-primary:active { transform: scale(0.97); }
-.btn-ghost {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  color: var(--text-display-accent); border: 1px solid var(--border);
-}
-.btn-danger {
-  background: color-mix(in srgb, var(--status-red) 16%, transparent);
-  color: var(--status-red); border: 1px solid color-mix(in srgb, var(--status-red) 50%, transparent);
-}
-.btn-sm { padding: 6px 12px; font-size: 11px; }
-.badge {
-  display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800;
-  text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 100px;
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-  color: var(--text-display-accent); border: 1px solid var(--border);
-}
+    /* Top Bar */
+    .main { min-width: 0; display: flex; flex-direction: column; }
+    .topbar {
+      position: sticky; top: 0; z-index: 15; height: 64px; padding: 0 26px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border); background: rgba(6, 9, 19, 0.75);
+      backdrop-filter: blur(20px);
+    }
+    .crumb { color: var(--muted); font-size: 14px; }
+    .crumb b { color: var(--text); }
+    .top-actions { display: flex; gap: 8px; }
 
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--nav-height);
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-light);
-  display: flex; align-items: center; padding: 0 20px; justify-content: space-between;
-}
-.nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.15rem; cursor: pointer; color: var(--text); }
-.nav-logo-mark {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-  display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900;
-  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 40%, transparent);
-}
+    /* Content Area */
+    .content { padding: 24px 28px 40px; max-width: 1560px; margin: 0 auto; width: 100%; }
+    .page { display: none; }
+    .page.active { display: block; animation: pageFade 0.35s ease forwards; }
+    @keyframes pageFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-#app-container {
-  position: relative; z-index: 1;
-  padding: calc(var(--nav-height) + 18px) 16px 90px;
-  max-width: 1240px; margin: 0 auto;
-}
-.view-section { display: none; animation: fadeIn 0.25s ease; }
-.view-section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    /* Page Head */
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .page-head h1 { font-size: 26px; font-weight: 850; margin: 0 0 4px; letter-spacing: -0.4px; }
+    .page-head p { margin: 0; color: var(--muted); font-size: 13px; }
 
-.pages-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
-.page-card {
-  border-radius: 20px; padding: 1.75rem; background: var(--glass-bg);
-  border: 1px solid var(--glass-border); position: relative; overflow: hidden; cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.page-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--card-accent), transparent); opacity: 0.7;
-}
-.page-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--card-accent) 50%, transparent); }
-.page-card-icon {
-  width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  margin-bottom: 1rem; background: color-mix(in srgb, var(--card-accent) 15%, transparent); font-size: 20px;
-}
-.page-card-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text); }
-.page-card-desc { font-size: 0.85rem; color: var(--fg); line-height: 1.55; }
+    /* Buttons */
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      min-height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--glass); color: var(--text); font-weight: 700; font-size: 13px;
+      transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { border-color: var(--border2); background: rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
+    .btn.primary {
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      background: linear-gradient(135deg, #f59e0b, #6366f1);
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.3); color: #fff;
+    }
+    .btn.green { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.3); color: #a7f3d0; }
+    .btn.warn { background: rgba(251, 146, 60, 0.12); border-color: rgba(251, 146, 60, 0.3); color: #fed7aa; }
+    .btn.danger { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.3); color: #fecaca; }
 
-.data-table-wrap {
-  overflow-x: auto; border-radius: 14px; border: 1px solid var(--border-light);
-  background: var(--surface-strong); margin-top: 14px;
-}
-table { width: 100%; border-collapse: collapse; min-width: 820px; }
-th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-light); }
-th {
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
-  font-size: 0.72rem; text-transform: uppercase; color: var(--fg); letter-spacing: 0.06em; font-weight: 800;
-}
-.kpi-input {
-  width: 84px; background: var(--glass-bg); border: 1px solid var(--border);
-  color: var(--text); padding: 8px 6px; border-radius: 8px; outline: none;
-  font-family: 'JetBrains Mono', monospace; text-align: center; cursor: pointer; font-weight: 700;
-}
-.kpi-input:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
-.kpi-total-row { background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight: 900; }
+    /* Hero Banner with Solar Radial Glow */
+    .hero {
+      padding: 24px; border-radius: 20px; margin-bottom: 18px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(96, 165, 250, 0.08));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      box-shadow: inset 0 0 50px rgba(245, 158, 11, 0.06);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; -webkit-mask-image: radial-gradient(circle, black 30%, transparent 70%);
+      top: -60px; right: -40px; width: 240px; height: 240px;
+      background: conic-gradient(from 0deg, #f59e0b, #a78bfa, #38bdf8, #f59e0b);
+      opacity: 0.25; filter: blur(35px); pointer-events: none;
+    }
+    .hero h2 { font-size: 28px; margin: 0 0 4px; font-weight: 850; }
+    .hero p { margin: 0; color: var(--muted); font-size: 13px; }
 
-.shelf-container {
-  background: color-mix(in srgb, var(--bg) 50%, transparent);
-  border: 1px solid var(--border-light); border-radius: 14px; margin-bottom: 20px; overflow: hidden;
-}
-.shelf-header {
-  padding: 10px 16px; background: var(--surface-mid); font-weight: 800; font-size: 0.85rem;
-  border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;
-}
-.shelf-track {
-  display: flex; gap: 10px; padding: 16px; overflow-x: auto; min-height: 130px; align-items: flex-end;
-  background: linear-gradient(180deg, transparent 75%, color-mix(in srgb, var(--accent) 8%, transparent) 100%);
-}
-.shelf-track::-webkit-scrollbar { height: 6px; }
-.shelf-track::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-.prod-bottle {
-  width: 58px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative;
-}
-.prod-img-box {
-  width: 50px; height: 68px; background: var(--glass-bg); border: 1.5px solid var(--border);
-  border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;
-  margin-bottom: 5px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-.prod-badge {
-  position: absolute; top: -4px; right: -4px; width: 13px; height: 13px; border-radius: 50%;
-  background: var(--status-red); border: 2px solid var(--bg); display: none;
-}
-.prod-badge.show { display: block; animation: pulse 1.4s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-.prod-label {
-  font-size: 8px; color: var(--fg); text-align: center; line-height: 1.2;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; font-weight: 600;
-}
+    /* Editable Inline Spans */
+    .editable-val {
+      border-bottom: 1.5px dashed #f59e0b;
+      padding: 1px 4px;
+      outline: none;
+      cursor: text;
+      transition: background 0.2s;
+    }
+    .editable-val:focus {
+      background: rgba(245, 158, 11, 0.2);
+      border-bottom: 2px solid #fff;
+      border-radius: 4px;
+    }
 
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px);
-  display: none; align-items: flex-end; justify-content: center; z-index: 2000; padding: 0;
-}
-.modal-overlay.active { display: flex; }
-.modal-content {
-  background: var(--surface-strong); border-top: 1px solid var(--border);
-  border-radius: 28px 28px 0 0; width: 100%; max-width: 480px; padding: 22px 24px 34px;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-}
-.calc-display {
-  background: rgba(0, 0, 0, 0.35); border-radius: 16px; padding: 16px 20px;
-  margin-bottom: 18px; text-align: right; border: 1px solid var(--border-light);
-}
-.calc-formula { font-family: 'JetBrains Mono', monospace; color: var(--fg); font-size: 0.95rem; min-height: 1.3em; margin-bottom: 4px; }
-.calc-main { font-family: 'JetBrains Mono', monospace; font-size: 2.3rem; font-weight: 800; color: #ffffff; }
-.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.calc-btn {
-  height: 56px; border-radius: 14px; background: var(--surface); color: var(--text);
-  font-size: 1.3rem; font-weight: 800; border: 1px solid var(--border-light); cursor: pointer;
-  user-select: none; transition: opacity 0.15s;
-}
-.calc-btn:active { opacity: 0.6; transform: scale(0.96); }
-.calc-btn.op { background: var(--teal-d); color: #fff; }
-.calc-btn.eq { background: var(--aura-bg); color: #fff; grid-column: span 2; }
-.calc-btn.del { background: color-mix(in srgb, var(--status-red) 30%, transparent); color: #fff; grid-column: span 2; }
+    /* Cards and Grids */
+    .grid { display: grid; gap: 14px; }
+    .kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 14px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--r); box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+    .kpi { padding: 14px 16px; }
+    .kpi .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .kpi .val { font-size: 22px; font-weight: 850; margin-top: 4px; }
+    .kpi .sub { font-size: 11px; color: var(--green); margin-top: 2px; }
 
-.bottom-nav {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  backdrop-filter: blur(20px); border-top: 1px solid var(--border-light);
-  display: flex; padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-}
-.bnav-btn {
-  flex: 1; background: none; border: none; color: var(--fg);
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font-size: 9px; font-weight: 800; cursor: pointer; text-transform: uppercase;
-}
-.bnav-btn.active { color: var(--accent); }
+    .layout2 { grid-template-columns: 1.4fr 0.9fr; }
+    .layout3 { grid-template-columns: repeat(3, 1fr); }
+    .panel { padding: 18px; }
+    .panel-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .panel-title h3 { margin: 0; font-size: 14px; font-weight: 750; }
 
-.header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    /* Tables */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r2); background: rgba(0, 0, 0, 0.25); }
+    .table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 13px; }
+    .table th, .table td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+    .table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: rgba(255, 255, 255, 0.03); }
+    .table tr:last-child td { border-bottom: 0; }
+    .table input {
+      width: 100%; min-width: 60px; padding: 6px 8px; background: rgba(6, 10, 20, 0.7);
+      border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px;
+    }
+    .table input:focus { border-color: #f59e0b; outline: none; }
 
-.add-form {
-  display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; margin-top: 12px;
-}
-.add-form input, .add-form select {
-  flex: 1; min-width: 110px; padding: 9px 10px; background: var(--surface-strong);
-  border: 1px solid var(--border); color: var(--text); border-radius: 8px;
-  font-family: 'Inter', sans-serif; font-size: 12px;
-}
-.toast {
-  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-  background: var(--surface-strong); border: 1px solid var(--accent); color: var(--text);
-  padding: 10px 18px; border-radius: 10px; font-size: 12.5px; font-weight: 700; z-index: 3000;
-  opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
-.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-3); display: inline-block; }
-.sync-dot.saving { background: var(--status-amber); animation: pulse 0.8s infinite; }
-</style>
+    /* Shelf Planner Structure */
+    .shelf { display: grid; gap: 14px; }
+    .rack-category { color: #f59e0b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin: 12px 0 4px; }
+    .shelf-row { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: stretch; }
+    .shelf-label {
+      padding: 12px; border: 1px solid var(--border); border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .shelf-label .icon { font-size: 24px; margin-bottom: 4px; }
+    .shelf-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .slot { min-height: 74px; border: 1px dashed rgba(145, 160, 197, 0.25); border-radius: 10px; padding: 8px; background: rgba(255, 255, 255, 0.02); font-size: 11px; }
+    .slot.filled { border-style: solid; background: rgba(96, 165, 250, 0.07); }
+    .slot.expiry-red { border-color: var(--red); background: rgba(248, 113, 113, 0.12); }
+    .slot.expiry-orange { border-color: var(--amber); background: rgba(251, 146, 60, 0.12); }
+    .slot.expiry-green { border-color: var(--green); background: rgba(52, 211, 153, 0.07); }
+
+    /* Chart & Progress */
+    .chart { height: 120px; display: flex; align-items: flex-end; gap: 6px; padding: 8px 4px 0; }
+    .bar {
+      flex: 1; border-radius: 5px 5px 2px 2px;
+      background: linear-gradient(180deg, #f59e0b, rgba(99, 102, 241, 0.35));
+      position: relative; transition: height 0.4s;
+    }
+    .bar small { position: absolute; left: 50%; transform: translateX(-50%); bottom: -20px; color: var(--muted); font-size: 9px; white-space: nowrap; }
+    .chart-wrap { padding-bottom: 22px; }
+    .progress { height: 7px; background: rgba(255, 255, 255, 0.08); border-radius: 99px; overflow: hidden; margin: 8px 0; }
+    .progress > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #60a5fa); transition: width 0.4s; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 3px 8px; font-size: 10px; font-weight: 800; border: 1px solid var(--border); }
+    .badge.ok { color: #a7f3d0; background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.25); }
+    .badge.warn { color: #fed7aa; background: rgba(251, 146, 60, 0.1); border-color: rgba(251, 146, 60, 0.25); }
+    .badge.red { color: #fecaca; background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.25); }
+
+    /* Scanner UI */
+    .scan-box { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+    .scanner { min-height: 280px; border: 1px dashed var(--border2); border-radius: 14px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+
+    /* Modals & Toast */
+    .modal { position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 90; padding: 16px; }
+    .modal.open { display: grid; }
+    .modal-card { width: min(640px, 100%); max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 16px; background: #0c1222; border: 1px solid var(--border2); box-shadow: var(--shadow); }
+    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .field { display: grid; gap: 4px; }
+    .field label { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+    .field input, .field select, .field textarea { width: 100%; padding: 8px 10px; background: rgba(6, 10, 20, 0.8); border: 1px solid var(--border); border-radius: 8px; color: var(--text); }
+    .span2 { grid-column: span 2; }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 100; background: #131d36; border: 1px solid var(--border2); padding: 12px 18px; border-radius: 12px; display: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); }
+    .toast.show { display: block; animation: pageFade 0.3s ease; }
+
+    /* Interactive Bottom Navigation Dock (Active on Mobile / Small screens) */
+    @media(max-width: 900px) {
+      .app { grid-template-columns: 1fr; padding-bottom: 84px; }
+      .sidebar {
+        position: fixed; top: auto; bottom: 12px; left: 12px; right: 12px; height: 64px;
+        flex-direction: row; justify-content: space-around; padding: 0 10px;
+        border-radius: 20px; border: 1px solid var(--border2); background: rgba(8, 12, 24, 0.94);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.85); backdrop-filter: blur(24px);
+      }
+      .brand, .sidebar-foot { display: none !important; }
+      .nav { display: flex; width: 100%; justify-content: space-around; gap: 0; }
+      .nav button { padding: 10px; border-radius: 14px; font-size: 0; justify-content: center; width: auto; }
+      .nav button .ico { font-size: 20px; width: auto; }
+      .nav button:hover { transform: none; }
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .layout2, .layout3, .scan-box { grid-template-columns: 1fr; }
+      .shelf-row { grid-template-columns: 1fr; }
+      .content { padding: 16px; }
+    }
+  </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo" onclick="navigate('portal')">
-    <div class="nav-logo-mark">P</div>
-    <span>PharmaTrack <span style="color:var(--text-display-accent)">Pro</span></span>
-  </div>
-  <div style="display:flex; align-items:center; gap:8px;">
-    <span class="badge"><span class="sync-dot" id="sync-dot"></span> <span id="sync-label">Saved</span></span>
-    <button class="btn btn-ghost btn-sm" onclick="toggleTheme()">🌓 Theme</button>
-    <div class="badge" id="nav-clock">00:00:00</div>
-  </div>
-</nav>
+<div id="splash">
+  <div class="splash-logo">⚕️</div>
+  <h1 class="splash-title">PharmaTrack Pro</h1>
+  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+</div>
 
-<main id="app-container">
-
-  <section id="view-portal" class="view-section active">
-    <div class="header-flex">
+<div class="app">
+  <!-- Interactive Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="mark">P</div>
       <div>
-        <span class="badge" style="margin-bottom: 8px;">Operational Suite</span>
-        <h1 style="font-size: 1.85rem; font-weight: 900;">Pharmacy Floor Portal</h1>
-      </div>
-      <div class="badge" style="background:var(--accent-3); color:#000; border:none;">Boots T3 Arrivals</div>
-    </div>
-
-    <div class="pages-grid">
-      <div class="page-card" style="--card-accent: var(--chart-1);" onclick="navigate('kpi')">
-        <div class="page-card-icon">📊</div>
-        <h2 class="page-card-title">KPI & Agenda</h2>
-        <p class="page-card-desc">10-block clubbed agenda, interactive calculator modal, ATV, and Aura share tracking. Data persists across sessions.</p>
-      </div>
-
-      <div class="page-card" style="--card-accent: var(--chart-3);" onclick="navigate('planner')">
-        <div class="page-card-icon">📦</div>
-        <h2 class="page-card-title">Inventory & Planner</h2>
-        <p class="page-card-desc">Master planogram racks, live stock indicators, add/edit/remove SKUs, and total SKU audits computed from real data.</p>
-      </div>
-
-      <div class="page-card" style="--card-accent: var(--chart-2);" onclick="navigate('rota')">
-        <div class="page-card-icon">⏰</div>
-        <h2 class="page-card-title">Duty Rota & Time</h2>
-        <p class="page-card-desc">Vysakh RTA shift tracking, editable Week 28 matrix, clock-in/break log with timestamps.</p>
-      </div>
-
-      <div class="page-card" style="--card-accent: var(--chart-4);" onclick="navigate('scanner')">
-        <div class="page-card-icon">📷</div>
-        <h2 class="page-card-title">Scanner & Logger</h2>
-        <p class="page-card-desc">GS1 DataMatrix / AI-compliant parser, fridge telemetry, and exportable CSV scan ledger.</p>
+        <b>Pharma<span>Track</span></b>
+        <small style="display:block;color:var(--muted);font-size:11px">Solar v2.6</small>
       </div>
     </div>
-  </section>
-
-  <section id="view-kpi" class="view-section">
-    <div class="header-flex">
-      <div>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('portal')">← Back to Portal</button>
-        <h1 style="font-size: 1.45rem; font-weight: 800; margin-top:8px;">Clubbed Hourly Sales</h1>
-      </div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <div class="badge" style="background:var(--accent-3); color:#000; border:none;">Vysakh Shift Active</div>
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV('kpi')">⬇ Export CSV</button>
-        <button class="btn btn-danger btn-sm" onclick="resetKpi()">Reset Day</button>
+    <nav class="nav" id="nav">
+      <button class="active" data-page="dashboard"><span class="ico">◈</span>Dashboard</button>
+      <button data-page="sales"><span class="ico">▥</span>Sales Entry</button>
+      <button data-page="inventory"><span class="ico">▦</span>Inventory</button>
+      <button data-page="scanner"><span class="ico">⌗</span>GS1 Scanner</button>
+      <button data-page="expiry"><span class="ico">◷</span>Expiry Tracker</button>
+      <button data-page="shelf"><span class="ico">▤</span>Shelf Map</button>
+      <button data-page="restock"><span class="ico">↗</span>Restock</button>
+      <button data-page="reports"><span class="ico">▧</span>Reports</button>
+      <button data-page="settings"><span class="ico">⚙</span>Settings</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="status-card">
+        Autosave: <b style="color:var(--green)">ON</b><br>
+        Saved: <span id="lastSave">now</span>
       </div>
     </div>
+  </aside>
 
-    <div class="data-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Time Slot</th><th>Sale (AED)</th><th>TRN</th><th>ATV</th>
-            <th>No7 (AED)</th><th>No7 %</th><th>Aura TRN</th><th>Aura %</th>
-          </tr>
-        </thead>
-        <tbody id="kpi-tbody"></tbody>
-        <tfoot>
-          <tr class="kpi-total-row">
-            <td>TOTAL</td>
-            <td id="tot-sale">0</td><td id="tot-trn">0</td>
-            <td id="tot-atv" style="color:var(--accent);">0.0</td>
-            <td id="tot-no7">0</td><td id="tot-no7-pct">0.0%</td>
-            <td id="tot-aura">0</td><td id="tot-aura-pct">0.0%</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </section>
-
-  <section id="view-planner" class="view-section">
-    <div class="header-flex">
-      <div>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('portal')">← Back to Portal</button>
-        <h1 style="font-size: 1.45rem; font-weight: 800; margin-top:8px;">Planogram Shelves</h1>
+  <!-- Main Content Areas -->
+  <main class="main">
+    <header class="topbar">
+      <div class="crumb">PharmaTrack Pro / <b id="crumb">Dashboard</b></div>
+      <div class="top-actions">
+        <button class="btn primary" id="quickAdd">＋ Add Product</button>
+        <button class="btn" id="exportJson">Backup</button>
       </div>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <div class="glass" style="padding: 6px 14px; text-align: center; border-color: var(--accent-3);">
-          <div style="font-size: 9px; color: var(--fg); text-transform: uppercase; font-weight: 800;">Total SKU / Units</div>
-          <div style="font-size: 1.15rem; font-weight: 900; color: var(--accent-3);" id="sku-badge">0 / 0</div>
+    </header>
+
+    <div class="content">
+      <!-- 1. DASHBOARD -->
+      <section class="page active" id="page-dashboard">
+        <div class="hero">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap">
+            <div>
+              <div class="badge ok" style="margin-bottom:8px">Live UAE Node</div>
+              <h2>Good evening, <span class="editable-val" id="userName" contenteditable="true" title="Click to edit name">Vysakh</span></h2>
+              <p>Branch: <span class="editable-val" id="branchNameDash" contenteditable="true" title="Click to edit branch">Boots DXB T3 Arrivals</span></p>
+            </div>
+            <div class="actions">
+              <button class="btn primary" data-goto="sales">Enter Sales</button>
+              <button class="btn" data-goto="scanner">Scan Barcode</button>
+            </div>
+          </div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="toggleAddForm()">+ Add SKU</button>
-      </div>
+
+        <div class="grid kpis" id="dashKpis"></div>
+
+        <div class="grid layout2">
+          <div class="card panel">
+            <div class="panel-title">
+              <h3>Target Pacing</h3>
+              <span>Target: <b class="editable-val" id="achSub" contenteditable="true" title="Click to edit target amount">60000</b> AED</span>
+            </div>
+            <div style="font-size:32px;font-weight:900" id="achVal">0%</div>
+            <div class="progress"><span id="achBar" style="width:0%"></span></div>
+            <div class="sub" id="paceText" style="font-size:12px;color:var(--muted)"></div>
+            <div class="chart-wrap" style="margin-top:20px">
+              <div class="panel-title"><h3>Hourly Revenue</h3></div>
+              <div class="chart" id="salesChart"></div>
+            </div>
+          </div>
+
+          <div class="card panel">
+            <div class="panel-title"><h3>Priority Alerts</h3><span id="watchCount"></span></div>
+            <div id="watchList" style="display:grid;gap:8px"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. SALES ENTRY -->
+      <section class="page" id="page-sales">
+        <div class="page-head">
+          <div><h1>Sales Entry</h1><p>10 hourly tracking blocks · automatic metric pacing.</p></div>
+          <div class="actions">
+            <button class="btn green" id="saveSales">Save Checkpoint</button>
+          </div>
+        </div>
+        <div class="grid kpis" id="salesKpis"></div>
+        <div class="card panel"><div class="table-wrap"><table class="table" id="salesTable"></table></div></div>
+      </section>
+
+      <!-- 3. INVENTORY -->
+      <section class="page" id="page-inventory">
+        <div class="page-head">
+          <div><h1>Inventory Master</h1><p>Full GTIN database, batch codes, and shelf allocations.</p></div>
+          <div class="actions">
+            <button class="btn primary" id="addProduct">＋ Add Product</button>
+            <button class="btn" id="downloadCsv">CSV Template</button>
+          </div>
+        </div>
+        <div class="card panel">
+          <div class="actions" style="margin-bottom:12px">
+            <input id="invSearch" placeholder="Search GTIN / RMS / Product..." style="flex:1;padding:8px 12px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
+            <select id="invFilter" style="padding:8px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
+              <option value="all">All items</option><option value="expired">Expired</option><option value="soon">Within 30d</option><option value="low">Low Stock</option>
+            </select>
+          </div>
+          <div class="table-wrap"><table class="table" id="invTable"></table></div>
+        </div>
+      </section>
+
+      <!-- 4. GS1 SCANNER -->
+      <section class="page" id="page-scanner">
+        <div class="page-head">
+          <div><h1>GS1 Camera Scanner</h1><p>Parse AI (01) GTIN, (17) Expiry, and (10) Batch.</p></div>
+          <button class="btn primary" id="btnRestartCamera">Restart Camera</button>
+        </div>
+        <div class="scan-box">
+          <div class="card panel">
+            <div class="scanner" id="scannerContainer"><div id="reader" style="width:100%"></div></div>
+          </div>
+          <div class="card panel">
+            <div class="panel-title"><h3>Manual GS1 Input</h3><span id="parseState" class="badge">waiting</span></div>
+            <div class="field"><textarea id="gs1Input" placeholder="Example: (01)06212345678903(17)270131(10)B24018" style="height:100px"></textarea></div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn primary" id="parseGs1">Parse String</button>
+              <button class="btn" id="clearGs1">Clear</button>
+            </div>
+            <div id="parseResult" style="margin-top:14px"></div>
+          </div>
+        </div>
+        <div class="card panel" style="margin-top:14px">
+          <div class="panel-title"><h3>Recent Camera & String Scans</h3><span id="scanCount"></span></div>
+          <div class="table-wrap"><table class="table" id="scanTable"></table></div>
+        </div>
+      </section>
+
+      <!-- 5. EXPIRY TRACKER -->
+      <section class="page" id="page-expiry">
+        <div class="page-head">
+          <div><h1>Expiry Tracker</h1><p>Automatic categorization for expired and near-expiry vitamins.</p></div>
+          <div class="actions">
+            <button class="btn danger" id="filterExpired">Expired</button>
+            <button class="btn warn" id="filterSoon">Within 30d</button>
+            <button class="btn" id="filterAllExpiry">All Stock</button>
+          </div>
+        </div>
+        <div class="grid kpis" id="expiryKpis"></div>
+        <div class="card panel"><div class="table-wrap"><table class="table" id="expiryTable"></table></div></div>
+      </section>
+
+      <!-- 6. SHELF MAP -->
+      <section class="page" id="page-shelf">
+        <div class="page-head">
+          <div><h1>Shelf Planner</h1><p>Visual planogram and shelf organization.</p></div>
+          <button class="btn" onclick="window.print()">Print Planogram</button>
+        </div>
+        <div class="card panel"><div id="shelfMap" class="shelf"></div></div>
+      </section>
+
+      <!-- 7. RESTOCK -->
+      <section class="page" id="page-restock">
+        <div class="page-head">
+          <div><h1>Smart Restock</h1><p>Calculated replenishment orders to reach maximum capacity.</p></div>
+          <button class="btn primary" id="exportRestock">Export Restock CSV</button>
+        </div>
+        <div class="grid kpis" id="restockKpis"></div>
+        <div class="card panel"><div class="table-wrap"><table class="table" id="restockTable"></table></div></div>
+      </section>
+
+      <!-- 8. REPORTS -->
+      <section class="page" id="page-reports">
+        <div class="page-head">
+          <div><h1>Reports & Audits</h1><p>Daily performance figures and branch notes.</p></div>
+          <button class="btn primary" onclick="window.print()">Print / Export PDF</button>
+        </div>
+        <div class="grid layout2">
+          <div class="card panel"><div class="panel-title"><h3>Sales Summary</h3><span id="reportDate"></span></div><div id="reportSales"></div></div>
+          <div class="card panel"><div class="panel-title"><h3>Audit Expiry Snapshot</h3></div><div id="reportExpiry"></div></div>
+        </div>
+        <div class="card panel" style="margin-top:14px">
+          <div class="panel-title"><h3>Branch Handover Notes</h3></div>
+          <div class="field"><textarea id="reportNotes" style="min-height:90px" placeholder="Write handover instructions..."></textarea></div>
+        </div>
+      </section>
+
+      <!-- 9. SETTINGS -->
+      <section class="page" id="page-settings">
+        <div class="page-head"><div><h1>Settings & Backups</h1><p>Master database controls.</p></div></div>
+        <div class="grid layout2">
+          <div class="card panel">
+            <div class="panel-title"><h3>Configuration</h3></div>
+            <div class="form-grid">
+              <div class="field span2"><label>Branch Name</label><input id="setBranch"></div>
+              <div class="field"><label>Currency</label><select id="setCurrency"><option>AED</option><option>USD</option></select></div>
+              <div class="field"><label>Monthly Target</label><input type="number" id="setTargetInput"></div>
+            </div>
+            <div class="actions" style="margin-top:14px"><button class="btn primary" id="saveSettings">Save Settings</button></div>
+          </div>
+          <div class="card panel">
+            <div class="panel-title"><h3>Maintenance</h3></div>
+            <div class="actions" style="flex-direction:column;align-items:stretch">
+              <button class="btn danger" id="resetDemo">Reset All Data to Demo Defaults</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+  </main>
+</div>
 
-    <div class="glass add-form" id="add-form" style="display:none;">
-      <input type="text" id="new-name" placeholder="Product name">
-      <input type="text" id="new-barcode" placeholder="Barcode / GTIN">
-      <input type="text" id="new-shelf" placeholder="Shelf e.g. 1.3">
-      <input type="number" id="new-stock" placeholder="Stock units" min="0">
-      <button class="btn btn-primary btn-sm" onclick="addProduct()">Save</button>
-    </div>
-
-    <div id="shelf-view-container"></div>
-  </section>
-
-  <section id="view-rota" class="view-section">
-    <div class="header-flex">
-      <div>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('portal')">← Back to Portal</button>
-        <h1 style="font-size: 1.45rem; font-weight: 800; margin-top:8px;">Staff Time & Rota</h1>
-      </div>
-    </div>
-
-    <div class="pages-grid" style="grid-template-columns: 1fr 2fr;">
-      <div class="glass" style="padding: 20px; text-align: center;">
-        <span class="badge" style="margin-bottom: 12px;">★ Vysakh (331356)</span>
-        <div style="font-size: 2.8rem; font-family:'JetBrains Mono',monospace; font-weight: 900; color: var(--accent); margin-bottom: 4px;" id="shift-clock">00:00:00</div>
-        <p style="color: var(--fg); font-size: 11px; margin-bottom: 8px;">Scheduled: 1:00 PM – 10:00 PM</p>
-        <p style="color: var(--fg); font-size: 10.5px; margin-bottom: 16px;" id="clock-status">Not clocked in</p>
-        <div style="display: flex; gap: 8px; justify-content: center;">
-          <button class="btn btn-primary" onclick="clockAction('in')">Clock In</button>
-          <button class="btn btn-ghost" onclick="clockAction('break')">Break</button>
-          <button class="btn btn-danger" onclick="clockAction('out')">Clock Out</button>
+<!-- Add/Edit Product Modal -->
+<div class="modal" id="productModal">
+  <div class="modal-card">
+    <div class="panel-title"><h3 id="modalTitle">Add Product</h3><button class="btn" id="closeModal">✕</button></div>
+    <form id="productForm">
+      <div class="form-grid">
+        <div class="field"><label>GTIN</label><input name="gtin" required></div>
+        <div class="field"><label>RMS</label><input name="rms"></div>
+        <div class="field span2"><label>Description</label><input name="description" required></div>
+        <div class="field"><label>Brand</label><input name="brand"></div>
+        <div class="field"><label>Supplier</label><input name="supplier"></div>
+        <div class="field"><label>Batch</label><input name="batch"></div>
+        <div class="field"><label>Expiry</label><input type="date" name="expiry"></div>
+        <div class="field"><label>Units</label><input type="number" name="units" value="10"></div>
+        <div class="field"><label>Min</label><input type="number" name="min" value="5"></div>
+        <div class="field"><label>Max</label><input type="number" name="max" value="20"></div>
+        <div class="field"><label>Facings</label><input type="number" name="facings" value="1"></div>
+        <div class="field span2">
+          <label>Shelf Rack</label>
+          <select name="shelf">
+            <option value="RACK 1">RACK 1 (Collagen)</option><option value="RACK 2">RACK 2 (Women's)</option>
+            <option value="RACK 3">RACK 3</option><option value="RACK 4">RACK 4 (Immunity)</option>
+            <option value="RACK 5">RACK 5</option><option value="RACK 6">RACK 6 (Heart)</option>
+            <option value="RACK 7">RACK 7</option><option value="RACK 8">RACK 8 (Weight)</option>
+          </select>
         </div>
       </div>
-
-      <div class="data-table-wrap" style="margin-top:0;">
-        <div style="padding: 12px 16px; font-weight: 800; border-bottom: 1px solid var(--border-light); display:flex; justify-content:space-between;">
-          <span>Week 28 Matrix (Fri 3 - Thu 9)</span>
-          <span style="font-size:10px; color:var(--fg); font-weight:600;">Tap a shift cell to edit</span>
-        </div>
-        <table>
-          <thead><tr><th>Employee</th><th>Role</th><th>Fri 3</th><th>Sat 4</th><th>Sun 5</th></tr></thead>
-          <tbody id="roster-tbody"></tbody>
-        </table>
+      <div class="actions" style="justify-content:flex-end;margin-top:14px">
+        <button type="button" class="btn" id="cancelProduct">Cancel</button>
+        <button type="submit" class="btn primary">Save Product</button>
       </div>
-    </div>
-  </section>
-
-  <section id="view-scanner" class="view-section">
-    <div class="header-flex">
-      <div>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('portal')">← Back to Portal</button>
-        <h1 style="font-size: 1.45rem; font-weight: 800; margin-top:8px;">GS1 Decoder & Logger</h1>
-      </div>
-    </div>
-
-    <div class="pages-grid">
-      <div class="glass" style="padding: 18px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-          <span style="font-weight: 800;">Clinical Fridge Telemetry</span>
-          <span class="badge" style="background:var(--accent-3); color:#000; border:none;" id="fridge-status">Safe (2-8°C)</span>
-        </div>
-        <div style="font-size: 2.6rem; font-family:'JetBrains Mono',monospace; font-weight: 900; color: var(--accent-3); text-align: center; margin: 12px 0;" id="fridge-temp">4.2 °C</div>
-        <p style="font-size:10px; color:var(--fg); text-align:center; margin-bottom:10px;">Simulated feed — wire to your real fridge sensor API for production use.</p>
-        <button class="btn btn-ghost" style="width: 100%; border-color: var(--status-red); color: var(--status-red);" onclick="toggleFridgeSpike()">Simulate Spike Excursion</button>
-      </div>
-
-      <div class="glass" style="padding: 18px;">
-        <div style="font-weight: 800; margin-bottom: 10px;">GS1 AI-Compliant String Processing</div>
-        <input type="text" id="gs1-raw-input" placeholder="e.g. (01)08532440030051(17)270830(10)B2601"
-               style="width: 100%; padding: 10px 12px; background: var(--surface-strong); border: 1px solid var(--border); color: var(--text); border-radius: 8px; margin-bottom: 10px; font-family:'JetBrains Mono',monospace;">
-        <button class="btn btn-primary" style="width: 100%;" onclick="processGS1()">Ingest Barcode</button>
-        <p style="font-size:10px; color:var(--fg); margin-top:8px;">Supports AIs (01) GTIN-14, (17) expiry, (11) prod date, (10) batch/lot, (21) serial, (30) count — with or without parentheses, and FNC1 (GS, 0x1D) group separators.</p>
-      </div>
-    </div>
-
-    <div class="data-table-wrap">
-      <div style="padding: 12px 16px; font-weight: 800; border-bottom: 1px solid var(--border-light); display:flex; justify-content:space-between;">
-        <span>Processed Scan Ledger</span>
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV('gs1')">⬇ Export Ledger</button>
-      </div>
-      <table>
-        <thead><tr><th>GTIN-14</th><th>Product Description</th><th>Expiry</th><th>Batch</th><th>Scanned</th></tr></thead>
-        <tbody id="gs1-tbody"></tbody>
-      </table>
-    </div>
-  </section>
-
-</main>
-
-<nav class="bottom-nav">
-  <button class="bnav-btn active" id="bnav-portal" onclick="navigate('portal')">🏠 Portal</button>
-  <button class="bnav-btn" id="bnav-kpi" onclick="navigate('kpi')">📊 KPI</button>
-  <button class="bnav-btn" id="bnav-planner" onclick="navigate('planner')">📦 Planner</button>
-  <button class="bnav-btn" id="bnav-rota" onclick="navigate('rota')">⏰ Rota</button>
-  <button class="bnav-btn" id="bnav-scanner" onclick="navigate('scanner')">📷 Scanner</button>
-</nav>
-
-<div class="modal-overlay" id="calc-modal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-      <h3 style="font-size: 1.15rem; font-weight: 800;" id="calc-title">Data Entry</h3>
-      <button style="background:none; border:none; color:var(--fg); font-size:22px; cursor:pointer;" onclick="closeCalc()">✕</button>
-    </div>
-    <div class="calc-display">
-      <div class="calc-formula" id="calc-formula"></div>
-      <div class="calc-main" id="calc-main">0</div>
-    </div>
-    <div class="calc-grid">
-      <button class="calc-btn" onclick="calcPress('7')">7</button>
-      <button class="calc-btn" onclick="calcPress('8')">8</button>
-      <button class="calc-btn" onclick="calcPress('9')">9</button>
-      <button class="calc-btn op" onclick="calcPress('-')">-</button>
-      <button class="calc-btn" onclick="calcPress('4')">4</button>
-      <button class="calc-btn" onclick="calcPress('5')">5</button>
-      <button class="calc-btn" onclick="calcPress('6')">6</button>
-      <button class="calc-btn op" onclick="calcPress('+')">+</button>
-      <button class="calc-btn" onclick="calcPress('1')">1</button>
-      <button class="calc-btn" onclick="calcPress('2')">2</button>
-      <button class="calc-btn" onclick="calcPress('3')">3</button>
-      <button class="calc-btn op" onclick="calcPress('C')">C</button>
-      <button class="calc-btn" onclick="calcPress('0')">0</button>
-      <button class="calc-btn" onclick="calcPress('.')">.</button>
-      <button class="calc-btn eq" onclick="calcPress('=')">SAVE (=)</button>
-      <button class="calc-btn del" id="calc-delete-btn" style="display:none;" onclick="deleteFromCalc()">Delete SKU</button>
-    </div>
+    </form>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ============ STORAGE HELPERS ============ */
-async function loadKey(key, fallback) {
-  try {
-    const res = await window.storage.get(key, false);
-    return res ? JSON.parse(res.value) : fallback;
-  } catch (e) {
-    return fallback;
-  }
+// Splash removal
+window.onload = () => {
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    if (s) { s.style.opacity = '0'; setTimeout(() => s.remove(), 500); }
+  }, 1200);
+};
+
+const KEY = 'pharmatrack_pro_solar_v2';
+const hours = ['12am','2am','4am','6am','8am','10am','12pm','2pm','4pm','6pm'];
+const metricCols = ['sales','trn','no7','aura','units','footfall'];
+const today = new Date();
+const iso = d => new Date(d).toISOString().slice(0,10);
+const days = (a,b) => Math.round((new Date(b)-new Date(a))/86400000);
+const fmt = n => Number(n||0).toLocaleString('en-US');
+const money = n => `${state.settings.currency || 'AED'} ${fmt(n)}`;
+const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+
+const rackStructure = [
+  { group: "Collagen & Skin Brightening", racks: [{ id: 'RACK 1', icon: '🧴', status: 'Low' }] },
+  { group: "Women's / Skin, Hair & Nails", racks: [{ id: 'RACK 2', icon: '🌸', status: '' }, { id: 'RACK 3', icon: '💅', status: '' }] },
+  { group: "Immunity / Multivitamins", racks: [{ id: 'RACK 4', icon: '💊', status: 'Low' }, { id: 'RACK 5', icon: '🛡️', status: '' }] },
+  { group: "Heart Health & Omegas", racks: [{ id: 'RACK 6', icon: '🫀', status: '' }, { id: 'RACK 7', icon: '💪', status: '' }] }
+];
+
+function defaultState() {
+  const t = iso(today);
+  const products = [
+    { id: 1, gtin: '874312020605', rms: 'ZIBOZ1202', description: 'ZINCELATED 50MG 100CAP', brand: 'ZIBOZ', supplier: 'ZIBOZ', batch: 'NB10', expiry: addDays(t, 22), units: 4, min: 6, max: 24, facings: 2, shelf: 'RACK 1' },
+    { id: 2, gtin: '874312017803', rms: 'ZIBOZ1178', description: 'VITAMIN E-1000 IU SOFTGELS', brand: 'ZIBOZ', supplier: 'ZIBOZ', batch: 'NB12', expiry: addDays(t, 180), units: 14, min: 6, max: 24, facings: 2, shelf: 'RACK 1' },
+    { id: 3, gtin: '874312117800', rms: 'PUR55100', description: 'PURITANS PRIDE C-500MG 100S', brand: 'PURITAN', supplier: 'PURITAN', batch: 'WM4', expiry: addDays(t, -5), units: 8, min: 6, max: 20, facings: 2, shelf: 'RACK 4' }
+  ];
+  const sales = {
+    rows: hours.map((h, i) => ({
+      hour: h,
+      sales: [1200, 950, 1400, 800, 1600, 2100, 1950, 1700, 1300, 900][i],
+      trn: [12, 10, 15, 8, 17, 21, 20, 16, 12, 9][i],
+      no7: [40, 30, 50, 20, 60, 80, 70, 50, 40, 30][i],
+      aura: [6, 4, 8, 5, 10, 14, 11, 9, 6, 4][i],
+      units: [24, 20, 30, 16, 34, 42, 40, 32, 24, 18][i],
+      footfall: [40, 35, 50, 30, 60, 75, 70, 58, 45, 35][i]
+    }))
+  };
+  return { version: 2, settings: { branch: 'Boots DXB T3 Arrivals', currency: 'AED', target: 60000, userName: 'Vysakh' }, products, sales, scans: [], notes: '' };
 }
-async function saveKey(key, value) {
-  const dot = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-label');
-  dot.classList.add('saving'); label.textContent = 'Saving…';
+
+function addDays(base, n) { const d = new Date(base); d.setDate(d.getDate() + n); return iso(d); }
+function load() {
   try {
-    await window.storage.set(key, JSON.stringify(value), false);
-    dot.classList.remove('saving'); label.textContent = 'Saved';
-  } catch (e) {
-    dot.classList.remove('saving'); label.textContent = 'Save failed';
-    showToast('Could not save — check connection');
-  }
+    const raw = localStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : defaultState();
+  } catch { return defaultState(); }
 }
-function showToast(msg) {
+let state = load();
+
+function persist() {
+  localStorage.setItem(KEY, JSON.stringify(state));
+  const el = document.getElementById('lastSave');
+  if (el) el.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+persist();
+
+function toast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-/* ============ DEFAULTS (used only on first run) ============ */
-const KPI_SLOTS = [
-  "12:00 AM – 06:00 AM", "06:00 AM – 08:00 AM", "08:00 AM – 10:00 AM",
-  "10:00 AM – 12:00 PM", "12:00 PM – 02:00 PM", "02:00 PM – 04:00 PM",
-  "04:00 PM – 06:00 PM", "06:00 PM – 08:00 PM", "08:00 PM – 10:00 PM", "10:00 PM – 12:00 AM"
-];
-const DEFAULT_KPI = KPI_SLOTS.map(slot => ({ slot, sale: 0, trn: 0, no7: 0, aura: 0 }));
-const DEFAULT_PRODUCTS = [
-  { barcode: "08532440030051", name: "NEOCELL SUPER COLLAGEN PLUS VIT C", shelf: "1.2", stock: 18 },
-  { barcode: "08684556261201", name: "VITABIOTICS PERFECTIL PLUS SKIN", shelf: "1.2", stock: 0 },
-  { barcode: "00016185019867", name: "PRO COLLAGENIUM 14X25ML", shelf: "1.1", stock: 12 },
-  { barcode: "00850072993003", name: "VITABIOTICS WELLWOMAN CAPS", shelf: "2.1", stock: 24 },
-  { barcode: "00033984032750", name: "SOLGAR CHELATED ZINC TAB", shelf: "2.2", stock: 6 },
-  { barcode: "06291109121039", name: "CENTRUM MEN TAB 100S", shelf: "3.1", stock: 0 },
-  { barcode: "00733739018076", name: "SOLGAR GENTLE IRON 25MG", shelf: "5.4", stock: 14 }
-];
-const DEFAULT_ROSTER = [
-  { name: "331356 / Vysakh", role: "PH", shifts: ["1-10 PM", "1-10 PM", "10-6AM"] },
-  { name: "311378 / Nadiya", role: "PH", shifts: ["NIGHT OFF", "6-3PM", "1-10 PM"] },
-  { name: "318672 / Saravanan", role: "SM-PH", shifts: ["6-3PM", "9-3PM", "6-3PM"] }
-];
-
-let kpiData = [];
-let products = [];
-let roster = [];
-let gs1Ledger = [];
-let clockState = { status: 'out', lastAction: null };
-
-/* ============ NAV & THEME ============ */
-function navigate(viewId) {
-  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.bnav-btn').forEach(el => el.classList.remove('active'));
-  const target = document.getElementById(`view-${viewId}`);
-  const navBtn = document.getElementById(`bnav-${viewId}`);
-  if (target) target.classList.add('active');
-  if (navBtn) navBtn.classList.add('active');
-}
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-}
-setInterval(() => {
-  const now = new Date().toLocaleTimeString('en-US', { hour12: false });
-  document.getElementById('nav-clock').textContent = now;
-  document.getElementById('shift-clock').textContent = now;
-}, 1000);
-
-/* ============ SAFE ARITHMETIC (no eval / no Function) ============ */
-function safeEval(expr) {
-  const cleaned = expr.replace(/[^0-9+\-*/.]/g, '');
-  if (!cleaned) return 0;
-  let pos = 0;
-  function peek() { return cleaned[pos]; }
-  function consume() { return cleaned[pos++]; }
-  function parseNumber() {
-    let start = pos;
-    if (peek() === '-' ) consume();
-    while (pos < cleaned.length && /[0-9.]/.test(peek())) consume();
-    const num = parseFloat(cleaned.slice(start, pos));
-    return isNaN(num) ? 0 : num;
-  }
-  function parseTerm() {
-    let value = parseNumber();
-    while (pos < cleaned.length && (peek() === '*' || peek() === '/')) {
-      const op = consume();
-      const rhs = parseNumber();
-      value = op === '*' ? value * rhs : (rhs !== 0 ? value / rhs : 0);
-    }
-    return value;
-  }
-  function parseExpr() {
-    let value = parseTerm();
-    while (pos < cleaned.length && (peek() === '+' || peek() === '-')) {
-      const op = consume();
-      const rhs = parseTerm();
-      value = op === '+' ? value + rhs : value - rhs;
-    }
-    return value;
-  }
-  const result = parseExpr();
-  return isFinite(result) ? result : 0;
+function statusFor(p) {
+  const d = days(iso(today), p.expiry);
+  if (d < 0) return 'Expired';
+  if (d <= 30) return 'Within 30d';
+  if (p.units <= p.min) return 'Low stock';
+  return 'OK';
 }
 
-/* ============ KPI TABLE & CALCULATOR ============ */
-function renderKpiTable() {
-  const tbody = document.getElementById('kpi-tbody');
-  let tSale = 0, tTrn = 0, tNo7 = 0, tAura = 0;
-  tbody.innerHTML = kpiData.map((row, idx) => {
-    tSale += row.sale; tTrn += row.trn; tNo7 += row.no7; tAura += row.aura;
-    const atv = row.trn > 0 ? (row.sale / row.trn).toFixed(1) : '0.0';
-    const no7Pct = row.sale > 0 ? ((row.no7 / row.sale) * 100).toFixed(1) : '0.0';
-    const auraPct = row.trn > 0 ? ((row.aura / row.trn) * 100).toFixed(1) : '0.0';
-    return `<tr>
-        <td style="font-weight:700;">${row.slot}</td>
-        <td><input class="kpi-input" readonly value="${row.sale}" onclick="openCalc('kpi', ${idx}, 'sale', 'Sales (AED)')"></td>
-        <td><input class="kpi-input" readonly value="${row.trn}" onclick="openCalc('kpi', ${idx}, 'trn', 'Transactions')"></td>
-        <td style="font-family:'JetBrains Mono',monospace; color:var(--accent); font-weight:700;">${atv}</td>
-        <td><input class="kpi-input" readonly value="${row.no7}" onclick="openCalc('kpi', ${idx}, 'no7', 'No7 Sales')"></td>
-        <td style="font-family:'JetBrains Mono',monospace;">${no7Pct}%</td>
-        <td><input class="kpi-input" readonly value="${row.aura}" onclick="openCalc('kpi', ${idx}, 'aura', 'Aura TRN')"></td>
-        <td style="font-family:'JetBrains Mono',monospace;">${auraPct}%</td>
-      </tr>`;
-  }).join('');
-  document.getElementById('tot-sale').textContent = tSale.toLocaleString();
-  document.getElementById('tot-trn').textContent = tTrn;
-  document.getElementById('tot-atv').textContent = tTrn > 0 ? (tSale / tTrn).toFixed(1) : '0.0';
-  document.getElementById('tot-no7').textContent = tNo7.toLocaleString();
-  document.getElementById('tot-no7-pct').textContent = tSale > 0 ? ((tNo7 / tSale) * 100).toFixed(1) + '%' : '0.0%';
-  document.getElementById('tot-aura').textContent = tAura;
-  document.getElementById('tot-aura-pct').textContent = tTrn > 0 ? ((tAura / tTrn) * 100).toFixed(1) + '%' : '0.0%';
-}
-async function resetKpi() {
-  if (!confirm('Reset all KPI figures for the day?')) return;
-  kpiData = KPI_SLOTS.map(slot => ({ slot, sale: 0, trn: 0, no7: 0, aura: 0 }));
-  renderKpiTable();
-  await saveKey('kpi-data', kpiData);
-  showToast('KPI day reset');
+function statusBadge(st) {
+  const c = st === 'Expired' ? 'red' : (st === 'Within 30d' || st === 'Low stock') ? 'warn' : 'ok';
+  return `<span class="badge ${c}">${st}</span>`;
 }
 
-let calcMode = null;   // 'kpi' or 'stock'
-let calcTarget = { row: null, field: null, prodIdx: null };
-let formulaStr = '';
-
-function openCalc(mode, rowIdxOrProdIdx, field, title) {
-  calcMode = mode;
-  document.getElementById('calc-delete-btn').style.display = 'none';
-  if (mode === 'kpi') {
-    calcTarget = { row: rowIdxOrProdIdx, field };
-    formulaStr = kpiData[rowIdxOrProdIdx][field] === 0 ? '' : String(kpiData[rowIdxOrProdIdx][field]);
-  } else if (mode === 'stock') {
-    calcTarget = { prodIdx: rowIdxOrProdIdx };
-    formulaStr = String(products[rowIdxOrProdIdx].stock);
-    document.getElementById('calc-delete-btn').style.display = 'block';
-  }
-  document.getElementById('calc-title').textContent = title;
-  document.getElementById('calc-main').textContent = formulaStr || '0';
-  document.getElementById('calc-formula').textContent = '';
-  document.getElementById('calc-modal').classList.add('active');
-}
-function closeCalc() { document.getElementById('calc-modal').classList.remove('active'); }
-
-async function calcPress(val) {
-  const main = document.getElementById('calc-main');
-  const form = document.getElementById('calc-formula');
-  if (val === 'C') {
-    formulaStr = ''; main.textContent = '0'; form.textContent = '';
-  } else if (val === '=') {
-    const evaluated = safeEval(formulaStr) || 0;
-    const finalVal = parseFloat(evaluated.toFixed(2));
-    if (calcMode === 'kpi') {
-      kpiData[calcTarget.row][calcTarget.field] = finalVal;
-      renderKpiTable();
-      await saveKey('kpi-data', kpiData);
-    } else if (calcMode === 'stock') {
-      products[calcTarget.prodIdx].stock = Math.max(0, Math.round(finalVal));
-      renderShelves();
-      await saveKey('products', products);
-    }
-    closeCalc();
-  } else {
-    formulaStr += val; main.textContent = formulaStr;
-    const preview = safeEval(formulaStr.replace(/[+\-*/.]$/, ""));
-    form.textContent = "= " + preview;
-  }
-}
-async function deleteFromCalc() {
-  if (calcMode !== 'stock' || calcTarget.prodIdx === null) return;
-  if (!confirm('Remove this SKU from the planogram?')) return;
-  products.splice(calcTarget.prodIdx, 1);
-  renderShelves();
-  await saveKey('products', products);
-  closeCalc();
-  showToast('SKU removed');
+function totals() {
+  const t = { sales: 0, trn: 0, no7: 0, aura: 0, units: 0, footfall: 0 };
+  state.sales.rows.forEach(r => metricCols.forEach(k => t[k] += Number(r[k] || 0)));
+  return t;
 }
 
-/* ============ PLANOGRAM ============ */
-function toggleAddForm() {
-  const f = document.getElementById('add-form');
-  f.style.display = f.style.display === 'none' ? 'flex' : 'none';
-}
-async function addProduct() {
-  const name = document.getElementById('new-name').value.trim();
-  const barcode = document.getElementById('new-barcode').value.trim();
-  const shelf = document.getElementById('new-shelf').value.trim();
-  const stock = parseInt(document.getElementById('new-stock').value, 10) || 0;
-  if (!name || !barcode || !shelf) { showToast('Name, barcode and shelf are required'); return; }
-  products.push({ name: name.toUpperCase(), barcode, shelf, stock });
-  document.getElementById('new-name').value = '';
-  document.getElementById('new-barcode').value = '';
-  document.getElementById('new-shelf').value = '';
-  document.getElementById('new-stock').value = '';
-  toggleAddForm();
-  renderShelves();
-  await saveKey('products', products);
-  showToast('SKU added');
-}
-function renderShelves() {
-  const container = document.getElementById('shelf-view-container');
-  const grouped = {};
-  products.forEach((p, idx) => {
-    if (!grouped[p.shelf]) grouped[p.shelf] = [];
-    grouped[p.shelf].push({ ...p, idx });
-  });
-  container.innerHTML = Object.keys(grouped).sort().map(shelf => {
-    const items = grouped[shelf];
-    const bottles = items.map(p => {
-      const isOos = p.stock === 0;
-      return `<div class="prod-bottle" onclick="openCalc('stock', ${p.idx}, 'stock', '${p.name.replace(/'/g, "\\'")}')">
-          <div class="prod-img-box" style="${isOos ? 'border-color:var(--status-red); opacity:0.6;' : ''}">
-            <div class="prod-badge ${isOos ? 'show' : ''}"></div>💊
-          </div>
-          <div class="prod-label">${p.name}</div>
-          <div style="font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:800; color:${isOos ? 'var(--status-red)' : 'var(--accent-3)'}">${isOos ? 'OUT' : p.stock + 'u'}</div>
-        </div>`;
-    }).join('');
-    return `<div class="shelf-container">
-        <div class="shelf-header"><span>Shelf Module ${shelf}</span><span class="badge">${items.length} Products</span></div>
-        <div class="shelf-track">${bottles}</div>
-      </div>`;
-  }).join('');
-  document.getElementById('sku-badge').textContent =
-    `${products.length} / ${products.reduce((s, p) => s + p.stock, 0)}`;
+/* Render Dashboard */
+function renderDashboard() {
+  const t = totals();
+  const tgt = state.settings.target || 60000;
+  const pct = Math.min(100, (t.sales / tgt) * 100);
+
+  document.getElementById('userName').textContent = state.settings.userName || 'Vysakh';
+  document.getElementById('branchNameDash').textContent = state.settings.branch;
+  document.getElementById('achSub').textContent = tgt;
+  document.getElementById('achVal').textContent = pct.toFixed(1) + '%';
+  document.getElementById('achBar').style.width = pct + '%';
+  document.getElementById('paceText').textContent = `${money(t.sales)} reached · ${money(Math.max(0, tgt - t.sales))} remaining`;
+
+  document.getElementById('dashKpis').innerHTML = [
+    ['Total Sales', money(t.sales), 'Live sum'],
+    ['Transactions', fmt(t.trn), 'Count'],
+    ['Units Sold', fmt(t.units), 'Volume'],
+    ['AURA Club', fmt(t.aura), `${t.trn ? ((t.aura/t.trn)*100).toFixed(0) : 0}% trn share`],
+    ['No7 Sales', money(t.no7), 'Brand sales'],
+    ['Footfall', fmt(t.footfall), 'Visitors']
+  ].map(x => `<div class="card kpi"><div class="label">${x[0]}</div><div class="val">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join('');
+
+  const mx = Math.max(...state.sales.rows.map(r => r.sales), 1);
+  document.getElementById('salesChart').innerHTML = state.sales.rows.map(r => `
+    <div class="bar" style="height:${Math.max(12, (r.sales/mx)*100)}%"><small>${r.hour}</small></div>
+  `).join('');
+
+  const alerts = state.products.filter(p => statusFor(p) !== 'OK');
+  document.getElementById('watchCount').textContent = `${alerts.length} flagged`;
+  document.getElementById('watchList').innerHTML = alerts.length ? alerts.map(p => `
+    <div style="display:flex;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border)">
+      <div><b>${esc(p.description)}</b><div style="font-size:11px;color:var(--muted)">${p.units} units · ${p.shelf}</div></div>
+      ${statusBadge(statusFor(p))}
+    </div>
+  `).join('') : '<div style="color:var(--muted)">All stock healthy.</div>';
 }
 
-/* ============ ROTA ============ */
-function renderRota() {
-  document.getElementById('roster-tbody').innerHTML = roster.map((emp, ei) => `
-    <tr>
-      <td style="font-weight:700;">${emp.name}</td>
-      <td style="color:var(--accent); font-weight:800;">${emp.role}</td>
-      ${emp.shifts.map((s, si) => `<td style="cursor:pointer;" onclick="editShift(${ei},${si})">${s}</td>`).join('')}
-    </tr>`).join('');
-}
-async function editShift(empIdx, shiftIdx) {
-  const current = roster[empIdx].shifts[shiftIdx];
-  const updated = prompt('Edit shift (e.g. "6-3PM", "NIGHT OFF"):', current);
-  if (updated === null) return;
-  roster[empIdx].shifts[shiftIdx] = updated.trim() || current;
-  renderRota();
-  await saveKey('roster', roster);
-  showToast('Rota updated');
-}
-async function clockAction(action) {
-  const now = new Date().toLocaleString();
-  clockState = { status: action === 'out' ? 'out' : (action === 'in' ? 'in' : 'break'), lastAction: now };
-  const status = document.getElementById('clock-status');
-  if (action === 'in') status.textContent = `Clocked in at ${now}`;
-  else if (action === 'break') status.textContent = `On break since ${now}`;
-  else status.textContent = `Clocked out at ${now}`;
-  await saveKey('clock-state', clockState);
-}
+/* Render Sales Entry */
+function renderSales() {
+  const t = totals();
+  document.getElementById('salesKpis').innerHTML = [
+    ['Sales', money(t.sales)], ['Transactions', fmt(t.trn)], ['Units', fmt(t.units)]
+  ].map(x => `<div class="card kpi"><div class="label">${x[0]}</div><div class="val">${x[1]}</div></div>`).join('');
 
-/* ============ FRIDGE TELEMETRY ============ */
-let fridgeExcursion = false;
-setInterval(() => {
-  if (fridgeExcursion) return;
-  const val = (4.2 + (Math.random() * 0.4 - 0.2)).toFixed(1);
-  document.getElementById('fridge-temp').textContent = `${val} °C`;
-}, 3000);
-function toggleFridgeSpike() {
-  fridgeExcursion = !fridgeExcursion;
-  const temp = document.getElementById('fridge-temp');
-  const badge = document.getElementById('fridge-status');
-  if (fridgeExcursion) {
-    temp.textContent = "11.6 °C"; temp.style.color = "var(--status-red)";
-    badge.textContent = "EXCURSION DETECTED"; badge.style.background = "var(--status-red)"; badge.style.color = "#fff";
-  } else {
-    temp.textContent = "4.2 °C"; temp.style.color = "var(--accent-3)";
-    badge.textContent = "Safe (2-8°C)"; badge.style.background = "var(--accent-3)"; badge.style.color = "#000";
-  }
-}
-
-/* ============ GS1 AI-COMPLIANT PARSER ============ */
-// Fixed-length Application Identifiers (length of DATA after the AI code)
-const FIXED_AI = { '00': 18, '01': 14, '02': 14, '11': 6, '12': 6, '13': 6, '15': 6, '16': 6, '17': 6, '20': 2 };
-// Variable-length AIs read until FNC1 (0x1D) or end of string
-const VARIABLE_AI = new Set(['10', '21', '22', '30', '240', '241', '250', '251', '253', '254', '400', '401', '402', '403', '410', '420', '421']);
-const GS = String.fromCharCode(29); // FNC1 group separator
-
-function parseGS1(raw) {
-  // Normalise: strip parentheses around AI codes -> (01)... becomes 01...
-  let s = raw.replace(/\(([0-9]{2,4})\)/g, '$1');
-  const result = {};
-  let pos = 0;
-  while (pos < s.length) {
-    // try 2, then 3, then 4-digit AI codes
-    let matchedAI = null, aiLen = 0;
-    for (const len of [4, 3, 2]) {
-      const candidate = s.substr(pos, len);
-      if (FIXED_AI.hasOwnProperty(candidate) || VARIABLE_AI.has(candidate)) {
-        matchedAI = candidate; aiLen = len; break;
-      }
-    }
-    if (!matchedAI) break; // unrecognised — stop parsing here
-    pos += aiLen;
-    if (FIXED_AI.hasOwnProperty(matchedAI)) {
-      const len = FIXED_AI[matchedAI];
-      result[matchedAI] = s.substr(pos, len);
-      pos += len;
-    } else {
-      // variable length: read until GS separator or end of string
-      const gsIdx = s.indexOf(GS, pos);
-      const end = gsIdx === -1 ? s.length : gsIdx;
-      result[matchedAI] = s.substring(pos, end);
-      pos = gsIdx === -1 ? s.length : gsIdx + 1;
-    }
-  }
-  return result;
-}
-
-async function processGS1() {
-  const input = document.getElementById('gs1-raw-input').value.trim();
-  if (!input) return;
-  const parsed = parseGS1(input);
-
-  let gtin = parsed['01'] || '';
-  if (!gtin) {
-    // fallback: treat the numeric portion as a raw GTIN if no AI structure was found
-    const digitsOnly = input.replace(/\D/g, '');
-    gtin = digitsOnly ? digitsOnly.slice(0, 14).padStart(14, '0') : 'UNKNOWN';
-  }
-
-  let exp = 'N/A';
-  if (parsed['17'] && parsed['17'].length === 6) {
-    const yy = parsed['17'].substring(0, 2), mm = parsed['17'].substring(2, 4);
-    exp = `20${yy}-${mm}`;
-  }
-  const batch = parsed['10'] || parsed['21'] || 'N/A';
-
-  const match = products.find(p => p.barcode === gtin || gtin.endsWith(p.barcode) || p.barcode.endsWith(gtin));
-  const name = match ? match.name : "UNRECOGNISED ITEM — verify manually";
-
-  const entry = { gtin, name, exp, batch, scanned: new Date().toLocaleString() };
-  gs1Ledger.unshift(entry);
-  renderGS1Ledger();
-  document.getElementById('gs1-raw-input').value = '';
-  await saveKey('gs1-ledger', gs1Ledger);
-}
-function renderGS1Ledger() {
-  document.getElementById('gs1-tbody').innerHTML = gs1Ledger.map(e => `
-    <tr>
-      <td style="font-family:'JetBrains Mono',monospace; color:var(--accent); font-weight:700;">${e.gtin}</td>
-      <td style="font-weight:700;">${e.name}</td>
-      <td style="font-family:'JetBrains Mono',monospace;">${e.exp}</td>
-      <td style="font-family:'JetBrains Mono',monospace;">${e.batch}</td>
-      <td style="font-size:10.5px; color:var(--fg);">${e.scanned}</td>
-    </tr>`).join('');
-}
-
-/* ============ CSV EXPORT ============ */
-function downloadCSV(filename, rows) {
-  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-function exportCSV(kind) {
-  if (kind === 'kpi') {
-    const rows = [['Time Slot', 'Sale (AED)', 'TRN', 'ATV', 'No7 (AED)', 'No7 %', 'Aura TRN', 'Aura %']];
-    kpiData.forEach(r => {
-      const atv = r.trn > 0 ? (r.sale / r.trn).toFixed(1) : '0.0';
-      const no7Pct = r.sale > 0 ? ((r.no7 / r.sale) * 100).toFixed(1) : '0.0';
-      const auraPct = r.trn > 0 ? ((r.aura / r.trn) * 100).toFixed(1) : '0.0';
-      rows.push([r.slot, r.sale, r.trn, atv, r.no7, no7Pct + '%', r.aura, auraPct + '%']);
+  let html = '<thead><tr><th>Hour</th><th>Sales</th><th>TRN</th><th>No7</th><th>AURA</th><th>Units</th><th>Footfall</th></tr></thead><tbody>';
+  state.sales.rows.forEach((r, i) => {
+    html += `<tr><td><b>${r.hour}</b></td>`;
+    metricCols.forEach(k => {
+      html += `<td><input type="number" step="0.01" value="${r[k]??0}" oninput="state.sales.rows[${i}]['${k}']=Number(this.value||0);renderDashboard();persist()"></td>`;
     });
-    downloadCSV(`kpi_${new Date().toISOString().slice(0,10)}.csv`, rows);
-  } else if (kind === 'gs1') {
-    const rows = [['GTIN-14', 'Product', 'Expiry', 'Batch', 'Scanned At']];
-    gs1Ledger.forEach(e => rows.push([e.gtin, e.name, e.exp, e.batch, e.scanned]));
-    downloadCSV(`scan_ledger_${new Date().toISOString().slice(0,10)}.csv`, rows);
-  }
+    html += `</tr>`;
+  });
+  html += `<tr><td><b>Total</b></td>${metricCols.map(k => `<td><b>${fmt(t[k])}</b></td>`).join('')}</tr></tbody>`;
+  document.getElementById('salesTable').innerHTML = html;
 }
 
-/* ============ INIT ============ */
-async function init() {
-  [kpiData, products, roster, gs1Ledger, clockState] = await Promise.all([
-    loadKey('kpi-data', DEFAULT_KPI),
-    loadKey('products', DEFAULT_PRODUCTS),
-    loadKey('roster', DEFAULT_ROSTER),
-    loadKey('gs1-ledger', []),
-    loadKey('clock-state', { status: 'out', lastAction: null })
-  ]);
-  renderKpiTable();
-  renderShelves();
-  renderRota();
-  renderGS1Ledger();
-  if (clockState.lastAction) {
-    const label = clockState.status === 'in' ? 'Clocked in at' : clockState.status === 'break' ? 'On break since' : 'Clocked out at';
-    document.getElementById('clock-status').textContent = `${label} ${clockState.lastAction}`;
-  }
+/* Render Inventory */
+function renderInventory() {
+  const q = (document.getElementById('invSearch')?.value || '').toLowerCase();
+  const f = document.getElementById('invFilter')?.value || 'all';
+  const filtered = state.products.filter(p => {
+    const hay = `${p.description} ${p.gtin} ${p.rms}`.toLowerCase();
+    const st = statusFor(p);
+    return (!q || hay.includes(q)) && (f === 'all' || (f === 'expired' && st === 'Expired') || (f === 'soon' && st === 'Within 30d') || (f === 'low' && st === 'Low stock'));
+  });
+
+  let html = '<thead><tr><th>Description</th><th>GTIN</th><th>RMS</th><th>Batch</th><th>Expiry</th><th>Units</th><th>Shelf</th><th>Status</th><th></th></tr></thead><tbody>';
+  filtered.forEach(p => {
+    html += `<tr>
+      <td><b>${esc(p.description)}</b></td>
+      <td>${esc(p.gtin)}</td>
+      <td>${esc(p.rms)}</td>
+      <td>${esc(p.batch)}</td>
+      <td>${p.expiry}</td>
+      <td>${p.units}</td>
+      <td>${p.shelf}</td>
+      <td>${statusBadge(statusFor(p))}</td>
+      <td><button class="btn" onclick="openProduct(${p.id})">Edit</button></td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('invTable').innerHTML = html;
 }
-init();
+
+/* Render Expiry */
+function renderExpiry() {
+  const e = state.products.filter(p => statusFor(p) === 'Expired').length;
+  const s = state.products.filter(p => statusFor(p) === 'Within 30d').length;
+  document.getElementById('expiryKpis').innerHTML = `
+    <div class="card kpi"><div class="label">Expired</div><div class="val" style="color:var(--red)">${e}</div></div>
+    <div class="card kpi"><div class="label">Within 30 Days</div><div class="val" style="color:var(--amber)">${s}</div></div>
+  `;
+  let html = '<thead><tr><th>Item</th><th>Expiry</th><th>Days Left</th><th>Units</th><th>Status</th></tr></thead><tbody>';
+  state.products.forEach(p => {
+    html += `<tr><td><b>${esc(p.description)}</b></td><td>${p.expiry}</td><td>${days(iso(today), p.expiry)}</td><td>${p.units}</td><td>${statusBadge(statusFor(p))}</td></tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('expiryTable').innerHTML = html;
+}
+
+/* Render Shelf Planner */
+function renderShelf() {
+  let html = '';
+  rackStructure.forEach(cat => {
+    html += `<div class="rack-category">${cat.group}</div>`;
+    cat.racks.forEach(r => {
+      const items = state.products.filter(p => p.shelf === r.id);
+      html += `<div class="shelf-row">
+        <div class="shelf-label">
+          <div class="icon">${r.icon}</div>
+          <b>${r.id}</b>
+          <div style="font-size:11px;color:var(--muted)">${items.length} Assigned</div>
+        </div>
+        <div class="shelf-cells">
+          ${items.map(p => `<div class="slot filled"><b>${esc(p.description.slice(0,18))}</b><div>${p.units}u · ${p.facings}f</div></div>`).join('')}
+          ${Array(Math.max(1, 4 - items.length)).fill('<div class="slot"><span style="color:var(--muted)">Empty Slot</span></div>').join('')}
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('shelfMap').innerHTML = html;
+}
+
+/* Render Restock */
+function renderRestock() {
+  const list = state.products.map(p => ({ ...p, need: Math.max(0, p.max - p.units) })).filter(p => p.need > 0);
+  document.getElementById('restockKpis').innerHTML = `
+    <div class="card kpi"><div class="label">Items Needing Restock</div><div class="val">${list.length}</div></div>
+    <div class="card kpi"><div class="label">Total Units Required</div><div class="val">${list.reduce((a,b)=>a+b.need,0)}</div></div>
+  `;
+  let html = '<thead><tr><th>Product</th><th>On Hand</th><th>Max</th><th>Suggested Order</th><th>Supplier</th></tr></thead><tbody>';
+  list.forEach(p => {
+    html += `<tr><td><b>${esc(p.description)}</b></td><td>${p.units}</td><td>${p.max}</td><td><b>${p.need}</b></td><td>${esc(p.supplier)}</td></tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('restockTable').innerHTML = html;
+}
+
+/* Render Scanner List */
+function renderScans() {
+  document.getElementById('scanCount').textContent = `${state.scans.length} scans`;
+  let html = '<thead><tr><th>Time</th><th>Result</th><th>GTIN</th><th>Batch</th><th>Expiry</th></tr></thead><tbody>';
+  state.scans.slice().reverse().forEach(s => {
+    html += `<tr><td>${new Date(s.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td><td>${s.match ? '🟢 Matched' : '⚪ Unmatched'}</td><td>${esc(s.gtin||s.raw)}</td><td>${esc(s.batch||'--')}</td><td>${esc(s.expiry||'--')}</td></tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('scanTable').innerHTML = html;
+}
+
+/* GS1 Parser */
+function parseGS1(raw) {
+  let s = raw.replace(/\u001d/g,'|').trim();
+  const out = { raw, gtin: '', expiry: '', batch: '' };
+  const m01 = s.match(/(?:\(01\)|01)(\d{14})/); if (m01) out.gtin = m01[1];
+  const m17 = s.match(/(?:\(17\)|17)(\d{6})/);
+  if (m17) {
+    const v = m17[1];
+    out.expiry = `20${v.slice(0,2)}-${v.slice(2,4)}-${v.slice(4,6)}`;
+  }
+  const m10 = s.match(/(?:\(10\)|10)([A-Za-z0-9._\/-]+)/); if (m10) out.batch = m10[1];
+  return out;
+}
+
+/* Navigation System */
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('active', b.dataset.page === name));
+  document.getElementById('crumb').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  window.scrollTo(0, 0);
+  if (name === 'scanner') initCamera();
+}
+
+document.getElementById('nav').addEventListener('click', e => {
+  const b = e.target.closest('button[data-page]');
+  if (b) switchPage(b.dataset.page);
+});
+document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => switchPage(b.dataset.goto));
+
+/* Editable Inline Listeners */
+document.getElementById('userName').onblur = e => { state.settings.userName = e.target.textContent.trim(); persist(); toast('User name updated'); };
+document.getElementById('branchNameDash').onblur = e => { state.settings.branch = e.target.textContent.trim(); persist(); toast('Branch updated'); };
+document.getElementById('achSub').onblur = e => {
+  const v = Number(e.target.textContent.replace(/[^0-9.]/g, ''));
+  if (v > 0) { state.settings.target = v; renderDashboard(); persist(); toast('Monthly target updated'); }
+};
+
+/* Product Modal Handling */
+let editId = null;
+function openProduct(id = null) {
+  editId = id;
+  const p = id ? state.products.find(x => x.id === id) : null;
+  document.getElementById('modalTitle').textContent = p ? 'Edit Product' : 'Add Product';
+  const f = document.getElementById('productForm');
+  ['gtin','rms','description','brand','supplier','batch','expiry','units','min','max','facings','shelf'].forEach(k => {
+    f.elements[k].value = p ? (p[k] ?? '') : (k === 'units' ? 10 : k === 'min' ? 5 : k === 'max' ? 20 : k === 'shelf' ? 'RACK 1' : '');
+  });
+  document.getElementById('productModal').classList.add('open');
+}
+window.openProduct = openProduct;
+document.getElementById('quickAdd').onclick = () => openProduct();
+document.getElementById('addProduct').onclick = () => openProduct();
+document.getElementById('closeModal').onclick = () => document.getElementById('productModal').classList.remove('open');
+document.getElementById('cancelProduct').onclick = () => document.getElementById('productModal').classList.remove('open');
+
+document.getElementById('productForm').onsubmit = e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const data = {
+    gtin: f.get('gtin'), rms: f.get('rms'), description: f.get('description'),
+    brand: f.get('brand'), supplier: f.get('supplier'), batch: f.get('batch'),
+    expiry: f.get('expiry') || iso(today), units: Number(f.get('units')),
+    min: Number(f.get('min')), max: Number(f.get('max')),
+    facings: Number(f.get('facings')), shelf: f.get('shelf')
+  };
+  if (editId) {
+    Object.assign(state.products.find(p => p.id === editId), data);
+  } else {
+    data.id = Date.now();
+    state.products.push(data);
+  }
+  persist(); renderAll();
+  document.getElementById('productModal').classList.remove('open');
+  toast('Product saved successfully');
+};
+
+/* Parse Button */
+document.getElementById('parseGs1').onclick = () => {
+  const val = document.getElementById('gs1Input').value;
+  const res = parseGS1(val);
+  const match = state.products.find(p => p.gtin === res.gtin);
+  state.scans.push({ ...res, at: new Date().toISOString(), match: !!match });
+  persist(); renderScans();
+  toast(match ? `Matched: ${match.description}` : 'GS1 parsed (not in database)');
+};
+document.getElementById('clearGs1').onclick = () => { document.getElementById('gs1Input').value = ''; };
+
+/* Camera */
+let scanner = null;
+function initCamera() {
+  if (scanner) return;
+  try {
+    scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 120 } }, false);
+    scanner.render(txt => {
+      const p = parseGS1(txt);
+      const match = state.products.find(x => x.gtin === p.gtin);
+      state.scans.push({ ...p, at: new Date().toISOString(), match: !!match });
+      persist(); renderScans();
+      toast('Camera scan recorded');
+    });
+  } catch(e) {}
+}
+document.getElementById('btnRestartCamera').onclick = () => { if (scanner) { scanner.clear(); scanner = null; } initCamera(); };
+
+/* Reports & Settings */
+document.getElementById('saveSales').onclick = () => { persist(); toast('Sales record saved'); };
+document.getElementById('saveSettings').onclick = () => {
+  state.settings.branch = document.getElementById('setBranch').value || state.settings.branch;
+  state.settings.currency = document.getElementById('setCurrency').value;
+  state.settings.target = Number(document.getElementById('setTargetInput').value || 60000);
+  persist(); renderAll(); toast('Settings saved');
+};
+document.getElementById('resetDemo').onclick = () => {
+  if (confirm('Reset database to demo configuration?')) {
+    state = defaultState(); persist(); renderAll(); toast('Defaults restored');
+  }
+};
+document.getElementById('exportJson').onclick = () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pharmatrack_backup_${iso(today)}.json`;
+  a.click();
+};
+
+function renderAll() {
+  renderDashboard();
+  renderSales();
+  renderInventory();
+  renderExpiry();
+  renderShelf();
+  renderRestock();
+  renderScans();
+  document.getElementById('setBranch').value = state.settings.branch;
+  document.getElementById('setCurrency').value = state.settings.currency;
+  document.getElementById('setTargetInput').value = state.settings.target;
+}
+
+renderAll();
 </script>
 </body>
 </html>
