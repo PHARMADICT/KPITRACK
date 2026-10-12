@@ -311,7 +311,7 @@
       <button class="active" data-page="dashboard"><span class="ico">◈</span>Dashboard</button>
       <button data-page="sales"><span class="ico">▥</span>DAILY AGENDA-HOUR</button>
       <button data-page="RE BALANCE "><span class="ico">▦</span>RE BALANCE </button>
-      <button data-page="scanner"><span class="ico">⌗</span>GS1 Scanner</button>
+      <button data-page="scanner"><span class="ico">⌗</span>BARCODE/GTIN Scanner</button>
       <button data-page="expiry"><span class="ico">◷</span>Expiry Tracker</button>
       <button data-page="shelf"><span class="ico">▤</span>Shelf Map</button>
       <button data-page="restock"><span class="ico">↗</span>Restock</button>
@@ -392,7 +392,7 @@
       <!-- 3. RE BALANCE  -->
       <section class="page" id="page-RE BALANCE ">
         <div class="page-head">
-          <div><h1>RE BALANCE  Master</h1><p>Full GTIN database, batch codes, and shelf allocations.</p></div>
+          <div><h1>RE BALANCE  Master</h1><p>Full BARCODE/GTINdatabase, batch codes, and shelf allocations.</p></div>
           <div class="actions">
             <button class="btn primary" id="addProduct">＋ Add Product</button>
             <button class="btn" id="downloadCsv">CSV Template</button>
@@ -400,7 +400,7 @@
         </div>
         <div class="card panel">
           <div class="actions" style="margin-bottom:12px">
-            <input id="invSearch" placeholder="Search GTIN / RMS / Product..." style="flex:1;padding:8px 12px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
+            <input id="invSearch" placeholder="Search BARCODE/GTIN/ RMS / Product..." style="flex:1;padding:8px 12px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
             <select id="invFilter" style="padding:8px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
               <option value="all">All items</option><option value="expired">Expired</option><option value="soon">Within 30d</option><option value="low">Low Stock</option>
             </select>
@@ -409,10 +409,10 @@
         </div>
       </section>
 
-      <!-- 4. GS1 SCANNER -->
+      <!-- 4. BARCODE/GTIN SCANNER -->
       <section class="page" id="page-scanner">
         <div class="page-head">
-          <div><h1>GS1 Camera Scanner</h1><p>Parse AI (01) GTIN, (17) Expiry, and (10) Batch.</p></div>
+          <div><h1>PRODUCT  Camera Scanner</h1><p>Parse AI (01) GTIN, (17) Expiry, and (10) Batch.</p></div>
           <button class="btn primary" id="btnRestartCamera">Restart Camera</button>
         </div>
         <div class="scan-box">
@@ -420,11 +420,11 @@
             <div class="scanner" id="scannerContainer"><div id="reader" style="width:100%"></div></div>
           </div>
           <div class="card panel">
-            <div class="panel-title"><h3>Manual GS1 Input</h3><span id="parseState" class="badge">waiting</span></div>
-            <div class="field"><textarea id="gs1Input" placeholder="Example: (01)06212345678903(17)270131(10)B24018" style="height:100px"></textarea></div>
+            <div class="panel-title"><h3>Manual PRODUCT  Input</h3><span id="parseState" class="badge">waiting</span></div>
+            <div class="field"><textarea id="PRODUCT Input" placeholder="Example: (01)06212345678903(17)270131(10)B24018" style="height:100px"></textarea></div>
             <div class="actions" style="margin-top:10px">
-              <button class="btn primary" id="parseGs1">Parse String</button>
-              <button class="btn" id="clearGs1">Clear</button>
+              <button class="btn primary" id="parsePRODUCT ">Parse String</button>
+              <button class="btn" id="clearPRODUCT ">Clear</button>
             </div>
             <div id="parseResult" style="margin-top:14px"></div>
           </div>
@@ -784,11 +784,11 @@ function renderScans() {
   document.getElementById('scanTable').innerHTML = html;
 }
 
-/* GS1 Parser */
-function parseGS1(raw) {
+/* PRODUCT  Parser */
+function parsePRODUCT (raw) {
   let s = raw.replace(/\u001d/g,'|').trim();
   const out = { raw, gtin: '', expiry: '', batch: '' };
-  const m01 = s.match(/(?:\(01\)|01)(\d{14})/); if (m01) out.gtin = m01[1];
+  const m01 = s.match(/(?:\(01\)|01)(\d{14})/); if (m01) out.BARCODE/GTIN= m01[1];
   const m17 = s.match(/(?:\(17\)|17)(\d{6})/);
   if (m17) {
     const v = m17[1];
@@ -864,7 +864,7 @@ document.getElementById('productForm').onsubmit = e => {
 document.getElementById('parseGs1').onclick = () => {
   const val = document.getElementById('gs1Input').value;
   const res = parseGS1(val);
-  const match = state.products.find(p => p.gtin === res.gtin);
+  const match = state.products.find(p => p.BARCODE/GTIN=== res.gtin);
   state.scans.push({ ...res, at: new Date().toISOString(), match: !!match });
   persist(); renderScans();
   toast(match ? `Matched: ${match.description}` : 'GS1 parsed (not in database)');
@@ -879,7 +879,7 @@ function initCamera() {
     scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 120 } }, false);
     scanner.render(txt => {
       const p = parseGS1(txt);
-      const match = state.products.find(x => x.gtin === p.gtin);
+      const match = state.products.find(x => x.BARCODE/GTIN=== p.gtin);
       state.scans.push({ ...p, at: new Date().toISOString(), match: !!match });
       persist(); renderScans();
       toast('Camera scan recorded');
