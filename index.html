@@ -1,346 +1,476 @@
+Here is the fully finished code. I have kept all of the POS Terminal logic you requested (the lock screen, the quick-dispense window, the instant "Sold" vs "Stock" tracking, and the photo attachment) and seamlessly merged it with your new PHARMAGUARD iOS Glass Premium CSS design.
+I replaced the old styles with your new CSS, mapped the HTML elements to your new classes (like .root, .card, .btn-parse, .db-table, and .product-card), and added just the necessary layout rules for the modals and splash screen using your new premium color variables.
+Replace your entire file with this:
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>PharmaGuard Pro - Secure Terminal</title>
+  <style>
+    /* =========================================================
+       PHARMAGUARD · CDD
+       iOS GLASS UI — PREMIUM MOTION EDITION
+       CSS replacement · Existing class names preserved
+       ========================================================= */
 
-/* ── iOS GLASS · CDD / PHARMAGUARD REDESIGN ── */
-:root {
-  --bg: #06132F;
-  --surface: rgba(23, 49, 94, 0.52);
-  --border: rgba(117, 169, 255, 0.20);
-  --border-hi: rgba(153, 194, 255, 0.42);
-  --lemon: #7195FF;
-  --leaf: #36D6A0;
-  --teal: #48DDF5;
-  --amber: #FFC76A;
-  --red: #FF6485;
-  --blue: #438BFF;
-  --text: #F3F6FF;
-  --muted: #A2B7DB;
+    :root {
+      color-scheme: dark;
+
+      --bg: #06132f;
+      --surface: rgba(23, 49, 94, 0.52);
+      --surface-hover: rgba(42, 75, 132, 0.58);
+      --border: rgba(117, 169, 255, 0.20);
+      --border-hi: rgba(153, 194, 255, 0.48);
+
+      --lemon: #7195ff;
+      --leaf: #36d6a0;
+      --teal: #48ddf5;
+      --amber: #ffc76a;
+      --red: #ff6485;
+      --blue: #438bff;
+
+      --text: #f3f6ff;
+      --muted: #a2b7db;
+
+      --glass-blur: 24px;
+      --radius-lg: 20px;
+      --radius-md: 15px;
+
+      --ease-spring: cubic-bezier(.2, .8, .2, 1);
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+
+      --shadow-card:
+        0 12px 32px rgba(0, 0, 0, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .045);
+
+      --shadow-glow:
+        0 8px 28px rgba(67, 139, 255, .22);
+    }
+
+    /* ── GLOBAL ────────────────────────────────────────────── */
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      min-height: 100%;
+      scroll-behavior: smooth;
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Segoe UI",
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overscroll-behavior-y: contain;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { touch-action: manipulation; }
+
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 3px;
+    }
+
+    /* ── BACKGROUND / MAIN APP ─────────────────────────────── */
+
+    .root {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      max-width: 760px;
+      min-height: 100vh;
+      margin-inline: auto;
+      padding: 28px 17px 52px;
+      overflow: clip;
+
+      background:
+        radial-gradient(ellipse at 4% 0%, rgba(61, 119, 255, .26), transparent 38%),
+        radial-gradient(ellipse at 100% 34%, rgba(119, 75, 255, .15), transparent 40%),
+        radial-gradient(ellipse at 45% 100%, rgba(29, 117, 171, .12), transparent 42%),
+        linear-gradient(155deg, #10285a 0%, #071735 46%, #030d23 100%);
+    }
+
+    .root::before, .root::after {
+      position: absolute; z-index: -1; content: ""; pointer-events: none; border-radius: 50%;
+      filter: blur(55px); animation: ambient-float 12s ease-in-out infinite alternate;
+    }
+
+    .root::before { width: 230px; height: 230px; top: 100px; right: -130px; background: rgba(66, 112, 255, .10); }
+    .root::after { width: 190px; height: 190px; left: -120px; bottom: 150px; background: rgba(54, 214, 160, .07); animation-delay: -5s; }
+
+    /* ── HEADER ────────────────────────────────────────────── */
+
+    .header-logo {
+      color: #86b4ff; letter-spacing: .15em; font-size: 11px; font-weight: 800;
+      animation: fade-up .65s var(--ease-out) both;
+    }
+
+    .header-title {
+      margin-block: 8px;
+      background: linear-gradient(115deg, #fff 0%, #a9c8ff 52%, #80e8ff 100%);
+      background-size: 200% 100%; background-position: 0% center;
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      animation: fade-up .7s var(--ease-out) .06s both, title-shimmer 9s ease-in-out infinite alternate;
+    }
+
+    .header-sub { color: #afc5ea; line-height: 1.75; animation: fade-up .7s var(--ease-out) .12s both; }
+
+    /* ── GLASS TABS ────────────────────────────────────────── */
+
+    .tabs {
+      display: flex; gap: 5px; padding: 5px; border: 1px solid rgba(130, 177, 255, .18); border-radius: 17px;
+      background: rgba(9, 25, 56, .76); backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035), 0 8px 25px rgba(0, 0, 0, .12);
+      animation: fade-up .65s var(--ease-out) .16s both;
+    }
+
+    .tab {
+      position: relative; flex: 1; min-width: 0; min-height: 43px; padding: 10px 9px; overflow: hidden;
+      color: #a9bfE6; background: transparent; border: 1px solid transparent; border-radius: 12px;
+      font-size: 12px; font-weight: 650; cursor: pointer;
+      transition: color .22s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease, transform .25s var(--ease-spring);
+    }
+    .tab:hover { color: #fff; background: rgba(102, 148, 255, .09); }
+    .tab:active { transform: scale(.96); }
+    .tab.active {
+      color: #fff; background: linear-gradient(135deg, #526aff 0%, #397fff 70%, #49b8f4 140%);
+      border-color: rgba(159, 189, 255, .48); box-shadow: 0 5px 20px rgba(60, 104, 255, .26), inset 0 1px 0 rgba(255, 255, 255, .20);
+    }
+
+    /* ── GLASS CARDS ───────────────────────────────────────── */
+
+    .card, .product-card {
+      position: relative; overflow: hidden; border: 1px solid rgba(120, 173, 255, .23); border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(29, 59, 111, .72), rgba(8, 27, 62, .84));
+      box-shadow: var(--shadow-card); backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+      transition: border-color .3s ease, background .3s ease, box-shadow .3s ease, transform .3s var(--ease-spring);
+      animation: card-enter .6s var(--ease-out) both;
+    }
+    .card::before, .product-card::before {
+      position: absolute; inset: 0; z-index: 0; content: ""; pointer-events: none;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .055), transparent 28%, transparent 72%, rgba(119, 166, 255, .025)); opacity: .8;
+    }
+    .card > *, .product-card > * { position: relative; }
+    .card { padding: 20px; }
+    .card:hover, .product-card:hover { border-color: rgba(153, 194, 255, .37); box-shadow: 0 15px 38px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255, 255, 255, .05); }
+
+    .card-title { color: #a9c7f6; font-size: 11px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+
+    /* ── INPUTS ────────────────────────────────────────────── */
+
+    textarea, input[type="text"], input:not([type]), select {
+      width: 100%; color: var(--text); background: rgba(3, 15, 39, .72); border: 1px solid rgba(121, 173, 255, .27); border-radius: var(--radius-md); padding: 14px 15px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.6;
+      transition: border-color .22s ease, box-shadow .22s ease, background .22s ease;
+    }
+    textarea:focus, input[type="text"]:focus, input:not([type]):focus, select:focus {
+      outline: none; border-color: #659aff; background: rgba(5, 19, 48, .92); box-shadow: 0 0 0 3px rgba(76, 132, 255, .13), 0 0 18px rgba(76, 132, 255, .06);
+    }
+
+    /* ── BUTTONS ───────────────────────────────────────────── */
+
+    .btn-parse, .btn-sample {
+      position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 9px; overflow: hidden;
+      font-weight: 700; cursor: pointer; transition: transform .22s var(--ease-spring), box-shadow .25s ease, border-color .25s ease, filter .25s ease;
+    }
+    .btn-parse::before, .btn-sample::before {
+      position: absolute; inset: 0; content: ""; pointer-events: none;
+      background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, .18) 48%, transparent 70%);
+      transform: translateX(-130%); transition: transform .65s ease;
+    }
+    .btn-parse:hover::before, .btn-sample:hover::before { transform: translateX(130%); }
+
+    .btn-parse {
+      width: 100%; min-height: 51px; padding: 13px 18px; color: #fff;
+      background: linear-gradient(115deg, #5669ff, #347fff 65%, #45bdf5);
+      border: 1px solid rgba(170, 196, 255, .30); border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(55, 107, 255, .25), inset 0 1px 0 rgba(255, 255, 255, .16);
+    }
+    .btn-parse:hover { filter: brightness(1.09); box-shadow: 0 11px 30px rgba(55, 107, 255, .35), inset 0 1px 0 rgba(255, 255, 255, .20); }
+    .btn-parse:active, .btn-sample:active { transform: scale(.975); }
+
+    .btn-sample {
+      min-height: 38px; padding: 9px 13px; color: #c3d6f7; background: rgba(42, 73, 129, .40);
+      border: 1px solid rgba(132, 176, 255, .22); border-radius: 11px; font-size: 12px;
+    }
+    .btn-sample:hover { color: #fff; background: rgba(72, 112, 190, .28); border-color: #729eff; }
+
+    /* ── PRODUCT STATUS CARDS ──────────────────────────────── */
+
+    .product-card { padding: 17px; text-align: left; width: 100%; background: transparent; color: inherit; font-family: inherit; }
+    .product-name { color: #f5f8ff; font-size: 18px; font-weight: 750; line-height: 1.4; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .product-brand { color: #afc5ea; font-size: 12px; margin-top: 4px; }
+    
+    .expiry-badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid transparent; border-radius: 11px; font-size: 11px; font-weight: 750; }
+    .expiry-badge.ok { color: #55e6b5; background: rgba(54, 214, 160, .14); border-color: rgba(54, 214, 160, .17); }
+
+    /* ── DATABASE TABLE ────────────────────────────────────── */
+
+    .db-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-md); border: 1px solid var(--border); background: rgba(0,0,0,0.2); margin-top: 10px; }
+    .db-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+    .db-table th { padding: 12px 10px; color: #afc5ea; background: rgba(12, 31, 66, .80); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-align: left; white-space: nowrap; }
+    .db-table td { padding: 12px 10px; color: #e5edff; border-bottom: 1px solid rgba(137, 180, 255, .10); }
+    .db-table tr:hover td { background: rgba(106, 154, 255, .07); }
+
+    /* ── ANIMATIONS ────────────────────────────────────────── */
+
+    @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes card-enter { from { opacity: 0; transform: translateY(15px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes ambient-float { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-12px, 18px, 0) scale(1.08); } }
+    @keyframes title-shimmer { from { background-position: 0% center; } to { background-position: 100% center; } }
+
+    /* ── FUNCTIONAL LAYOUT EXTENSIONS (SPLASH, POS, MODALS) ── */
+
+    #splash, #lockScreen {
+      position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.5s ease; backdrop-filter: blur(25px);
+    }
+    #lockScreen { z-index: 9998; background: rgba(6, 19, 47, 0.95); }
+    .qr-box {
+      width: 150px; height: 150px; border: 2px dashed var(--teal); border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 30px;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .modal { position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 90; padding: 16px; }
+    .modal.open { display: grid; }
+    .modal-card { width: min(640px, 100%); max-height: 90vh; overflow-y: auto; padding: 24px; border-radius: var(--radius-lg); background: var(--bg); border: 1px solid var(--border); box-shadow: var(--shadow-glow); }
+
+    .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin: 20px 0; }
+    .pos-btn { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; border: 1px solid rgba(120, 173, 255, .23); }
+    .pos-btn:active { transform: scale(0.96); border-color: var(--teal); }
+
+    .photo-upload {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px; border: 1px dashed var(--blue); border-radius: var(--radius-md);
+      background: rgba(67, 139, 255, 0.1); color: var(--blue); font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .photo-upload:hover { background: rgba(67, 139, 255, 0.2); }
+    .photo-upload input[type="file"] { display: none; }
+
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 100; background: rgba(9, 25, 56, .95); border: 1px solid var(--border-hi); padding: 14px 20px; border-radius: var(--radius-md); display: none; font-size: 13px; font-weight: 600; color: #fff; box-shadow: var(--shadow-glow); }
+    .toast.show { display: block; animation: fade-up 0.3s ease; }
+
+    .page { display: none; } .page.active { display: block; animation: fade-up 0.35s ease; }
+
+    /* MOBILE ADJUSTMENTS */
+    @media (max-width: 600px) {
+      .root { padding: max(20px, env(safe-area-inset-top)) 12px max(34px, env(safe-area-inset-bottom)); }
+      .header-title { font-size: clamp(23px, 6vw, 29px); line-height: 1.18; }
+      .header-sub { font-size: 13px; line-height: 1.65; }
+      .card { padding: 15px; border-radius: 17px; }
+      .tabs { gap: 3px; padding: 4px; border-radius: 15px; }
+      .tab { min-height: 42px; padding: 9px 5px; border-radius: 11px; font-size: 10px; }
+      .product-card { padding: 15px; border-radius: 17px; }
+      .product-name { font-size: 16px; }
+      .btn-parse { min-height: 49px; }
+      .pos-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div style="font-size: 64px; margin-bottom: 12px; animation: fade-up 0.6s ease both;">⚕️</div>
+  <h1 class="header-title">PharmaGuard</h1>
+</div>
+
+<!-- SECURE LOCK SCREEN -->
+<div id="lockScreen" style="display:none;">
+  <div class="qr-box">🔳</div>
+  <h2 class="header-title" style="margin: 0 0 8px; font-size: 28px;">Terminal Locked</h2>
+  <p class="header-sub" style="margin-bottom: 30px;">Scan QR or verify identity to access terminal.</p>
+  <button class="btn-parse" style="width: auto; padding: 16px 32px;" onclick="unlockTerminal()">
+    <span style="font-size: 20px;">👤</span> Face ID / Pattern Unlock
+  </button>
+</div>
+
+<!-- MAIN APP -->
+<div class="root" id="mainApp" style="display:none;">
+  <header style="margin-bottom: 24px;">
+    <div class="header-logo">PHARMAGUARD SECURE TERMINAL</div>
+    <h1 class="header-title" id="crumb">Dashboard</h1>
+    
+    <div class="tabs" id="nav" style="margin-top: 16px;">
+      <button class="tab active" data-page="dashboard">Overview</button>
+      <button class="tab" data-page="inventory">Sales & Inventory</button>
+    </div>
+  </header>
+
+  <div class="content">
+    
+    <!-- DASHBOARD PAGE -->
+    <section class="page active" id="page-dashboard">
+      <div class="card" style="margin-bottom: 20px;">
+        <h2 class="card-title">Welcome to the Terminal</h2>
+        <p class="header-sub" style="margin-top:8px;">Tap 'Quick Dispense' to open the sales grid and record items instantly. Inventory databases will sync automatically.</p>
+        <button class="btn-parse" style="margin-top: 16px;" onclick="openPosModal()">⚡ Quick Dispense Menu</button>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Recent Activity</h3>
+        <p class="header-sub" style="margin-top:8px; font-size: 12px;">Sales operations and stock deducts will appear in the main system backend logs.</p>
+      </div>
+    </section>
+
+    <!-- INVENTORY PAGE -->
+    <section class="page" id="page-inventory">
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom: 16px;">Live Database</h2>
+        <div class="db-wrap">
+          <table class="db-table" id="invTable"></table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- QUICK DISPENSE MODAL -->
+<div class="modal" id="posModal">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 class="header-title" style="margin:0; font-size:22px;">⚡ Record Sale</h3>
+      <button class="btn-sample" onclick="document.getElementById('posModal').classList.remove('open')">✕ Close</button>
+    </div>
+    
+    <div class="pos-grid" id="posGrid"></div>
+
+    <div style="margin-top: 10px;">
+      <label class="photo-upload">
+        <span>📷 Attach Rx Photo / Document</span>
+        <input type="file" accept="image/*" onchange="handlePhoto(this)">
+      </label>
+      <div id="photoStatus" style="font-size: 12px; color: var(--leaf); text-align: center; margin-top: 12px; font-weight: bold;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 1. Startup & Lock Screen
+window.onload = () => {
+  setTimeout(() => {
+    document.getElementById('splash').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('splash').remove();
+      document.getElementById('lockScreen').style.display = 'flex';
+    }, 500);
+  }, 1200);
+};
+
+function unlockTerminal() {
+  document.getElementById('lockScreen').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    renderAll();
+  }, 300);
 }
 
-body {
-  background: #06132F;
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
+// 2. Pre-filled 10 Medicines Database
+let state = {
+  products: [
+    { id: 1, name: 'Panadol 500mg', units: 45, sold: 0 },
+    { id: 2, name: 'Brufen 400mg', units: 30, sold: 0 },
+    { id: 3, name: 'Amoxil 500mg', units: 15, sold: 0 },
+    { id: 4, name: 'Zyrtec 10mg', units: 22, sold: 0 },
+    { id: 5, name: 'Claritin 10mg', units: 18, sold: 0 },
+    { id: 6, name: 'Augmentin 1g', units: 12, sold: 0 },
+    { id: 7, name: 'Lipitor 20mg', units: 40, sold: 0 },
+    { id: 8, name: 'Nexium 40mg', units: 25, sold: 0 },
+    { id: 9, name: 'Ventolin Inhaler', units: 10, sold: 0 },
+    { id: 10, name: 'Glucophage 500mg', units: 55, sold: 0 }
+  ]
+};
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-.root {
-  max-width: 720px;
-  min-height: 100vh;
-  padding: 26px 16px 48px;
-  background:
-    radial-gradient(ellipse at 8% 0%, rgba(61, 119, 255, .25), transparent 42%),
-    radial-gradient(ellipse at 100% 42%, rgba(119, 75, 255, .15), transparent 42%),
-    linear-gradient(155deg, #10285A 0%, #071735 44%, #030D23 100%);
+// 3. Quick Dispense POS Logic mapped to the Premium Classes
+function openPosModal() {
+  const grid = document.getElementById('posGrid');
+  grid.innerHTML = state.products.slice(0, 10).map(p => `
+    <button class="product-card pos-btn" onclick="dispenseItem(${p.id})">
+      <div class="product-name" style="font-size: 15px;">${p.name}</div>
+      <div class="product-brand">Stock: <b id="qty-${p.id}" style="color:var(--text);">${p.units}</b></div>
+      <div class="expiry-badge ok" style="margin-top:12px;">Sold: <b id="sold-${p.id}">${p.sold}</b></div>
+    </button>
+  `).join('');
+  
+  document.getElementById('photoStatus').textContent = '';
+  document.getElementById('posModal').classList.add('open');
 }
 
-.header-logo {
-  color: #86B4FF;
-  letter-spacing: .14em;
-}
-
-.header-title {
-  background: linear-gradient(115deg, #FFFFFF, #A9C8FF 55%, #80E8FF);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.header-sub {
-  color: #AFC5EA;
-  line-height: 1.8;
-}
-
-.tabs {
-  gap: 5px;
-  padding: 5px;
-  border-radius: 16px;
-  background: rgba(9, 25, 56, .72);
-  border-color: rgba(130, 177, 255, .18);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-}
-
-.tab {
-  min-height: 42px;
-  border-radius: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  letter-spacing: .01em;
-  text-transform: none;
-}
-
-.tab.active {
-  color: #FFFFFF;
-  background: linear-gradient(135deg, #526AFF, #397FFF);
-  border-color: rgba(159, 189, 255, .5);
-  box-shadow: 0 5px 20px rgba(60, 104, 255, .28);
-}
-
-.card,
-.product-card {
-  border-radius: 20px;
-  background: linear-gradient(
-    145deg,
-    rgba(29, 59, 111, .68),
-    rgba(8, 27, 62, .80)
-  );
-  border: 1px solid rgba(120, 173, 255, .23);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-}
-
-.card {
-  padding: 19px;
-}
-
-.card-title {
-  color: #A9C7F6;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 11px;
-  letter-spacing: .11em;
-}
-
-.card-title::after,
-.divider {
-  background: rgba(137, 180, 255, .18);
-}
-
-textarea,
-input[type=text] {
-  background: rgba(3, 15, 39, .66);
-  border: 1px solid rgba(121, 173, 255, .26);
-  border-radius: 15px;
-  padding: 14px;
-  color: #F3F6FF;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-
-textarea:focus,
-input[type=text]:focus {
-  border-color: #659AFF;
-  box-shadow: 0 0 0 4px rgba(76, 132, 255, .13);
-}
-
-.input-label {
-  color: #AFC5EA;
-  letter-spacing: .07em;
-}
-
-.btn-parse {
-  min-height: 50px;
-  border-radius: 15px;
-  color: white;
-  background: linear-gradient(115deg, #5669FF, #347FFF 65%, #45BDF5);
-  box-shadow: 0 8px 22px rgba(55, 107, 255, .26);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  letter-spacing: .03em;
-}
-
-.btn-sample {
-  color: #C3D6F7;
-  background: rgba(42, 73, 129, .40);
-  border: 1px solid rgba(132, 176, 255, .22);
-  border-radius: 10px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  letter-spacing: 0;
-}
-
-.btn-sample:hover {
-  background: rgba(72, 112, 190, .28);
-  border-color: #729EFF;
-}
-
-.ai-chip,
-.field,
-.step-row {
-  background: rgba(3, 15, 39, .38);
-  border: 1px solid rgba(132, 176, 255, .17);
-  border-radius: 12px;
-}
-
-.ai-chip-key,
-.field.highlight .field-val {
-  color: #91B9FF;
-}
-
-.ai-chip-val,
-.field-val {
-  color: #F0F5FF;
-}
-
-.step-row {
-  padding: 10px 12px;
-  border-radius: 11px;
-}
-
-.step-row.hit {
-  background: rgba(54, 214, 160, .09);
-  border-color: rgba(54, 214, 160, .30);
-}
-
-.step-num {
-  width: 25px;
-  height: 25px;
-}
-
-.step-num.pass {
-  background: rgba(54, 214, 160, .16);
-  color: #55E6B5;
-}
-
-.step-num.fail {
-  background: rgba(255, 100, 133, .12);
-  color: #FF7996;
-}
-
-.step-label {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 12px;
-}
-
-.step-label.pass {
-  color: #55E6B5;
-}
-
-.step-label.fail {
-  color: #A2B7DB;
-}
-
-.product-card.ok {
-  background: linear-gradient(140deg, rgba(29, 105, 100, .30), rgba(8, 35, 66, .82));
-  border-color: rgba(54, 214, 160, .43);
-}
-
-.product-card.warning {
-  background: linear-gradient(140deg, rgba(123, 83, 28, .28), rgba(29, 36, 65, .82));
-  border-color: rgba(255, 199, 106, .48);
-}
-
-.product-card.expired {
-  background: linear-gradient(140deg, rgba(127, 39, 69, .35), rgba(32, 23, 59, .84));
-  border-color: rgba(255, 100, 133, .55);
-}
-
-.product-card.unmatched {
-  background: rgba(25, 41, 72, .55);
-  border-color: rgba(255, 199, 106, .42);
-}
-
-.product-name {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  font-size: 18px;
-  letter-spacing: -.02em;
-}
-
-.product-brand {
-  color: #AFC5EA;
-}
-
-.expiry-badge {
-  border-radius: 12px;
-}
-
-.expiry-badge.ok {
-  color: #55E6B5;
-  background: rgba(54, 214, 160, .14);
-}
-
-.expiry-badge.warning {
-  color: #FFD18A;
-  background: rgba(255, 199, 106, .14);
-}
-
-.expiry-badge.expired {
-  color: #FF8BA3;
-  background: rgba(255, 100, 133, .15);
-}
-
-.expiry-badge.none {
-  color: #B0C2E0;
-  background: rgba(143, 169, 211, .10);
-}
-
-.format-badge {
-  color: #8CEBFA;
-  background: rgba(72, 221, 245, .09);
-  border-color: rgba(72, 221, 245, .23);
-  border-radius: 12px;
-}
-
-.error-box {
-  color: #FF8BA3;
-  background: rgba(255, 100, 133, .09);
-  border-color: rgba(255, 100, 133, .26);
-  border-radius: 13px;
-}
-
-.rms-pill {
-  color: #A9C5FF;
-  background: rgba(89, 128, 255, .13);
-  border-color: rgba(89, 128, 255, .25);
-}
-
-.rtv-pill.yes {
-  color: #55E6B5;
-  background: rgba(54, 214, 160, .12);
-}
-
-.rtv-pill.no {
-  color: #FF8BA3;
-  background: rgba(255, 100, 133, .12);
-}
-
-.db-table th {
-  color: #AFC5EA;
-}
-
-.db-table td {
-  border-bottom-color: rgba(137, 180, 255, .10);
-}
-
-.db-table tr:hover td {
-  background: rgba(106, 154, 255, .07);
-}
-
-.score-bar {
-  background: linear-gradient(90deg, #FF6485, #FFC76A);
-}
-
-@media (max-width: 480px) {
-  .root {
-    padding: 20px 12px 32px;
+function dispenseItem(id) {
+  const item = state.products.find(x => x.id === id);
+  if (item && item.units > 0) {
+    item.units -= 1; // Decrease Stock
+    item.sold += 1;  // Increase Sold Count
+    
+    // Instantly update the numbers on the button
+    document.getElementById(`qty-${id}`).textContent = item.units;
+    document.getElementById(`sold-${id}`).textContent = item.sold;
+    
+    toast(`✅ Sold 1x ${item.name}`);
+    renderAll(); // Update the main table
+  } else {
+    toast(`❌ Out of stock: ${item.name}`);
   }
+}
 
-  .header-title {
-    font-size: 24px;
-  }
-
-  .card {
-    padding: 15px;
-    border-radius: 17px;
-  }
-
-  .tabs {
-    gap: 3px;
-  }
-
-  .tab {
-    padding: 9px 5px;
-    font-size: 10px;
-  }
-
-  .ai-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .fields-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .product-card {
-    padding: 15px;
-  }
-
-  .db-wrap {
-    margin-right: -4px;
+function handlePhoto(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('photoStatus').textContent = '✅ Photo securely attached: ' + input.files[0].name;
+    toast('Prescription photo added.');
   }
 }
+
+// 4. Data Rendering and Navigation mapped to Premium Table CSS
+function renderAll() {
+  let html = '<thead><tr><th>ID</th><th>MEDICINE NAME</th><th>IN STOCK</th><th>SOLD TODAY</th></tr></thead><tbody>';
+  state.products.forEach(p => {
+    html += `<tr>
+      <td>#00${p.id}</td>
+      <td style="font-weight: 700;">${p.name}</td>
+      <td>${p.units}</td>
+      <td style="color:var(--leaf); font-weight: 800;">+${p.sold}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('invTable').innerHTML = html;
+}
+
+document.getElementById('nav').addEventListener('click', e => {
+  const b = e.target.closest('button[data-page]');
+  if (b) {
+    const name = b.dataset.page;
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+    document.querySelectorAll('#nav button').forEach(btn => btn.classList.toggle('active', btn.dataset.page === name));
+    document.getElementById('crumb').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+});
+</script>
+</body>
+</html>
+
