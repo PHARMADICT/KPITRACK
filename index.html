@@ -1,928 +1,346 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>KPI & TRACK— Vitamins Module (UAE)</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <style>
-    :root {
-      --bg: #060913;
-      --panel: rgba(14, 20, 36, 0.72);
-      --panel2: rgba(10, 15, 28, 0.85);
-      --text: #f1f5f9;
-      --muted: #8fa0c7;
-      --accent: #60a5fa;
-      --purple: #a78bfa;
-      --solar-gold: #f59e0b;
-      --solar-amber: rgba(245, 158, 11, 0.18);
-      --green: #34d399;
-      --amber: #fb923c;
-      --red: #f87171;
-      --cyan: #38bdf8;
-      --border: rgba(255, 255, 255, 0.09);
-      --border2: rgba(96, 165, 250, 0.28);
-      --glass: rgba(255, 255, 255, 0.04);
-      --shadow: 0 16px 45px rgba(0, 0, 0, 0.55);
-      --r: 18px;
-      --r2: 12px;
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font: 14px/1.5 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(circle at 18% 4%, rgba(245, 158, 11, 0.16), transparent 38%),
-        radial-gradient(circle at 82% 12%, rgba(96, 165, 250, 0.18), transparent 42%),
-        radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.08), transparent 50%),
-        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.12), transparent 40%);
-      background-attachment: fixed;
-    }
 
-    /* Solar Lines & Grid Overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: 
-        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255, 255, 255, 0.015) 60px),
-        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255, 255, 255, 0.015) 60px);
-      z-index: 0;
-    }
-
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-
-    /* Splash Screen */
-    #splash {
-      position: fixed; inset: 0; z-index: 9999; background: var(--bg);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.5s ease; backdrop-filter: blur(25px);
-    }
-    .splash-logo {
-      font-size: 58px; margin-bottom: 12px;
-      animation: solarPulse 2.4s infinite ease-in-out;
-      background: linear-gradient(135deg, #fbbf24, var(--purple));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .splash-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin: 0; }
-    .splash-loader {
-      width: 170px; height: 3px; background: rgba(255,255,255,.08);
-      border-radius: 4px; margin-top: 26px; overflow: hidden; position: relative;
-    }
-    .splash-loader-bar {
-      position: absolute; top: 0; left: 0; width: 45%; height: 100%;
-      background: linear-gradient(90deg, #f59e0b, #60a5fa);
-      animation: solarLoad 1.2s infinite ease-in-out;
-    }
-    @keyframes solarPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(245,158,11,0.4)); } 50% { transform: scale(1.08); filter: drop-shadow(0 0 28px rgba(167,139,250,0.6)); } }
-    @keyframes solarLoad { 0% { left: -45%; } 100% { left: 100%; } }
-
-    /* Layout Structure */
-    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; position: relative; z-index: 1; }
-    
-    /* Sidebar Navigation */
-    .sidebar {
-      position: sticky; top: 0; height: 100vh; padding: 20px 16px;
-      border-right: 1px solid var(--border); background: rgba(6, 9, 19, 0.85);
-      backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 20;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; padding: 6px 8px 22px; }
-    .mark {
-      width: 40px; height: 40px; border-radius: 12px;
-      background: linear-gradient(135deg, #f59e0b, #6366f1);
-      display: grid; place-items: center; font-weight: 900; font-size: 18px;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
-    }
-    .brand b { font-size: 17px; font-weight: 800; }
-    .brand span { color: #f59e0b; }
-    .nav { display: grid; gap: 6px; }
-    .nav button {
-      border: 1px solid transparent; background: transparent; color: var(--muted);
-      padding: 11px 14px; border-radius: 12px; text-align: left; display: flex;
-      gap: 12px; align-items: center; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .nav button:hover { background: rgba(255,255,255,0.05); color: var(--text); transform: translateX(3px); }
-    .nav button.active {
-      background: linear-gradient(90deg, rgba(245,158,11,0.14), rgba(96,165,250,0.08));
-      border-color: rgba(245, 158, 11, 0.3); color: #fff;
-    }
-    .nav .ico { font-size: 17px; width: 22px; text-align: center; }
-    .sidebar-foot { margin-top: auto; display: grid; gap: 10px; font-size: 12px; }
-    .status-card { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--glass); color: var(--muted); }
-
-    /* Top Bar */
-    .main { min-width: 0; display: flex; flex-direction: column; }
-    .topbar {
-      position: sticky; top: 0; z-index: 15; height: 64px; padding: 0 26px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--border); background: rgba(6, 9, 19, 0.75);
-      backdrop-filter: blur(20px);
-    }
-    .crumb { color: var(--muted); font-size: 14px; }
-    .crumb b { color: var(--text); }
-    .top-actions { display: flex; gap: 8px; }
-
-    /* Content Area */
-    .content { padding: 24px 28px 40px; max-width: 1560px; margin: 0 auto; width: 100%; }
-    .page { display: none; }
-    .page.active { display: block; animation: pageFade 0.35s ease forwards; }
-    @keyframes pageFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Page Head */
-    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-    .page-head h1 { font-size: 26px; font-weight: 850; margin: 0 0 4px; letter-spacing: -0.4px; }
-    .page-head p { margin: 0; color: var(--muted); font-size: 13px; }
-
-    /* Buttons */
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .btn {
-      min-height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--glass); color: var(--text); font-weight: 700; font-size: 13px;
-      transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn:hover { border-color: var(--border2); background: rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
-    .btn.primary {
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      background: linear-gradient(135deg, #f59e0b, #6366f1);
-      box-shadow: 0 0 18px rgba(245, 158, 11, 0.3); color: #fff;
-    }
-    .btn.green { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.3); color: #a7f3d0; }
-    .btn.warn { background: rgba(251, 146, 60, 0.12); border-color: rgba(251, 146, 60, 0.3); color: #fed7aa; }
-    .btn.danger { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.3); color: #fecaca; }
-
-    /* Hero Banner with Solar Radial Glow */
-    .hero {
-      padding: 24px; border-radius: 20px; margin-bottom: 18px;
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(96, 165, 250, 0.08));
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      box-shadow: inset 0 0 50px rgba(245, 158, 11, 0.06);
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute; -webkit-mask-image: radial-gradient(circle, black 30%, transparent 70%);
-      top: -60px; right: -40px; width: 240px; height: 240px;
-      background: conic-gradient(from 0deg, #f59e0b, #a78bfa, #38bdf8, #f59e0b);
-      opacity: 0.25; filter: blur(35px); pointer-events: none;
-    }
-    .hero h2 { font-size: 28px; margin: 0 0 4px; font-weight: 850; }
-    .hero p { margin: 0; color: var(--muted); font-size: 13px; }
-
-    /* Editable Inline Spans */
-    .editable-val {
-      border-bottom: 1.5px dashed #f59e0b;
-      padding: 1px 4px;
-      outline: none;
-      cursor: text;
-      transition: background 0.2s;
-    }
-    .editable-val:focus {
-      background: rgba(245, 158, 11, 0.2);
-      border-bottom: 2px solid #fff;
-      border-radius: 4px;
-    }
-
-    /* Cards and Grids */
-    .grid { display: grid; gap: 14px; }
-    .kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 14px; }
-    .card {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: var(--r); box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-    }
-    .kpi { padding: 14px 16px; }
-    .kpi .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
-    .kpi .val { font-size: 22px; font-weight: 850; margin-top: 4px; }
-    .kpi .sub { font-size: 11px; color: var(--green); margin-top: 2px; }
-
-    .layout2 { grid-template-columns: 1.4fr 0.9fr; }
-    .layout3 { grid-template-columns: repeat(3, 1fr); }
-    .panel { padding: 18px; }
-    .panel-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .panel-title h3 { margin: 0; font-size: 14px; font-weight: 750; }
-
-    /* Tables */
-    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r2); background: rgba(0, 0, 0, 0.25); }
-    .table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 13px; }
-    .table th, .table td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; }
-    .table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: rgba(255, 255, 255, 0.03); }
-    .table tr:last-child td { border-bottom: 0; }
-    .table input {
-      width: 100%; min-width: 60px; padding: 6px 8px; background: rgba(6, 10, 20, 0.7);
-      border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px;
-    }
-    .table input:focus { border-color: #f59e0b; outline: none; }
-
-    /* Shelf Planner Structure */
-    .shelf { display: grid; gap: 14px; }
-    .rack-category { color: #f59e0b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin: 12px 0 4px; }
-    .shelf-row { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: stretch; }
-    .shelf-label {
-      padding: 12px; border: 1px solid var(--border); border-radius: 12px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-      display: flex; flex-direction: column; justify-content: center;
-    }
-    .shelf-label .icon { font-size: 24px; margin-bottom: 4px; }
-    .shelf-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-    .slot { min-height: 74px; border: 1px dashed rgba(145, 160, 197, 0.25); border-radius: 10px; padding: 8px; background: rgba(255, 255, 255, 0.02); font-size: 11px; }
-    .slot.filled { border-style: solid; background: rgba(96, 165, 250, 0.07); }
-    .slot.expiry-red { border-color: var(--red); background: rgba(248, 113, 113, 0.12); }
-    .slot.expiry-orange { border-color: var(--amber); background: rgba(251, 146, 60, 0.12); }
-    .slot.expiry-green { border-color: var(--green); background: rgba(52, 211, 153, 0.07); }
-
-    /* Chart & Progress */
-    .chart { height: 120px; display: flex; align-items: flex-end; gap: 6px; padding: 8px 4px 0; }
-    .bar {
-      flex: 1; border-radius: 5px 5px 2px 2px;
-      background: linear-gradient(180deg, #f59e0b, rgba(99, 102, 241, 0.35));
-      position: relative; transition: height 0.4s;
-    }
-    .bar small { position: absolute; left: 50%; transform: translateX(-50%); bottom: -20px; color: var(--muted); font-size: 9px; white-space: nowrap; }
-    .chart-wrap { padding-bottom: 22px; }
-    .progress { height: 7px; background: rgba(255, 255, 255, 0.08); border-radius: 99px; overflow: hidden; margin: 8px 0; }
-    .progress > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #60a5fa); transition: width 0.4s; }
-
-    /* Badges */
-    .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 3px 8px; font-size: 10px; font-weight: 800; border: 1px solid var(--border); }
-    .badge.ok { color: #a7f3d0; background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.25); }
-    .badge.warn { color: #fed7aa; background: rgba(251, 146, 60, 0.1); border-color: rgba(251, 146, 60, 0.25); }
-    .badge.red { color: #fecaca; background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.25); }
-
-    /* Scanner UI */
-    .scan-box { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
-    .scanner { min-height: 280px; border: 1px dashed var(--border2); border-radius: 14px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
-
-    /* Modals & Toast */
-    .modal { position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 90; padding: 16px; }
-    .modal.open { display: grid; }
-    .modal-card { width: min(640px, 100%); max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 16px; background: #0c1222; border: 1px solid var(--border2); box-shadow: var(--shadow); }
-    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .field { display: grid; gap: 4px; }
-    .field label { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
-    .field input, .field select, .field textarea { width: 100%; padding: 8px 10px; background: rgba(6, 10, 20, 0.8); border: 1px solid var(--border); border-radius: 8px; color: var(--text); }
-    .span2 { grid-column: span 2; }
-    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 100; background: #131d36; border: 1px solid var(--border2); padding: 12px 18px; border-radius: 12px; display: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); }
-    .toast.show { display: block; animation: pageFade 0.3s ease; }
-
-    /* Interactive Bottom Navigation Dock (Active on Mobile / Small screens) */
-    @media(max-width: 900px) {
-      .app { grid-template-columns: 1fr; padding-bottom: 84px; }
-      .sidebar {
-        position: fixed; top: auto; bottom: 12px; left: 12px; right: 12px; height: 64px;
-        flex-direction: row; justify-content: space-around; padding: 0 10px;
-        border-radius: 20px; border: 1px solid var(--border2); background: rgba(8, 12, 24, 0.94);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.85); backdrop-filter: blur(24px);
-      }
-      .brand, .sidebar-foot { display: none !important; }
-      .nav { display: flex; width: 100%; justify-content: space-around; gap: 0; }
-      .nav button { padding: 10px; border-radius: 14px; font-size: 0; justify-content: center; width: auto; }
-      .nav button .ico { font-size: 20px; width: auto; }
-      .nav button:hover { transform: none; }
-      .kpis { grid-template-columns: repeat(2, 1fr); }
-      .layout2, .layout3, .scan-box { grid-template-columns: 1fr; }
-      .shelf-row { grid-template-columns: 1fr; }
-      .content { padding: 16px; }
-    }
-  </style>
-</head>
-<body>
-
-<div id="splash">
-  <div class="splash-logo">⚕️</div>
-  <h1 class="splash-title">PharmaTrack Pro</h1>
-  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
-</div>
-
-<div class="app">
-  <!-- Interactive Navigation -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="mark">P</div>
-      <div>
-        <b>Pharma<span>Track</span></b>
-        <small style="display:block;color:var(--muted);font-size:11px">Solar v2.6</small>
-      </div>
-    </div>
-    <nav class="nav" id="nav">
-      <button class="active" data-page="dashboard"><span class="ico">◈</span>Dashboard</button>
-      <button data-page="sales"><span class="ico">▥</span>DAILY AGENDA-HOUR</button>
-      <button data-page="RE BALANCE "><span class="ico">▦</span>RE BALANCE </button>
-      <button data-page="scanner"><span class="ico">⌗</span>BARCODE/GTIN Scanner</button>
-      <button data-page="expiry"><span class="ico">◷</span>Expiry Tracker</button>
-      <button data-page="shelf"><span class="ico">▤</span>Shelf Map</button>
-      <button data-page="restock"><span class="ico">↗</span>Restock</button>
-      <button data-page="reports"><span class="ico">▧</span>Reports</button>
-      <button data-page="settings"><span class="ico">⚙</span>Settings</button>
-    </nav>
-    <div class="sidebar-foot">
-      <div class="status-card">
-        Autosave: <b style="color:var(--green)">ON</b><br>
-        Saved: <span id="lastSave">now</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Content Areas -->
-  <main class="main">
-    <header class="topbar">
-      <div class="crumb">KPI & TRACK/ <b id="crumb">Dashboard</b></div>
-      <div class="top-actions">
-        <button class="btn primary" id="quickAdd">＋ Add Product</button>
-        <button class="btn" id="exportJson">Backup</button>
-      </div>
-    </header>
-
-    <div class="content">
-      <!-- 1. DASHBOARD -->
-      <section class="page active" id="page-dashboard">
-        <div class="hero">
-          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap">
-            <div>
-              <div class="badge ok" style="margin-bottom:8px">Live UAE Node</div>
-              <h2>Good evening, <span class="editable-val" id="userName" contenteditable="true" title="Click to edit name">Vysakh</span></h2>
-              <p>Branch: <span class="editable-val" id="branchNameDash" contenteditable="true" title="Click to edit branch">STORE DXB T3 Arrivals</span></p>
-            </div>
-            <div class="actions">
-              <button class="btn primary" data-goto="sales">Enter Sales</button>
-              <button class="btn" data-goto="scanner">Scan Barcode</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid kpis" id="dashKpis"></div>
-
-        <div class="grid layout2">
-          <div class="card panel">
-            <div class="panel-title">
-              <h3>Target Pacing</h3>
-              <span>Target: <b class="editable-val" id="achSub" contenteditable="true" title="Click to edit target amount">60000</b> AED</span>
-            </div>
-            <div style="font-size:32px;font-weight:900" id="achVal">0%</div>
-            <div class="progress"><span id="achBar" style="width:0%"></span></div>
-            <div class="sub" id="paceText" style="font-size:12px;color:var(--muted)"></div>
-            <div class="chart-wrap" style="margin-top:20px">
-              <div class="panel-title"><h3>Hourly Revenue</h3></div>
-              <div class="chart" id="salesChart"></div>
-            </div>
-          </div>
-
-          <div class="card panel">
-            <div class="panel-title"><h3>Priority Alerts</h3><span id="watchCount"></span></div>
-            <div id="watchList" style="display:grid;gap:8px"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 2. DAILY AGENDA-HOUR -->
-      <section class="page" id="page-sales">
-        <div class="page-head">
-          <div><h1>DAILY AGENDA-HOUR</h1><p>10 hourly tracking blocks · automatic metric pacing.</p></div>
-          <div class="actions">
-            <button class="btn green" id="saveSales">SAVE HOUR DATA</button>
-          </div>
-        </div>
-        <div class="grid kpis" id="salesKpis"></div>
-        <div class="card panel"><div class="table-wrap"><table class="table" id="salesTable"></table></div></div>
-      </section>
-
-      <!-- 3. RE BALANCE  -->
-      <section class="page" id="page-RE BALANCE ">
-        <div class="page-head">
-          <div><h1>RE BALANCE  Master</h1><p>Full BARCODE/GTINdatabase, batch codes, and shelf allocations.</p></div>
-          <div class="actions">
-            <button class="btn primary" id="addProduct">＋ Add Product</button>
-            <button class="btn" id="downloadCsv">CSV Template</button>
-          </div>
-        </div>
-        <div class="card panel">
-          <div class="actions" style="margin-bottom:12px">
-            <input id="invSearch" placeholder="Search BARCODE/GTIN/ RMS / Product..." style="flex:1;padding:8px 12px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
-            <select id="invFilter" style="padding:8px;background:rgba(6,10,20,.7);border:1px solid var(--border);border-radius:8px;color:#fff">
-              <option value="all">All items</option><option value="expired">Expired</option><option value="soon">Within 30d</option><option value="low">Low Stock</option>
-            </select>
-          </div>
-          <div class="table-wrap"><table class="table" id="invTable"></table></div>
-        </div>
-      </section>
-
-      <!-- 4. BARCODE/GTIN SCANNER -->
-      <section class="page" id="page-scanner">
-        <div class="page-head">
-          <div><h1>PRODUCT  Camera Scanner</h1><p>Parse AI (01) GTIN, (17) Expiry, and (10) Batch.</p></div>
-          <button class="btn primary" id="btnRestartCamera">Restart Camera</button>
-        </div>
-        <div class="scan-box">
-          <div class="card panel">
-            <div class="scanner" id="scannerContainer"><div id="reader" style="width:100%"></div></div>
-          </div>
-          <div class="card panel">
-            <div class="panel-title"><h3>Manual PRODUCT  Input</h3><span id="parseState" class="badge">waiting</span></div>
-            <div class="field"><textarea id="PRODUCT Input" placeholder="Example: (01)06212345678903(17)270131(10)B24018" style="height:100px"></textarea></div>
-            <div class="actions" style="margin-top:10px">
-              <button class="btn primary" id="parsePRODUCT ">Parse String</button>
-              <button class="btn" id="clearPRODUCT ">Clear</button>
-            </div>
-            <div id="parseResult" style="margin-top:14px"></div>
-          </div>
-        </div>
-        <div class="card panel" style="margin-top:14px">
-          <div class="panel-title"><h3>Recent Camera & String Scans</h3><span id="scanCount"></span></div>
-          <div class="table-wrap"><table class="table" id="scanTable"></table></div>
-        </div>
-      </section>
-
-      <!-- 5. EXPIRY TRACKER -->
-      <section class="page" id="page-expiry">
-        <div class="page-head">
-          <div><h1>Expiry Tracker</h1><p>Automatic categorization for expired and near-expiry vitamins.</p></div>
-          <div class="actions">
-            <button class="btn danger" id="filterExpired">Expired</button>
-            <button class="btn warn" id="filterSoon">Within 30d</button>
-            <button class="btn" id="filterAllExpiry">All Stock</button>
-          </div>
-        </div>
-        <div class="grid kpis" id="expiryKpis"></div>
-        <div class="card panel"><div class="table-wrap"><table class="table" id="expiryTable"></table></div></div>
-      </section>
-
-      <!-- 6. SHELF MAP -->
-      <section class="page" id="page-shelf">
-        <div class="page-head">
-          <div><h1>Shelf Planner</h1><p>Visual planogram and shelf organization.</p></div>
-          <button class="btn" onclick="window.print()">Print Planogram</button>
-        </div>
-        <div class="card panel"><div id="shelfMap" class="shelf"></div></div>
-      </section>
-
-      <!-- 7. RESTOCK -->
-      <section class="page" id="page-restock">
-        <div class="page-head">
-          <div><h1>Smart Restock</h1><p>Calculated replenishment orders to reach maximum capacity.</p></div>
-          <button class="btn primary" id="exportRestock">Export Restock CSV</button>
-        </div>
-        <div class="grid kpis" id="restockKpis"></div>
-        <div class="card panel"><div class="table-wrap"><table class="table" id="restockTable"></table></div></div>
-      </section>
-
-      <!-- 8. REPORTS -->
-      <section class="page" id="page-reports">
-        <div class="page-head">
-          <div><h1>Reports & Audits</h1><p>Daily performance figures and branch notes.</p></div>
-          <button class="btn primary" onclick="window.print()">Print / Export PDF</button>
-        </div>
-        <div class="grid layout2">
-          <div class="card panel"><div class="panel-title"><h3>Sales Summary</h3><span id="reportDate"></span></div><div id="reportSales"></div></div>
-          <div class="card panel"><div class="panel-title"><h3>Audit Expiry Snapshot</h3></div><div id="reportExpiry"></div></div>
-        </div>
-        <div class="card panel" style="margin-top:14px">
-          <div class="panel-title"><h3>Branch Handover Notes</h3></div>
-          <div class="field"><textarea id="reportNotes" style="min-height:90px" placeholder="Write handover instructions..."></textarea></div>
-        </div>
-      </section>
-
-      <!-- 9. SETTINGS -->
-      <section class="page" id="page-settings">
-        <div class="page-head"><div><h1>Settings & Backups</h1><p>Master database controls.</p></div></div>
-        <div class="grid layout2">
-          <div class="card panel">
-            <div class="panel-title"><h3>Configuration</h3></div>
-            <div class="form-grid">
-              <div class="field span2"><label>Branch Name</label><input id="setBranch"></div>
-              <div class="field"><label>Currency</label><select id="setCurrency"><option>AED</option><option>USD</option></select></div>
-              <div class="field"><label>Monthly Target</label><input type="number" id="setTargetInput"></div>
-            </div>
-            <div class="actions" style="margin-top:14px"><button class="btn primary" id="saveSettings">Save Settings</button></div>
-          </div>
-          <div class="card panel">
-            <div class="panel-title"><h3>Maintenance</h3></div>
-            <div class="actions" style="flex-direction:column;align-items:stretch">
-              <button class="btn danger" id="resetDemo">Reset All Data to Demo Defaults</button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  </main>
-</div>
-
-<!-- Add/Edit Product Modal -->
-<div class="modal" id="productModal">
-  <div class="modal-card">
-    <div class="panel-title"><h3 id="modalTitle">Add Product</h3><button class="btn" id="closeModal">✕</button></div>
-    <form id="productForm">
-      <div class="form-grid">
-        <div class="field"><label>GTIN</label><input name="gtin" required></div>
-        <div class="field"><label>RMS</label><input name="rms"></div>
-        <div class="field span2"><label>Description</label><input name="description" required></div>
-        <div class="field"><label>Brand</label><input name="brand"></div>
-        <div class="field"><label>Supplier</label><input name="supplier"></div>
-        <div class="field"><label>Batch</label><input name="batch"></div>
-        <div class="field"><label>Expiry</label><input type="date" name="expiry"></div>
-        <div class="field"><label>Units</label><input type="number" name="units" value="10"></div>
-        <div class="field"><label>Min</label><input type="number" name="min" value="5"></div>
-        <div class="field"><label>Max</label><input type="number" name="max" value="20"></div>
-        <div class="field"><label>Facings</label><input type="number" name="facings" value="1"></div>
-        <div class="field span2">
-          <label>Shelf Rack</label>
-          <select name="shelf">
-            <option value="RACK 1">RACK 1 (Collagen)</option><option value="RACK 2">RACK 2 (Women's)</option>
-            <option value="RACK 3">RACK 3</option><option value="RACK 4">RACK 4 (Immunity)</option>
-            <option value="RACK 5">RACK 5</option><option value="RACK 6">RACK 6 (Heart)</option>
-            <option value="RACK 7">RACK 7</option><option value="RACK 8">RACK 8 (Weight)</option>
-          </select>
-        </div>
-      </div>
-      <div class="actions" style="justify-content:flex-end;margin-top:14px">
-        <button type="button" class="btn" id="cancelProduct">Cancel</button>
-        <button type="submit" class="btn primary">Save Product</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-// Splash removal
-window.onload = () => {
-  setTimeout(() => {
-    const s = document.getElementById('splash');
-    if (s) { s.style.opacity = '0'; setTimeout(() => s.remove(), 500); }
-  }, 1200);
-};
-
-const KEY = 'pharmatrack_pro_solar_v2';
-const hours = ['12am','2am','4am','6am','8am','10am','12pm','2pm','4pm','6pm'];
-const metricCols = ['sales','trn','no7','aura','units','footfall'];
-const today = new Date();
-const iso = d => new Date(d).toISOString().slice(0,10);
-const days = (a,b) => Math.round((new Date(b)-new Date(a))/86400000);
-const fmt = n => Number(n||0).toLocaleString('en-US');
-const money = n => `${state.settings.currency || 'AED'} ${fmt(n)}`;
-const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-
-const rackStructure = [
-  { group: "Collagen & Skin Brightening", racks: [{ id: 'RACK 1', icon: '🧴', status: 'Low' }] },
-  { group: "Women's / Skin, Hair & Nails", racks: [{ id: 'RACK 2', icon: '🌸', status: '' }, { id: 'RACK 3', icon: '💅', status: '' }] },
-  { group: "Immunity / Multivitamins", racks: [{ id: 'RACK 4', icon: '💊', status: 'Low' }, { id: 'RACK 5', icon: '🛡️', status: '' }] },
-  { group: "Heart Health & Omegas", racks: [{ id: 'RACK 6', icon: '🫀', status: '' }, { id: 'RACK 7', icon: '💪', status: '' }] }
-];
-
-function defaultState() {
-  const t = iso(today);
-  const products = [
-    { id: 1, gtin: '874312020605', rms: 'ZIBOZ1202', description: 'ZINCELATED 50MG 100CAP', brand: 'ZIBOZ', supplier: 'ZIBOZ', batch: 'NB10', expiry: addDays(t, 22), units: 4, min: 6, max: 24, facings: 2, shelf: 'RACK 1' },
-    { id: 2, gtin: '874312017803', rms: 'ZIBOZ1178', description: 'VITAMIN E-1000 IU SOFTGELS', brand: 'ZIBOZ', supplier: 'ZIBOZ', batch: 'NB12', expiry: addDays(t, 180), units: 14, min: 6, max: 24, facings: 2, shelf: 'RACK 1' },
-    { id: 3, gtin: '874312117800', rms: 'PUR55100', description: 'PURITANS PRIDE C-500MG 100S', brand: 'PURITAN', supplier: 'PURITAN', batch: 'WM4', expiry: addDays(t, -5), units: 8, min: 6, max: 20, facings: 2, shelf: 'RACK 4' }
-  ];
-  const sales = {
-    rows: hours.map((h, i) => ({
-      hour: h,
-      sales: [1200, 950, 1400, 800, 1600, 2100, 1950, 1700, 1300, 900][i],
-      trn: [12, 10, 15, 8, 17, 21, 20, 16, 12, 9][i],
-      no7: [40, 30, 50, 20, 60, 80, 70, 50, 40, 30][i],
-      aura: [6, 4, 8, 5, 10, 14, 11, 9, 6, 4][i],
-      units: [24, 20, 30, 16, 34, 42, 40, 32, 24, 18][i],
-      footfall: [40, 35, 50, 30, 60, 75, 70, 58, 45, 35][i]
-    }))
-  };
-  return { version: 2, settings: { branch: 'STORE DXB T3 Arrivals', currency: 'AED', target: 60000, userName: 'Vysakh' }, products, sales, scans: [], notes: '' };
+/* ── iOS GLASS · CDD / PHARMAGUARD REDESIGN ── */
+:root {
+  --bg: #06132F;
+  --surface: rgba(23, 49, 94, 0.52);
+  --border: rgba(117, 169, 255, 0.20);
+  --border-hi: rgba(153, 194, 255, 0.42);
+  --lemon: #7195FF;
+  --leaf: #36D6A0;
+  --teal: #48DDF5;
+  --amber: #FFC76A;
+  --red: #FF6485;
+  --blue: #438BFF;
+  --text: #F3F6FF;
+  --muted: #A2B7DB;
 }
 
-function addDays(base, n) { const d = new Date(base); d.setDate(d.getDate() + n); return iso(d); }
-function load() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : defaultState();
-  } catch { return defaultState(); }
-}
-let state = load();
-
-function persist() {
-  localStorage.setItem(KEY, JSON.stringify(state));
-  const el = document.getElementById('lastSave');
-  if (el) el.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-persist();
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+body {
+  background: #06132F;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-function statusFor(p) {
-  const d = days(iso(today), p.expiry);
-  if (d < 0) return 'Expired';
-  if (d <= 30) return 'Within 30d';
-  if (p.units <= p.min) return 'Low stock';
-  return 'OK';
+.root {
+  max-width: 720px;
+  min-height: 100vh;
+  padding: 26px 16px 48px;
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(61, 119, 255, .25), transparent 42%),
+    radial-gradient(ellipse at 100% 42%, rgba(119, 75, 255, .15), transparent 42%),
+    linear-gradient(155deg, #10285A 0%, #071735 44%, #030D23 100%);
 }
 
-function statusBadge(st) {
-  const c = st === 'Expired' ? 'red' : (st === 'Within 30d' || st === 'Low stock') ? 'warn' : 'ok';
-  return `<span class="badge ${c}">${st}</span>`;
+.header-logo {
+  color: #86B4FF;
+  letter-spacing: .14em;
 }
 
-function totals() {
-  const t = { sales: 0, trn: 0, no7: 0, aura: 0, units: 0, footfall: 0 };
-  state.sales.rows.forEach(r => metricCols.forEach(k => t[k] += Number(r[k] || 0)));
-  return t;
+.header-title {
+  background: linear-gradient(115deg, #FFFFFF, #A9C8FF 55%, #80E8FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Render Dashboard */
-function renderDashboard() {
-  const t = totals();
-  const tgt = state.settings.target || 60000;
-  const pct = Math.min(100, (t.sales / tgt) * 100);
-
-  document.getElementById('userName').textContent = state.settings.userName || 'Vysakh';
-  document.getElementById('branchNameDash').textContent = state.settings.branch;
-  document.getElementById('achSub').textContent = tgt;
-  document.getElementById('achVal').textContent = pct.toFixed(1) + '%';
-  document.getElementById('achBar').style.width = pct + '%';
-  document.getElementById('paceText').textContent = `${money(t.sales)} reached · ${money(Math.max(0, tgt - t.sales))} remaining`;
-
-  document.getElementById('dashKpis').innerHTML = [
-    ['Total Sales', money(t.sales), 'Live sum'],
-    ['Transactions', fmt(t.trn), 'Count'],
-    ['Units Sold', fmt(t.units), 'Volume'],
-    ['AURA Club', fmt(t.aura), `${t.trn ? ((t.aura/t.trn)*100).toFixed(0) : 0}% trn share`],
-    ['No7 Sales', money(t.no7), 'Brand sales'],
-    ['Footfall', fmt(t.footfall), 'Visitors']
-  ].map(x => `<div class="card kpi"><div class="label">${x[0]}</div><div class="val">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join('');
-
-  const mx = Math.max(...state.sales.rows.map(r => r.sales), 1);
-  document.getElementById('salesChart').innerHTML = state.sales.rows.map(r => `
-    <div class="bar" style="height:${Math.max(12, (r.sales/mx)*100)}%"><small>${r.hour}</small></div>
-  `).join('');
-
-  const alerts = state.products.filter(p => statusFor(p) !== 'OK');
-  document.getElementById('watchCount').textContent = `${alerts.length} flagged`;
-  document.getElementById('watchList').innerHTML = alerts.length ? alerts.map(p => `
-    <div style="display:flex;justify-content:space-between;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border)">
-      <div><b>${esc(p.description)}</b><div style="font-size:11px;color:var(--muted)">${p.units} units · ${p.shelf}</div></div>
-      ${statusBadge(statusFor(p))}
-    </div>
-  `).join('') : '<div style="color:var(--muted)">All stock healthy.</div>';
+.header-sub {
+  color: #AFC5EA;
+  line-height: 1.8;
 }
 
-/* Render DAILY AGENDA-HOUR */
-function renderSales() {
-  const t = totals();
-  document.getElementById('salesKpis').innerHTML = [
-    ['Sales', money(t.sales)], ['Transactions', fmt(t.trn)], ['Units', fmt(t.units)]
-  ].map(x => `<div class="card kpi"><div class="label">${x[0]}</div><div class="val">${x[1]}</div></div>`).join('');
-
-  let html = '<thead><tr><th>Hour</th><th>Sales</th><th>TRN</th><th>No7</th><th>AURA</th><th>Units</th><th>Footfall</th></tr></thead><tbody>';
-  state.sales.rows.forEach((r, i) => {
-    html += `<tr><td><b>${r.hour}</b></td>`;
-    metricCols.forEach(k => {
-      html += `<td><input type="number" step="0.01" value="${r[k]??0}" oninput="state.sales.rows[${i}]['${k}']=Number(this.value||0);renderDashboard();persist()"></td>`;
-    });
-    html += `</tr>`;
-  });
-  html += `<tr><td><b>Total</b></td>${metricCols.map(k => `<td><b>${fmt(t[k])}</b></td>`).join('')}</tr></tbody>`;
-  document.getElementById('salesTable').innerHTML = html;
+.tabs {
+  gap: 5px;
+  padding: 5px;
+  border-radius: 16px;
+  background: rgba(9, 25, 56, .72);
+  border-color: rgba(130, 177, 255, .18);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
-/* Render RE BALANCE  */
-function renderRE BALANCE () {
-  const q = (document.getElementById('invSearch')?.value || '').toLowerCase();
-  const f = document.getElementById('invFilter')?.value || 'all';
-  const filtered = state.products.filter(p => {
-    const hay = `${p.description} ${p.gtin} ${p.rms}`.toLowerCase();
-    const st = statusFor(p);
-    return (!q || hay.includes(q)) && (f === 'all' || (f === 'expired' && st === 'Expired') || (f === 'soon' && st === 'Within 30d') || (f === 'low' && st === 'Low stock'));
-  });
-
-  let html = '<thead><tr><th>Description</th><th>GTIN</th><th>RMS</th><th>Batch</th><th>Expiry</th><th>Units</th><th>Shelf</th><th>Status</th><th></th></tr></thead><tbody>';
-  filtered.forEach(p => {
-    html += `<tr>
-      <td><b>${esc(p.description)}</b></td>
-      <td>${esc(p.gtin)}</td>
-      <td>${esc(p.rms)}</td>
-      <td>${esc(p.batch)}</td>
-      <td>${p.expiry}</td>
-      <td>${p.units}</td>
-      <td>${p.shelf}</td>
-      <td>${statusBadge(statusFor(p))}</td>
-      <td><button class="btn" onclick="openProduct(${p.id})">Edit</button></td>
-    </tr>`;
-  });
-  html += '</tbody>';
-  document.getElementById('invTable').innerHTML = html;
+.tab {
+  min-height: 42px;
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .01em;
+  text-transform: none;
 }
 
-/* Render Expiry */
-function renderExpiry() {
-  const e = state.products.filter(p => statusFor(p) === 'Expired').length;
-  const s = state.products.filter(p => statusFor(p) === 'Within 30d').length;
-  document.getElementById('expiryKpis').innerHTML = `
-    <div class="card kpi"><div class="label">Expired</div><div class="val" style="color:var(--red)">${e}</div></div>
-    <div class="card kpi"><div class="label">Within 30 Days</div><div class="val" style="color:var(--amber)">${s}</div></div>
-  `;
-  let html = '<thead><tr><th>Item</th><th>Expiry</th><th>Days Left</th><th>Units</th><th>Status</th></tr></thead><tbody>';
-  state.products.forEach(p => {
-    html += `<tr><td><b>${esc(p.description)}</b></td><td>${p.expiry}</td><td>${days(iso(today), p.expiry)}</td><td>${p.units}</td><td>${statusBadge(statusFor(p))}</td></tr>`;
-  });
-  html += '</tbody>';
-  document.getElementById('expiryTable').innerHTML = html;
+.tab.active {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #526AFF, #397FFF);
+  border-color: rgba(159, 189, 255, .5);
+  box-shadow: 0 5px 20px rgba(60, 104, 255, .28);
 }
 
-/* Render Shelf Planner */
-function renderShelf() {
-  let html = '';
-  rackStructure.forEach(cat => {
-    html += `<div class="rack-category">${cat.group}</div>`;
-    cat.racks.forEach(r => {
-      const items = state.products.filter(p => p.shelf === r.id);
-      html += `<div class="shelf-row">
-        <div class="shelf-label">
-          <div class="icon">${r.icon}</div>
-          <b>${r.id}</b>
-          <div style="font-size:11px;color:var(--muted)">${items.length} Assigned</div>
-        </div>
-        <div class="shelf-cells">
-          ${items.map(p => `<div class="slot filled"><b>${esc(p.description.slice(0,18))}</b><div>${p.units}u · ${p.facings}f</div></div>`).join('')}
-          ${Array(Math.max(1, 4 - items.length)).fill('<div class="slot"><span style="color:var(--muted)">Empty Slot</span></div>').join('')}
-        </div>
-      </div>`;
-    });
-  });
-  document.getElementById('shelfMap').innerHTML = html;
+.card,
+.product-card {
+  border-radius: 20px;
+  background: linear-gradient(
+    145deg,
+    rgba(29, 59, 111, .68),
+    rgba(8, 27, 62, .80)
+  );
+  border: 1px solid rgba(120, 173, 255, .23);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
-/* Render Restock */
-function renderRestock() {
-  const list = state.products.map(p => ({ ...p, need: Math.max(0, p.max - p.units) })).filter(p => p.need > 0);
-  document.getElementById('restockKpis').innerHTML = `
-    <div class="card kpi"><div class="label">Items Needing Restock</div><div class="val">${list.length}</div></div>
-    <div class="card kpi"><div class="label">Total Units Required</div><div class="val">${list.reduce((a,b)=>a+b.need,0)}</div></div>
-  `;
-  let html = '<thead><tr><th>Product</th><th>On Hand</th><th>Max</th><th>Suggested Order</th><th>Supplier</th></tr></thead><tbody>';
-  list.forEach(p => {
-    html += `<tr><td><b>${esc(p.description)}</b></td><td>${p.units}</td><td>${p.max}</td><td><b>${p.need}</b></td><td>${esc(p.supplier)}</td></tr>`;
-  });
-  html += '</tbody>';
-  document.getElementById('restockTable').innerHTML = html;
+.card {
+  padding: 19px;
 }
 
-/* Render Scanner List */
-function renderScans() {
-  document.getElementById('scanCount').textContent = `${state.scans.length} scans`;
-  let html = '<thead><tr><th>Time</th><th>Result</th><th>GTIN</th><th>Batch</th><th>Expiry</th></tr></thead><tbody>';
-  state.scans.slice().reverse().forEach(s => {
-    html += `<tr><td>${new Date(s.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td><td>${s.match ? '🟢 Matched' : '⚪ Unmatched'}</td><td>${esc(s.gtin||s.raw)}</td><td>${esc(s.batch||'--')}</td><td>${esc(s.expiry||'--')}</td></tr>`;
-  });
-  html += '</tbody>';
-  document.getElementById('scanTable').innerHTML = html;
+.card-title {
+  color: #A9C7F6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  letter-spacing: .11em;
 }
 
-/* PRODUCT  Parser */
-function parsePRODUCT (raw) {
-  let s = raw.replace(/\u001d/g,'|').trim();
-  const out = { raw, gtin: '', expiry: '', batch: '' };
-  const m01 = s.match(/(?:\(01\)|01)(\d{14})/); if (m01) out.BARCODE/GTIN= m01[1];
-  const m17 = s.match(/(?:\(17\)|17)(\d{6})/);
-  if (m17) {
-    const v = m17[1];
-    out.expiry = `20${v.slice(0,2)}-${v.slice(2,4)}-${v.slice(4,6)}`;
+.card-title::after,
+.divider {
+  background: rgba(137, 180, 255, .18);
+}
+
+textarea,
+input[type=text] {
+  background: rgba(3, 15, 39, .66);
+  border: 1px solid rgba(121, 173, 255, .26);
+  border-radius: 15px;
+  padding: 14px;
+  color: #F3F6FF;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+textarea:focus,
+input[type=text]:focus {
+  border-color: #659AFF;
+  box-shadow: 0 0 0 4px rgba(76, 132, 255, .13);
+}
+
+.input-label {
+  color: #AFC5EA;
+  letter-spacing: .07em;
+}
+
+.btn-parse {
+  min-height: 50px;
+  border-radius: 15px;
+  color: white;
+  background: linear-gradient(115deg, #5669FF, #347FFF 65%, #45BDF5);
+  box-shadow: 0 8px 22px rgba(55, 107, 255, .26);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .03em;
+}
+
+.btn-sample {
+  color: #C3D6F7;
+  background: rgba(42, 73, 129, .40);
+  border: 1px solid rgba(132, 176, 255, .22);
+  border-radius: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+.btn-sample:hover {
+  background: rgba(72, 112, 190, .28);
+  border-color: #729EFF;
+}
+
+.ai-chip,
+.field,
+.step-row {
+  background: rgba(3, 15, 39, .38);
+  border: 1px solid rgba(132, 176, 255, .17);
+  border-radius: 12px;
+}
+
+.ai-chip-key,
+.field.highlight .field-val {
+  color: #91B9FF;
+}
+
+.ai-chip-val,
+.field-val {
+  color: #F0F5FF;
+}
+
+.step-row {
+  padding: 10px 12px;
+  border-radius: 11px;
+}
+
+.step-row.hit {
+  background: rgba(54, 214, 160, .09);
+  border-color: rgba(54, 214, 160, .30);
+}
+
+.step-num {
+  width: 25px;
+  height: 25px;
+}
+
+.step-num.pass {
+  background: rgba(54, 214, 160, .16);
+  color: #55E6B5;
+}
+
+.step-num.fail {
+  background: rgba(255, 100, 133, .12);
+  color: #FF7996;
+}
+
+.step-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+}
+
+.step-label.pass {
+  color: #55E6B5;
+}
+
+.step-label.fail {
+  color: #A2B7DB;
+}
+
+.product-card.ok {
+  background: linear-gradient(140deg, rgba(29, 105, 100, .30), rgba(8, 35, 66, .82));
+  border-color: rgba(54, 214, 160, .43);
+}
+
+.product-card.warning {
+  background: linear-gradient(140deg, rgba(123, 83, 28, .28), rgba(29, 36, 65, .82));
+  border-color: rgba(255, 199, 106, .48);
+}
+
+.product-card.expired {
+  background: linear-gradient(140deg, rgba(127, 39, 69, .35), rgba(32, 23, 59, .84));
+  border-color: rgba(255, 100, 133, .55);
+}
+
+.product-card.unmatched {
+  background: rgba(25, 41, 72, .55);
+  border-color: rgba(255, 199, 106, .42);
+}
+
+.product-name {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 18px;
+  letter-spacing: -.02em;
+}
+
+.product-brand {
+  color: #AFC5EA;
+}
+
+.expiry-badge {
+  border-radius: 12px;
+}
+
+.expiry-badge.ok {
+  color: #55E6B5;
+  background: rgba(54, 214, 160, .14);
+}
+
+.expiry-badge.warning {
+  color: #FFD18A;
+  background: rgba(255, 199, 106, .14);
+}
+
+.expiry-badge.expired {
+  color: #FF8BA3;
+  background: rgba(255, 100, 133, .15);
+}
+
+.expiry-badge.none {
+  color: #B0C2E0;
+  background: rgba(143, 169, 211, .10);
+}
+
+.format-badge {
+  color: #8CEBFA;
+  background: rgba(72, 221, 245, .09);
+  border-color: rgba(72, 221, 245, .23);
+  border-radius: 12px;
+}
+
+.error-box {
+  color: #FF8BA3;
+  background: rgba(255, 100, 133, .09);
+  border-color: rgba(255, 100, 133, .26);
+  border-radius: 13px;
+}
+
+.rms-pill {
+  color: #A9C5FF;
+  background: rgba(89, 128, 255, .13);
+  border-color: rgba(89, 128, 255, .25);
+}
+
+.rtv-pill.yes {
+  color: #55E6B5;
+  background: rgba(54, 214, 160, .12);
+}
+
+.rtv-pill.no {
+  color: #FF8BA3;
+  background: rgba(255, 100, 133, .12);
+}
+
+.db-table th {
+  color: #AFC5EA;
+}
+
+.db-table td {
+  border-bottom-color: rgba(137, 180, 255, .10);
+}
+
+.db-table tr:hover td {
+  background: rgba(106, 154, 255, .07);
+}
+
+.score-bar {
+  background: linear-gradient(90deg, #FF6485, #FFC76A);
+}
+
+@media (max-width: 480px) {
+  .root {
+    padding: 20px 12px 32px;
   }
-  const m10 = s.match(/(?:\(10\)|10)([A-Za-z0-9._\/-]+)/); if (m10) out.batch = m10[1];
-  return out;
-}
 
-/* Navigation System */
-function switchPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
-  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('active', b.dataset.page === name));
-  document.getElementById('crumb').textContent = name.charAt(0).toUpperCase() + name.slice(1);
-  window.scrollTo(0, 0);
-  if (name === 'scanner') initCamera();
-}
-
-document.getElementById('nav').addEventListener('click', e => {
-  const b = e.target.closest('button[data-page]');
-  if (b) switchPage(b.dataset.page);
-});
-document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => switchPage(b.dataset.goto));
-
-/* Editable Inline Listeners */
-document.getElementById('userName').onblur = e => { state.settings.userName = e.target.textContent.trim(); persist(); toast('User name updated'); };
-document.getElementById('branchNameDash').onblur = e => { state.settings.branch = e.target.textContent.trim(); persist(); toast('Branch updated'); };
-document.getElementById('achSub').onblur = e => {
-  const v = Number(e.target.textContent.replace(/[^0-9.]/g, ''));
-  if (v > 0) { state.settings.target = v; renderDashboard(); persist(); toast('Monthly target updated'); }
-};
-
-/* Product Modal Handling */
-let editId = null;
-function openProduct(id = null) {
-  editId = id;
-  const p = id ? state.products.find(x => x.id === id) : null;
-  document.getElementById('modalTitle').textContent = p ? 'Edit Product' : 'Add Product';
-  const f = document.getElementById('productForm');
-  ['gtin','rms','description','brand','supplier','batch','expiry','units','min','max','facings','shelf'].forEach(k => {
-    f.elements[k].value = p ? (p[k] ?? '') : (k === 'units' ? 10 : k === 'min' ? 5 : k === 'max' ? 20 : k === 'shelf' ? 'RACK 1' : '');
-  });
-  document.getElementById('productModal').classList.add('open');
-}
-window.openProduct = openProduct;
-document.getElementById('quickAdd').onclick = () => openProduct();
-document.getElementById('addProduct').onclick = () => openProduct();
-document.getElementById('closeModal').onclick = () => document.getElementById('productModal').classList.remove('open');
-document.getElementById('cancelProduct').onclick = () => document.getElementById('productModal').classList.remove('open');
-
-document.getElementById('productForm').onsubmit = e => {
-  e.preventDefault();
-  const f = new FormData(e.target);
-  const data = {
-    gtin: f.get('gtin'), rms: f.get('rms'), description: f.get('description'),
-    brand: f.get('brand'), supplier: f.get('supplier'), batch: f.get('batch'),
-    expiry: f.get('expiry') || iso(today), units: Number(f.get('units')),
-    min: Number(f.get('min')), max: Number(f.get('max')),
-    facings: Number(f.get('facings')), shelf: f.get('shelf')
-  };
-  if (editId) {
-    Object.assign(state.products.find(p => p.id === editId), data);
-  } else {
-    data.id = Date.now();
-    state.products.push(data);
+  .header-title {
+    font-size: 24px;
   }
-  persist(); renderAll();
-  document.getElementById('productModal').classList.remove('open');
-  toast('Product saved successfully');
-};
 
-/* Parse Button */
-document.getElementById('parseGs1').onclick = () => {
-  const val = document.getElementById('gs1Input').value;
-  const res = parseGS1(val);
-  const match = state.products.find(p => p.BARCODE/GTIN=== res.gtin);
-  state.scans.push({ ...res, at: new Date().toISOString(), match: !!match });
-  persist(); renderScans();
-  toast(match ? `Matched: ${match.description}` : 'GS1 parsed (not in database)');
-};
-document.getElementById('clearGs1').onclick = () => { document.getElementById('gs1Input').value = ''; };
-
-/* Camera */
-let scanner = null;
-function initCamera() {
-  if (scanner) return;
-  try {
-    scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 120 } }, false);
-    scanner.render(txt => {
-      const p = parseGS1(txt);
-      const match = state.products.find(x => x.BARCODE/GTIN=== p.gtin);
-      state.scans.push({ ...p, at: new Date().toISOString(), match: !!match });
-      persist(); renderScans();
-      toast('Camera scan recorded');
-    });
-  } catch(e) {}
-}
-document.getElementById('btnRestartCamera').onclick = () => { if (scanner) { scanner.clear(); scanner = null; } initCamera(); };
-
-/* Reports & Settings */
-document.getElementById('saveSales').onclick = () => { persist(); toast('Sales record saved'); };
-document.getElementById('saveSettings').onclick = () => {
-  state.settings.branch = document.getElementById('setBranch').value || state.settings.branch;
-  state.settings.currency = document.getElementById('setCurrency').value;
-  state.settings.target = Number(document.getElementById('setTargetInput').value || 60000);
-  persist(); renderAll(); toast('Settings saved');
-};
-document.getElementById('resetDemo').onclick = () => {
-  if (confirm('Reset database to demo configuration?')) {
-    state = defaultState(); persist(); renderAll(); toast('Defaults restored');
+  .card {
+    padding: 15px;
+    border-radius: 17px;
   }
-};
-document.getElementById('exportJson').onclick = () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `pharmatrack_backup_${iso(today)}.json`;
-  a.click();
-};
 
-function renderAll() {
-  renderDashboard();
-  renderSales();
-  renderRE BALANCE ();
-  renderExpiry();
-  renderShelf();
-  renderRestock();
-  renderScans();
-  document.getElementById('setBranch').value = state.settings.branch;
-  document.getElementById('setCurrency').value = state.settings.currency;
-  document.getElementById('setTargetInput').value = state.settings.target;
+  .tabs {
+    gap: 3px;
+  }
+
+  .tab {
+    padding: 9px 5px;
+    font-size: 10px;
+  }
+
+  .ai-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fields-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .product-card {
+    padding: 15px;
+  }
+
+  .db-wrap {
+    margin-right: -4px;
+  }
 }
-
-renderAll();
-</script>
-</body>
-</html>
